@@ -9,7 +9,7 @@ public interface TalonFXIO {
 
     }
 
-    public default void updateInputs(){};
+    public default void updateInputs(TalonFXIOInputs inputs){};
 
     public default void set(double value){};
 
