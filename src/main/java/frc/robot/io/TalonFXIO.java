@@ -1,12 +1,12 @@
 package frc.robot.io;
 
-import org.littletonrobotics.junction.AutoLog;
-
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
+
+import org.littletonrobotics.junction.AutoLog;
 
 public class TalonFXIO {
     @AutoLog
-    public static class TalonFXIOInputs{
+    public static class TalonFXIOInputs {
         public boolean connected;
         public double position; // radians of mechanism
         public double velocity; // radians of mechanism per sec
@@ -19,17 +19,17 @@ public class TalonFXIO {
         public String controlMode; // Control type for debugging
     }
 
-    private TalonFXIOInputsAutoLogged inputs=new TalonFXIOInputsAutoLogged();
+    private TalonFXIOInputsAutoLogged inputs = new TalonFXIOInputsAutoLogged();
 
-    public void updateInputs(){}
+    public void updateInputs() {}
 
-    public void applyConfig(TalonFXConfiguration config){}
+    public void applyConfig(TalonFXConfiguration config) {}
 
-    public void setSpeed(double value){}
+    public void setSpeed(double value) {}
 
-    public void setGoal(double pos){}
+    public void setGoal(double pos) {}
 
-    public TalonFXIOInputsAutoLogged getInputs(){
+    public TalonFXIOInputsAutoLogged getInputs() {
         return inputs;
     }
 }

@@ -24,10 +24,9 @@ public class RobotUtils {
 
     public static Pose2d invert(Pose2d pose) {
         return new Pose2d(
-            Field.fieldLength - pose.getX(),
-            Field.fieldWidth - pose.getY(),
-            pose.getRotation().rotateBy(Rotation2d.k180deg)
-        );
+                Field.fieldLength - pose.getX(),
+                Field.fieldWidth - pose.getY(),
+                pose.getRotation().rotateBy(Rotation2d.k180deg));
     }
 
     public static Pose2d invertToAlliance(Pose2d pose) {
@@ -40,11 +39,10 @@ public class RobotUtils {
 
     public static Pose3d invert(Pose3d pose) {
         return new Pose3d(
-            Field.fieldLength - pose.getX(),
-            Field.fieldWidth - pose.getY(),
-            pose.getZ(),
-            pose.getRotation().rotateBy(new Rotation3d(Rotation2d.k180deg))
-        );
+                Field.fieldLength - pose.getX(),
+                Field.fieldWidth - pose.getY(),
+                pose.getZ(),
+                pose.getRotation().rotateBy(new Rotation3d(Rotation2d.k180deg)));
     }
 
     public static Pose3d invertToAlliance(Pose3d pose) {
@@ -55,11 +53,8 @@ public class RobotUtils {
         }
     }
 
-    public static Translation2d invert(Translation2d trans){
-        return new Translation2d(
-            Field.fieldLength - trans.getX(),
-            Field.fieldWidth - trans.getY()
-        );
+    public static Translation2d invert(Translation2d trans) {
+        return new Translation2d(Field.fieldLength - trans.getX(), Field.fieldWidth - trans.getY());
     }
 
     public static Translation2d invertToAlliance(Translation2d trans) {
@@ -70,12 +65,8 @@ public class RobotUtils {
         }
     }
 
-    public static Translation3d invert(Translation3d trans){
-        return new Translation3d(
-            Field.fieldLength - trans.getX(),
-            Field.fieldWidth - trans.getY(),
-            trans.getZ()
-        );
+    public static Translation3d invert(Translation3d trans) {
+        return new Translation3d(Field.fieldLength - trans.getX(), Field.fieldWidth - trans.getY(), trans.getZ());
     }
 
     public static Translation3d invertToAlliance(Translation3d trans) {
@@ -86,11 +77,11 @@ public class RobotUtils {
         }
     }
 
-    public static double clamp(double in,double min,double max){
-        if(in<min){
+    public static double clamp(double in, double min, double max) {
+        if (in < min) {
             return min;
         }
-        if(in>max){
+        if (in > max) {
             return max;
         }
         return in;
