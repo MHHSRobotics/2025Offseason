@@ -12,13 +12,7 @@ public class CANcoderIO {
         public double velocity; // radians per sec
     }
 
-    private CANcoderIOInputsAutoLogged inputs = new CANcoderIOInputsAutoLogged();
-
-    public void updateInputs() {}
+    public void updateInputs(CANcoderIOInputs inputs) {}
 
     public void applyConfig(CANcoderConfiguration config) {}
-
-    public CANcoderIOInputsAutoLogged getInputs() {
-        return inputs;
-    }
 }

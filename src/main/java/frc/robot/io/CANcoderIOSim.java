@@ -25,7 +25,7 @@ public class CANcoderIOSim extends CANcoderIOBase {
     public void updateSimulation() {
         double mechPosition = mechSim.getOutput(0);
         double mechVelocity = mechSim.getOutput(1);
-
+        System.out.println(radiansPerMechOutput);
         encoderSim.setRawPosition(Units.radiansToRotations(mechPosition * radiansPerMechOutput));
         encoderSim.setVelocity(Units.radiansToRotations(mechVelocity * radiansPerMechOutput));
     }

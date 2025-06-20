@@ -42,14 +42,14 @@ public class RobotContainer {
                         DCMotor.getKrakenX60(1),
                         gearRatio,
                         Arm.moi,
-                        0,
+                        Math.sqrt(3 * Arm.moi / Arm.mass),
                         Arm.minAngle,
                         Arm.maxAngle,
                         true,
                         Units.degreesToRadians(90));
                 arm = new Arm(
                         new TalonFXIOSim(Arm.motorId, mechSim, gearRatio),
-                        new CANcoderIOSim(Arm.encoderId, mechSim, gearRatio));
+                        new CANcoderIOSim(Arm.encoderId, mechSim, Arm.sensorToMechanismRatio));
                 break;
             default:
                 arm = new Arm(new TalonFXIO(), new CANcoderIO());
@@ -58,8 +58,8 @@ public class RobotContainer {
     }
 
     private void configureBindings() {
-        controller.L1().whileTrue(new RepeatCommand(armCommands.changeGoal(() -> 0.02)));
-        controller.R1().whileTrue(new RepeatCommand(armCommands.changeGoal(() -> -0.02)));
+        controller.cross().whileTrue(new RepeatCommand(armCommands.changeGoal(() -> 0.02)));
+        controller.circle().whileTrue(new RepeatCommand(armCommands.changeGoal(() -> -0.02)));
     }
 
     public Command getAutonomousCommand() {

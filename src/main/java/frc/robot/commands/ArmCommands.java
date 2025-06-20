@@ -14,6 +14,10 @@ public class ArmCommands {
         this.arm = arm;
     }
 
+    public Command setSpeed(DoubleSupplier speed) {
+        return new InstantCommand(() -> arm.setSpeed(speed.getAsDouble()));
+    }
+
     public Command setGoal(DoubleSupplier goal) {
         return new InstantCommand(() -> arm.setGoal(goal.getAsDouble()), arm);
     }

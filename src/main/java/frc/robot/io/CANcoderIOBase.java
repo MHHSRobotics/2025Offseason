@@ -32,8 +32,7 @@ public class CANcoderIOBase extends CANcoderIO {
     }
 
     @Override
-    public void updateInputs() {
-        CANcoderIOInputs inputs = getInputs();
+    public void updateInputs(CANcoderIOInputs inputs) {
         updateSimulation();
         StatusCode sc = BaseStatusSignal.refreshAll(position, velocity);
         inputs.connected = connectedDebounce.calculate(sc.isOK());

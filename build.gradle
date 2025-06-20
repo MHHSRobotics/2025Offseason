@@ -126,8 +126,8 @@ gversion {
     classPackage = "frc.robot"
     className    = "BuildConstants"
     dateFormat   = "yyyy-MM-dd HH:mm:ss z"
-    timeZone     = "America/New_York"
-    indent       = "  "
+    timeZone     = "America/Los_Angeles"
+    indent       = "    "
 }
 
 // Create commit with working changes on event branches

@@ -19,17 +19,11 @@ public class TalonFXIO {
         public String controlMode; // Control type for debugging
     }
 
-    private TalonFXIOInputsAutoLogged inputs = new TalonFXIOInputsAutoLogged();
-
-    public void updateInputs() {}
+    public void updateInputs(TalonFXIOInputs inputs) {}
 
     public void applyConfig(TalonFXConfiguration config) {}
 
     public void setSpeed(double value) {}
 
     public void setGoal(double pos) {}
-
-    public TalonFXIOInputsAutoLogged getInputs() {
-        return inputs;
-    }
 }

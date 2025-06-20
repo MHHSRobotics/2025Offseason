@@ -13,7 +13,7 @@ import com.ctre.phoenix6.StatusCode;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.DutyCycleOut;
-import com.ctre.phoenix6.controls.PositionTorqueCurrentFOC;
+import com.ctre.phoenix6.controls.MotionMagicTorqueCurrentFOC;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.ControlModeValue;
 
@@ -34,7 +34,7 @@ public class TalonFXIOBase extends TalonFXIO {
     private StatusSignal<ControlModeValue> controlMode;
 
     private DutyCycleOut dutyCycleRequest = new DutyCycleOut(0);
-    private PositionTorqueCurrentFOC positionRequest = new PositionTorqueCurrentFOC(0);
+    private MotionMagicTorqueCurrentFOC positionRequest = new MotionMagicTorqueCurrentFOC(0);
 
     public TalonFXIOBase(int motorId, String canBus) {
         motor = new TalonFX(motorId, canBus);
@@ -55,8 +55,7 @@ public class TalonFXIOBase extends TalonFXIO {
     }
 
     @Override
-    public void updateInputs() {
-        TalonFXIOInputs inputs = getInputs();
+    public void updateInputs(TalonFXIOInputs inputs) {
         updateSimulation();
         StatusCode sc = BaseStatusSignal.refreshAll(
                 position,
@@ -81,7 +80,6 @@ public class TalonFXIOBase extends TalonFXIO {
     }
 
     public void updateSimulation() {}
-    ;
 
     @Override
     public void applyConfig(TalonFXConfiguration config) {
