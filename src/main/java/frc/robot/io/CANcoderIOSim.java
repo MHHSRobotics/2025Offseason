@@ -14,19 +14,27 @@ public class CANcoderIOSim extends CANcoderIOBase {
 
     private double radiansPerMechOutput;
 
-    public CANcoderIOSim(int encoderId, LinearSystemSim<N2, N1, N2> mechSim, double radiansPerMechOutput) {
+    private double offset;
+
+    public CANcoderIOSim(
+            int encoderId, LinearSystemSim<N2, N1, N2> mechSim, double radiansPerMechOutput, double offset) {
         super(encoderId);
         this.mechSim = mechSim;
         this.radiansPerMechOutput = radiansPerMechOutput;
+        this.offset = offset;
         encoderSim = getCANcoder().getSimState();
+    }
+
+    public CANcoderIOSim(int encoderId, LinearSystemSim<N2, N1, N2> mechSim, double radiansPerMechOutput) {
+        this(encoderId, mechSim, radiansPerMechOutput, 0);
     }
 
     @Override
     public void updateSimulation() {
         double mechPosition = mechSim.getOutput(0);
         double mechVelocity = mechSim.getOutput(1);
-        System.out.println(radiansPerMechOutput);
-        encoderSim.setRawPosition(Units.radiansToRotations(mechPosition * radiansPerMechOutput));
+
+        encoderSim.setRawPosition(Units.radiansToRotations((mechPosition - offset) * radiansPerMechOutput));
         encoderSim.setVelocity(Units.radiansToRotations(mechVelocity * radiansPerMechOutput));
     }
 }

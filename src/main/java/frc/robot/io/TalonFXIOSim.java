@@ -12,14 +12,21 @@ public class TalonFXIOSim extends TalonFXIOBase {
     private LinearSystemSim<N2, N1, N2> mechSim;
     private TalonFXSimState motorSim;
     private double radiansPerMechOutput;
+    private double offset;
 
-    public TalonFXIOSim(int motorId, LinearSystemSim<N2, N1, N2> mechSim, double radiansPerMechOutput) {
+    public TalonFXIOSim(int motorId, LinearSystemSim<N2, N1, N2> mechSim, double radiansPerMechOutput, double offset) {
         super(motorId);
         this.mechSim = mechSim;
         // this should be gearRatio for arms and flywheels, gearRatio/drumRadius for elevators
         this.radiansPerMechOutput = radiansPerMechOutput;
 
+        this.offset = offset;
+
         motorSim = getMotor().getSimState();
+    }
+
+    public TalonFXIOSim(int motorId, LinearSystemSim<N2, N1, N2> mechSim, double radiansPerMechOutput) {
+        this(motorId, mechSim, radiansPerMechOutput, 0);
     }
 
     @Override
@@ -32,7 +39,7 @@ public class TalonFXIOSim extends TalonFXIOBase {
 
         double mechPosition = mechSim.getOutput(0);
         double mechVelocity = mechSim.getOutput(1);
-        motorSim.setRawRotorPosition(Units.radiansToRotations(mechPosition * radiansPerMechOutput));
+        motorSim.setRawRotorPosition(Units.radiansToRotations((mechPosition - offset) * radiansPerMechOutput));
         motorSim.setRotorVelocity(Units.radiansToRotations(mechVelocity * radiansPerMechOutput));
     }
 }

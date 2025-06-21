@@ -13,7 +13,7 @@ import com.ctre.phoenix6.StatusCode;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.DutyCycleOut;
-import com.ctre.phoenix6.controls.MotionMagicTorqueCurrentFOC;
+import com.ctre.phoenix6.controls.PositionTorqueCurrentFOC;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.ControlModeValue;
 
@@ -31,10 +31,11 @@ public class TalonFXIOBase extends TalonFXIO {
     private StatusSignal<Current> statorCurrent;
     private StatusSignal<Temperature> temp;
     private StatusSignal<Double> closedLoopReference;
+    private StatusSignal<Double> closedLoopError;
     private StatusSignal<ControlModeValue> controlMode;
 
     private DutyCycleOut dutyCycleRequest = new DutyCycleOut(0);
-    private MotionMagicTorqueCurrentFOC positionRequest = new MotionMagicTorqueCurrentFOC(0);
+    private PositionTorqueCurrentFOC positionRequest = new PositionTorqueCurrentFOC(0);
 
     public TalonFXIOBase(int motorId, String canBus) {
         motor = new TalonFX(motorId, canBus);
@@ -48,6 +49,7 @@ public class TalonFXIOBase extends TalonFXIO {
         temp = motor.getDeviceTemp();
         closedLoopReference = motor.getClosedLoopReference();
         controlMode = motor.getControlMode();
+        closedLoopError = motor.getClosedLoopError();
     }
 
     public TalonFXIOBase(int motorId) {
@@ -66,7 +68,8 @@ public class TalonFXIOBase extends TalonFXIO {
                 statorCurrent,
                 temp,
                 closedLoopReference,
-                controlMode);
+                controlMode,
+                closedLoopError);
         inputs.connected = connectedDebounce.calculate(sc.isOK());
         inputs.position = Units.rotationsToRadians(position.getValueAsDouble());
         inputs.velocity = Units.rotationsToRadians(velocity.getValueAsDouble());
@@ -75,8 +78,9 @@ public class TalonFXIOBase extends TalonFXIO {
         inputs.supplyCurrent = supplyCurrent.getValueAsDouble();
         inputs.statorCurrent = statorCurrent.getValueAsDouble();
         inputs.temp = temp.getValueAsDouble();
-        inputs.setpoint = closedLoopReference.getValueAsDouble();
+        inputs.setpoint = Units.rotationsToRadians(closedLoopReference.getValueAsDouble());
         inputs.controlMode = controlMode.getValue().toString();
+        inputs.error = Units.rotationsToRadians(closedLoopError.getValueAsDouble());
     }
 
     public void updateSimulation() {}

@@ -3,7 +3,6 @@ package frc.robot;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N2;
 import edu.wpi.first.math.system.plant.DCMotor;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.simulation.LinearSystemSim;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -21,6 +20,7 @@ import frc.robot.io.TalonFXIOSim;
 import frc.robot.subsystems.Arm;
 
 public class RobotContainer {
+
     private Arm arm;
     private final ArmCommands armCommands;
     private final CommandPS5Controller controller = new CommandPS5Controller(0);
@@ -34,22 +34,27 @@ public class RobotContainer {
     private void initSubsystems() {
         switch (Constants.currentMode) {
             case REAL:
-                arm = new Arm(new TalonFXIOBase(Arm.motorId, "rio"), new CANcoderIOBase(Arm.encoderId, "rio"));
+                arm = new Arm(
+                        new TalonFXIOBase(Arm.Constants.motorId, "rio"),
+                        new CANcoderIOBase(Arm.Constants.encoderId, "rio"));
                 break;
             case SIM:
-                double gearRatio = Arm.rotorToSensorRatio * Arm.sensorToMechanismRatio;
-                LinearSystemSim<N2, N1, N2> mechSim = new SingleJointedArmSim(
+                LinearSystemSim<N2, N1, N2> armMech = new SingleJointedArmSim(
                         DCMotor.getKrakenX60(1),
-                        gearRatio,
-                        Arm.moi,
-                        Math.sqrt(3 * Arm.moi / Arm.mass),
-                        Arm.minAngle,
-                        Arm.maxAngle,
+                        Arm.Constants.gearRatio,
+                        Arm.Constants.moi,
+                        Arm.Constants.armLength,
+                        Arm.Constants.minAngle,
+                        Arm.Constants.maxAngle,
                         true,
-                        Units.degreesToRadians(90));
+                        Arm.Constants.startAngle);
                 arm = new Arm(
-                        new TalonFXIOSim(Arm.motorId, mechSim, gearRatio),
-                        new CANcoderIOSim(Arm.encoderId, mechSim, Arm.sensorToMechanismRatio));
+                        new TalonFXIOSim(Arm.Constants.motorId, armMech, Arm.Constants.gearRatio),
+                        new CANcoderIOSim(
+                                Arm.Constants.encoderId,
+                                armMech,
+                                Arm.Constants.sensorToMechanismRatio,
+                                Arm.Constants.encoderOffset));
                 break;
             default:
                 arm = new Arm(new TalonFXIO(), new CANcoderIO());
@@ -60,6 +65,7 @@ public class RobotContainer {
     private void configureBindings() {
         controller.cross().whileTrue(new RepeatCommand(armCommands.changeGoal(() -> 0.02)));
         controller.circle().whileTrue(new RepeatCommand(armCommands.changeGoal(() -> -0.02)));
+        // controller.cross().onTrue(armCommands.setSpeed(() -> 1)).onFalse(armCommands.setSpeed(() -> -1));
     }
 
     public Command getAutonomousCommand() {

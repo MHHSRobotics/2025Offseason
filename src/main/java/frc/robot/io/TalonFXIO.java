@@ -17,6 +17,7 @@ public class TalonFXIO {
         public double temp;
         public double setpoint; // Command being sent
         public String controlMode; // Control type for debugging
+        public double error;
     }
 
     public void updateInputs(TalonFXIOInputs inputs) {}
