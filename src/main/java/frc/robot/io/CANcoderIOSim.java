@@ -18,7 +18,7 @@ public class CANcoderIOSim extends CANcoderIOBase {
 
     public CANcoderIOSim(
             int encoderId, LinearSystemSim<N2, N1, N2> mechSim, double radiansPerMechOutput, double offset) {
-        super(encoderId);
+        super(encoderId, radiansPerMechOutput, offset);
         this.mechSim = mechSim;
         this.radiansPerMechOutput = radiansPerMechOutput;
         this.offset = offset;

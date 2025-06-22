@@ -3,53 +3,92 @@ package frc.robot.io;
 import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.AngularAcceleration;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Temperature;
 import edu.wpi.first.units.measure.Voltage;
 
 import com.ctre.phoenix6.BaseStatusSignal;
-import com.ctre.phoenix6.StatusCode;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.DutyCycleOut;
-import com.ctre.phoenix6.controls.PositionTorqueCurrentFOC;
+import com.ctre.phoenix6.controls.MotionMagicTorqueCurrentFOC;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.ControlModeValue;
 
 import frc.robot.Constants;
 
 public class TalonFXIOBase extends TalonFXIO {
-    private TalonFX motor;
     private Debouncer connectedDebounce = new Debouncer(Constants.debounceTime);
+
+    private TalonFX motor;
 
     private StatusSignal<Angle> position;
     private StatusSignal<AngularVelocity> velocity;
+    private StatusSignal<AngularAcceleration> accel;
+
     private StatusSignal<Voltage> appliedVoltage;
     private StatusSignal<Voltage> supplyVoltage;
     private StatusSignal<Current> supplyCurrent;
-    private StatusSignal<Current> statorCurrent;
-    private StatusSignal<Temperature> temp;
-    private StatusSignal<Double> closedLoopReference;
-    private StatusSignal<Double> closedLoopError;
+    private StatusSignal<Current> torqueCurrent;
+
     private StatusSignal<ControlModeValue> controlMode;
 
-    private DutyCycleOut dutyCycleRequest = new DutyCycleOut(0);
-    private PositionTorqueCurrentFOC positionRequest = new PositionTorqueCurrentFOC(0);
+    private StatusSignal<Double> closedLoopReference;
+    private StatusSignal<Double> closedLoopError;
+    private StatusSignal<Double> feedforward;
+    private StatusSignal<Double> derivOutput;
+    private StatusSignal<Double> intOutput;
+    private StatusSignal<Double> propOutput;
+
+    private StatusSignal<Temperature> temp;
+
+    private StatusSignal<Double> dutyCycle;
+
+    private StatusSignal<Boolean> hardwareFault;
+    private StatusSignal<Boolean> procTempFault;
+    private StatusSignal<Boolean> deviceTempFault;
+    private StatusSignal<Boolean> undervoltage;
+    private StatusSignal<Boolean> bootDuringEnable;
+    private StatusSignal<Boolean> forwardHardLimit;
+    private StatusSignal<Boolean> forwardSoftLimit;
+    private StatusSignal<Boolean> reverseHardLimit;
+    private StatusSignal<Boolean> reverseSoftLimit;
 
     public TalonFXIOBase(int motorId, String canBus) {
         motor = new TalonFX(motorId, canBus);
 
-        position = motor.getPosition();
+        position = motor.getPosition(true);
         velocity = motor.getVelocity();
+        accel = motor.getAcceleration();
+
         appliedVoltage = motor.getMotorVoltage();
         supplyVoltage = motor.getSupplyVoltage();
         supplyCurrent = motor.getSupplyCurrent();
-        statorCurrent = motor.getStatorCurrent();
-        temp = motor.getDeviceTemp();
-        closedLoopReference = motor.getClosedLoopReference();
+        torqueCurrent = motor.getTorqueCurrent();
+
         controlMode = motor.getControlMode();
+
+        closedLoopReference = motor.getClosedLoopReference();
         closedLoopError = motor.getClosedLoopError();
+        feedforward = motor.getClosedLoopFeedForward();
+        derivOutput = motor.getClosedLoopDerivativeOutput();
+        intOutput = motor.getClosedLoopIntegratedOutput();
+        propOutput = motor.getClosedLoopProportionalOutput();
+
+        temp = motor.getDeviceTemp();
+        dutyCycle = motor.getDutyCycle();
+
+        hardwareFault = motor.getFault_Hardware();
+        procTempFault = motor.getFault_ProcTemp();
+        deviceTempFault = motor.getFault_DeviceTemp();
+        undervoltage = motor.getFault_Undervoltage();
+        bootDuringEnable = motor.getFault_BootDuringEnable();
+        forwardHardLimit = motor.getFault_ForwardHardLimit();
+        forwardSoftLimit = motor.getFault_ForwardSoftLimit();
+        reverseHardLimit = motor.getFault_ReverseHardLimit();
+        reverseSoftLimit = motor.getFault_ReverseSoftLimit();
     }
 
     public TalonFXIOBase(int motorId) {
@@ -59,28 +98,66 @@ public class TalonFXIOBase extends TalonFXIO {
     @Override
     public void updateInputs(TalonFXIOInputs inputs) {
         updateSimulation();
-        StatusCode sc = BaseStatusSignal.refreshAll(
+
+        BaseStatusSignal.refreshAll(
                 position,
                 velocity,
+                accel,
                 appliedVoltage,
-                supplyVoltage,
                 supplyCurrent,
-                statorCurrent,
-                temp,
-                closedLoopReference,
+                supplyVoltage,
+                torqueCurrent,
                 controlMode,
-                closedLoopError);
-        inputs.connected = connectedDebounce.calculate(sc.isOK());
-        inputs.position = Units.rotationsToRadians(position.getValueAsDouble());
-        inputs.velocity = Units.rotationsToRadians(velocity.getValueAsDouble());
+                closedLoopReference,
+                closedLoopError,
+                feedforward,
+                derivOutput,
+                intOutput,
+                propOutput,
+                temp,
+                dutyCycle,
+                hardwareFault,
+                procTempFault,
+                deviceTempFault,
+                undervoltage,
+                bootDuringEnable,
+                forwardHardLimit,
+                forwardSoftLimit,
+                reverseHardLimit,
+                reverseSoftLimit);
+
+        inputs.connected = connectedDebounce.calculate(motor.isConnected());
+
+        inputs.positionRad = Units.rotationsToRadians(position.getValueAsDouble());
+        inputs.velocityRadPerSec = Units.rotationsToRadians(velocity.getValueAsDouble());
+        inputs.accelRadPerSecSquared = Units.rotationsToRadians(accel.getValueAsDouble());
+
         inputs.appliedVoltage = appliedVoltage.getValueAsDouble();
         inputs.supplyVoltage = supplyVoltage.getValueAsDouble();
         inputs.supplyCurrent = supplyCurrent.getValueAsDouble();
-        inputs.statorCurrent = statorCurrent.getValueAsDouble();
-        inputs.temp = temp.getValueAsDouble();
-        inputs.setpoint = Units.rotationsToRadians(closedLoopReference.getValueAsDouble());
+        inputs.torqueCurrent = torqueCurrent.getValueAsDouble();
+
         inputs.controlMode = controlMode.getValue().toString();
-        inputs.error = Units.rotationsToRadians(closedLoopError.getValueAsDouble());
+
+        inputs.setpointRad = Units.rotationsToRadians(closedLoopReference.getValueAsDouble());
+        inputs.errorRad = Units.rotationsToRadians(closedLoopError.getValueAsDouble());
+        inputs.feedforward = feedforward.getValueAsDouble();
+        inputs.derivOutput = derivOutput.getValueAsDouble();
+        inputs.intOutput = intOutput.getValueAsDouble();
+        inputs.propOutput = propOutput.getValueAsDouble();
+
+        inputs.temp = temp.getValueAsDouble();
+        inputs.dutyCycle = dutyCycle.getValueAsDouble();
+
+        inputs.hardwareFault = hardwareFault.getValue();
+        inputs.procTempFault = procTempFault.getValue();
+        inputs.deviceTempFault = deviceTempFault.getValue();
+        inputs.undervoltageFault = undervoltage.getValue();
+        inputs.bootDuringEnable = bootDuringEnable.getValue();
+        inputs.forwardHardLimit = forwardHardLimit.getValue();
+        inputs.forwardSoftLimit = forwardSoftLimit.getValue();
+        inputs.reverseHardLimit = reverseHardLimit.getValue();
+        inputs.reverseSoftLimit = reverseSoftLimit.getValue();
     }
 
     public void updateSimulation() {}
@@ -91,13 +168,13 @@ public class TalonFXIOBase extends TalonFXIO {
     }
 
     @Override
-    public void setSpeed(double value) {
-        motor.setControl(dutyCycleRequest.withOutput(value));
+    public void setControl(DutyCycleOut control) {
+        motor.setControl(control);
     }
 
     @Override
-    public void setGoal(double pos) {
-        motor.setControl(positionRequest.withPosition(pos));
+    public void setControl(MotionMagicTorqueCurrentFOC control) {
+        motor.setControl(control);
     }
 
     protected TalonFX getMotor() {

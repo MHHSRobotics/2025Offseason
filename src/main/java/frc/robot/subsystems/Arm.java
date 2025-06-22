@@ -15,8 +15,6 @@ import frc.robot.io.LoggedTalonFX;
 import frc.robot.io.TalonFXIO;
 import frc.robot.utils.RobotUtils;
 
-import static edu.wpi.first.units.Units.Radians;
-
 public class Arm extends SubsystemBase {
 
     public static class Constants {
@@ -25,11 +23,11 @@ public class Arm extends SubsystemBase {
         public static final int encoderId = 1;
         public static final double encoderOffset = -1.052;
 
-        public static final double rotorToSensorRatio = 25;
-        public static final double sensorToMechanismRatio = 28 / 9.;
+        public static final double gearRatio = 700 / 9.;
+        public static final double encoderRatio = 28 / 9.;
 
-        public static final double kP = 200;
-        public static final double kD = 0;
+        public static final double kP = 50;
+        public static final double kD = 200;
 
         public static final double kS = 0;
         public static final double kG = 0;
@@ -46,7 +44,7 @@ public class Arm extends SubsystemBase {
         public static final double maxAngle = Units.degreesToRadians(140);
         public static final double startAngle = Units.degreesToRadians(90);
 
-        public static final double gearRatio = rotorToSensorRatio * sensorToMechanismRatio;
+        public static final double rotorToSensorRatio = gearRatio / encoderRatio;
         public static final double armLength = Math.sqrt(3 * moi / mass);
     }
 
@@ -66,7 +64,7 @@ public class Arm extends SubsystemBase {
 
         motorConfig.Feedback.FeedbackRemoteSensorID = Constants.encoderId;
         motorConfig.Feedback.RotorToSensorRatio = Constants.rotorToSensorRatio;
-        motorConfig.Feedback.SensorToMechanismRatio = Constants.sensorToMechanismRatio;
+        motorConfig.Feedback.SensorToMechanismRatio = Constants.encoderRatio;
         motorConfig.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.FusedCANcoder;
 
         motorConfig.Slot0.GravityType = GravityTypeValue.Arm_Cosine;
@@ -81,8 +79,6 @@ public class Arm extends SubsystemBase {
         motorConfig.MotionMagic.MotionMagicAcceleration = Constants.maxAccel;
 
         CANcoderConfiguration encoderConfig = new CANcoderConfiguration();
-        encoderConfig.MagnetSensor.withMagnetOffset(
-                Radians.of(Constants.encoderOffset * Constants.sensorToMechanismRatio));
 
         motor.applyConfig(motorConfig);
         encoder.applyConfig(encoderConfig);

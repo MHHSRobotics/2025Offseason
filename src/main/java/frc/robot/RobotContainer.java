@@ -36,7 +36,11 @@ public class RobotContainer {
             case REAL:
                 arm = new Arm(
                         new TalonFXIOBase(Arm.Constants.motorId, "rio"),
-                        new CANcoderIOBase(Arm.Constants.encoderId, "rio"));
+                        new CANcoderIOBase(
+                                Arm.Constants.encoderId,
+                                "rio",
+                                Arm.Constants.encoderRatio,
+                                Arm.Constants.encoderOffset));
                 break;
             case SIM:
                 LinearSystemSim<N2, N1, N2> armMech = new SingleJointedArmSim(
@@ -53,7 +57,7 @@ public class RobotContainer {
                         new CANcoderIOSim(
                                 Arm.Constants.encoderId,
                                 armMech,
-                                Arm.Constants.sensorToMechanismRatio,
+                                Arm.Constants.encoderRatio,
                                 Arm.Constants.encoderOffset));
                 break;
             default:
