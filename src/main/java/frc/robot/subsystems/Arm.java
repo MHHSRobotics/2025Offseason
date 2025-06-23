@@ -80,7 +80,7 @@ public class Arm extends SubsystemBase {
 
         CANcoderConfiguration encoderConfig = new CANcoderConfiguration();
 
-        motor.applyConfig(motorConfig);
+        this.motor.applyConfig(motorConfig);
         encoder.applyConfig(encoderConfig);
     }
 

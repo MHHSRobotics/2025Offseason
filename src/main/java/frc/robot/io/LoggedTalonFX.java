@@ -1,12 +1,15 @@
 package frc.robot.io;
 
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 
+import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.DutyCycleOut;
 import com.ctre.phoenix6.controls.MotionMagicTorqueCurrentFOC;
 
 import org.littletonrobotics.junction.Logger;
+import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
 
 import static edu.wpi.first.units.Units.Radians;
 
@@ -30,9 +33,33 @@ public class LoggedTalonFX {
     private Alert reverseHardLimitAlert;
     private Alert reverseSoftLimitAlert;
 
+    private LoggedNetworkNumber kP;
+    private LoggedNetworkNumber kI;
+    private LoggedNetworkNumber kD;
+    private LoggedNetworkNumber kS;
+    private LoggedNetworkNumber kG;
+    private LoggedNetworkNumber kV;
+    private LoggedNetworkNumber kA;
+    private LoggedNetworkNumber cruiseVelocity;
+    private LoggedNetworkNumber maxAccel;
+
+    private double lastkP;
+    private double lastkI;
+    private double lastkD;
+    private double lastkG;
+    private double lastkS;
+    private double lastkV;
+    private double lastkA;
+    private double lastCruiseVelocity;
+    private double lastAccel;
+
+    private TalonFXConfiguration config;
+
     public LoggedTalonFX(TalonFXIO io, String logPath) {
         this.io = io;
         this.logPath = logPath;
+
+        config = new TalonFXConfiguration();
 
         disconnectedAlert = new Alert(logPath + " is disconnected", AlertType.kError);
 
@@ -45,6 +72,17 @@ public class LoggedTalonFX {
         forwardSoftLimitAlert = new Alert(logPath + " reached its forward soft limit", AlertType.kWarning);
         reverseHardLimitAlert = new Alert(logPath + " reached its reverse hard limit", AlertType.kWarning);
         reverseSoftLimitAlert = new Alert(logPath + " reached its reverse soft limit", AlertType.kWarning);
+
+        String pidPath = logPath.split("/")[0] + "/" + logPath.split("/")[0] + "PID";
+        kP = new LoggedNetworkNumber(pidPath + "/kP", lastkP);
+        kI = new LoggedNetworkNumber(pidPath + "/kI", lastkI);
+        kD = new LoggedNetworkNumber(pidPath + "/kD", lastkD);
+        kG = new LoggedNetworkNumber(pidPath + "/kG", lastkG);
+        kS = new LoggedNetworkNumber(pidPath + "/kS", lastkS);
+        kV = new LoggedNetworkNumber(pidPath + "/kV", lastkV);
+        kA = new LoggedNetworkNumber(pidPath + "/kA", lastkA);
+        cruiseVelocity = new LoggedNetworkNumber(pidPath + "/cruiseVelocity", lastCruiseVelocity);
+        maxAccel = new LoggedNetworkNumber(pidPath + "/maxAccel", lastAccel);
     }
 
     public void periodic() {
@@ -61,6 +99,18 @@ public class LoggedTalonFX {
         forwardSoftLimitAlert.set(inputs.forwardSoftLimit);
         reverseHardLimitAlert.set(inputs.reverseHardLimit);
         reverseSoftLimitAlert.set(inputs.reverseSoftLimit);
+
+        if (kP.get() != lastkP
+                || kI.get() != lastkI
+                || kD.get() != lastkD
+                || kG.get() != lastkG
+                || kS.get() != lastkS
+                || kV.get() != lastkV
+                || kA.get() != lastkA
+                || cruiseVelocity.get() != lastCruiseVelocity
+                || maxAccel.get() != lastAccel) {
+            updateConfig();
+        }
     }
 
     public double getPositionRad() {
@@ -81,5 +131,45 @@ public class LoggedTalonFX {
 
     public void setGoal(double position) {
         io.setControl(motionMagic.withPosition(Radians.of(position)));
+    }
+
+    // Applies the given config. Updates the tunable values as well, and their last values.
+    public void applyConfig(TalonFXConfiguration config) {
+        kP.set(config.Slot0.kP);
+        kI.set(config.Slot0.kI);
+        kD.set(config.Slot0.kD);
+        kG.set(config.Slot0.kG);
+        kS.set(config.Slot0.kS);
+        kV.set(config.Slot0.kV);
+        kA.set(config.Slot0.kA);
+
+        cruiseVelocity.set(config.MotionMagic.MotionMagicCruiseVelocity);
+        maxAccel.set(config.MotionMagic.MotionMagicAcceleration);
+        this.config = config;
+        updateConfig();
+    }
+
+    // Loads the data from the tunable values into config and applies it, also updates the last tunable values
+    private void updateConfig() {
+        lastkP = kP.get();
+        lastkI = kI.get();
+        lastkD = kD.get();
+        lastkG = kG.get();
+        lastkS = kS.get();
+        lastkV = kV.get();
+        lastkA = kA.get();
+        lastCruiseVelocity = cruiseVelocity.get();
+        lastAccel = maxAccel.get();
+
+        config.Slot0.kP = Units.rotationsToRadians(kP.get());
+        config.Slot0.kI = Units.rotationsToRadians(kI.get());
+        config.Slot0.kD = Units.rotationsToRadians(kD.get());
+        config.Slot0.kG = kG.get();
+        config.Slot0.kS = kS.get();
+        config.Slot0.kV = Units.rotationsToRadians(kV.get());
+        config.Slot0.kA = Units.rotationsToRadians(kA.get());
+        config.MotionMagic.MotionMagicCruiseVelocity = Units.rotationsToRadians(cruiseVelocity.get());
+        config.MotionMagic.MotionMagicAcceleration = Units.rotationsToRadians(maxAccel.get());
+        io.applyConfig(config);
     }
 }
