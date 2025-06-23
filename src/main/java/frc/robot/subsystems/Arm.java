@@ -1,6 +1,9 @@
 package frc.robot.subsystems;
 
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.util.Color;
+import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
@@ -8,6 +11,11 @@ import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
 import com.ctre.phoenix6.signals.GravityTypeValue;
 import com.ctre.phoenix6.signals.InvertedValue;
+
+import org.littletonrobotics.junction.Logger;
+import org.littletonrobotics.junction.mechanism.LoggedMechanism2d;
+import org.littletonrobotics.junction.mechanism.LoggedMechanismLigament2d;
+import org.littletonrobotics.junction.mechanism.LoggedMechanismRoot2d;
 
 import frc.robot.io.CANcoderIO;
 import frc.robot.io.LoggedCANcoder;
@@ -53,10 +61,15 @@ public class Arm extends SubsystemBase {
 
     private LoggedCANcoder encoder;
 
-    public Arm(TalonFXIO motor, CANcoderIO encoder) {
-        this.motor = new LoggedTalonFX(motor, "Arm/Motor");
-        this.encoder = new LoggedCANcoder(encoder, "Arm/Encoder");
+    // Mechanism visualization
+    private final LoggedMechanism2d mech = new LoggedMechanism2d(3, 3);
+    private final LoggedMechanismRoot2d root = mech.getRoot("ArmRoot", 1.5, 0.5);
+    private final LoggedMechanismLigament2d arm =
+            root.append(new LoggedMechanismLigament2d("Arm", 1.0, 0, 6, new Color8Bit(Color.kRed)));
+    private final LoggedMechanismLigament2d goalArm =
+            root.append(new LoggedMechanismLigament2d("GoalArm", 1.0, 0, 6, new Color8Bit(Color.kYellow)));
 
+    public Arm(TalonFXIO motorIO, CANcoderIO encoderIO) {
         TalonFXConfiguration motorConfig = new TalonFXConfiguration();
 
         motorConfig.MotorOutput.Inverted =
@@ -79,9 +92,10 @@ public class Arm extends SubsystemBase {
         motorConfig.MotionMagic.MotionMagicAcceleration = Constants.maxAccel;
 
         CANcoderConfiguration encoderConfig = new CANcoderConfiguration();
+        encoderConfig.MagnetSensor.MagnetOffset = Constants.encoderOffset;
 
-        this.motor.applyConfig(motorConfig);
-        encoder.applyConfig(encoderConfig);
+        motor = new LoggedTalonFX(motorIO, "Arm/Motor", motorConfig);
+        encoder = new LoggedCANcoder(encoderIO, "Arm/Encoder", encoderConfig);
     }
 
     public void setSpeed(double value) {
@@ -100,5 +114,8 @@ public class Arm extends SubsystemBase {
     public void periodic() {
         motor.periodic();
         encoder.periodic();
+        arm.setAngle(Rotation2d.fromRadians(motor.getPositionRad()));
+        goalArm.setAngle(Rotation2d.fromRadians(motor.getGoal()));
+        Logger.recordOutput("Arm/Mech", mech);
     }
 }

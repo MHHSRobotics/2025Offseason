@@ -55,11 +55,10 @@ public class LoggedTalonFX {
 
     private TalonFXConfiguration config;
 
-    public LoggedTalonFX(TalonFXIO io, String logPath) {
+    public LoggedTalonFX(TalonFXIO io, String logPath, TalonFXConfiguration config) {
         this.io = io;
         this.logPath = logPath;
-
-        config = new TalonFXConfiguration();
+        this.config = config;
 
         disconnectedAlert = new Alert(logPath + " is disconnected", AlertType.kError);
 
@@ -73,16 +72,19 @@ public class LoggedTalonFX {
         reverseHardLimitAlert = new Alert(logPath + " reached its reverse hard limit", AlertType.kWarning);
         reverseSoftLimitAlert = new Alert(logPath + " reached its reverse soft limit", AlertType.kWarning);
 
-        String pidPath = logPath.split("/")[0] + "/" + logPath.split("/")[0] + "PID";
-        kP = new LoggedNetworkNumber(pidPath + "/kP", lastkP);
-        kI = new LoggedNetworkNumber(pidPath + "/kI", lastkI);
-        kD = new LoggedNetworkNumber(pidPath + "/kD", lastkD);
-        kG = new LoggedNetworkNumber(pidPath + "/kG", lastkG);
-        kS = new LoggedNetworkNumber(pidPath + "/kS", lastkS);
-        kV = new LoggedNetworkNumber(pidPath + "/kV", lastkV);
-        kA = new LoggedNetworkNumber(pidPath + "/kA", lastkA);
-        cruiseVelocity = new LoggedNetworkNumber(pidPath + "/cruiseVelocity", lastCruiseVelocity);
-        maxAccel = new LoggedNetworkNumber(pidPath + "/maxAccel", lastAccel);
+        String pidPath = "AdvantageKit/" + logPath.split("/")[0] + "/" + logPath.split("/")[0] + "PID";
+        kP = new LoggedNetworkNumber(pidPath + "/kP", config.Slot0.kP);
+        kI = new LoggedNetworkNumber(pidPath + "/kI", config.Slot0.kI);
+        kD = new LoggedNetworkNumber(pidPath + "/kD", config.Slot0.kD);
+        kG = new LoggedNetworkNumber(pidPath + "/kG", config.Slot0.kG);
+        kS = new LoggedNetworkNumber(pidPath + "/kS", config.Slot0.kS);
+        kV = new LoggedNetworkNumber(pidPath + "/kV", config.Slot0.kV);
+        kA = new LoggedNetworkNumber(pidPath + "/kA", config.Slot0.kA);
+        cruiseVelocity =
+                new LoggedNetworkNumber(pidPath + "/cruiseVelocity", config.MotionMagic.MotionMagicCruiseVelocity);
+        maxAccel = new LoggedNetworkNumber(pidPath + "/maxAccel", config.MotionMagic.MotionMagicAcceleration);
+
+        updateConfig();
     }
 
     public void periodic() {
@@ -131,22 +133,6 @@ public class LoggedTalonFX {
 
     public void setGoal(double position) {
         io.setControl(motionMagic.withPosition(Radians.of(position)));
-    }
-
-    // Applies the given config. Updates the tunable values as well, and their last values.
-    public void applyConfig(TalonFXConfiguration config) {
-        kP.set(config.Slot0.kP);
-        kI.set(config.Slot0.kI);
-        kD.set(config.Slot0.kD);
-        kG.set(config.Slot0.kG);
-        kS.set(config.Slot0.kS);
-        kV.set(config.Slot0.kV);
-        kA.set(config.Slot0.kA);
-
-        cruiseVelocity.set(config.MotionMagic.MotionMagicCruiseVelocity);
-        maxAccel.set(config.MotionMagic.MotionMagicAcceleration);
-        this.config = config;
-        updateConfig();
     }
 
     // Loads the data from the tunable values into config and applies it, also updates the last tunable values

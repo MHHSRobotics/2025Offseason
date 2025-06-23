@@ -3,6 +3,8 @@ package frc.robot.io;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 
+import com.ctre.phoenix6.configs.CANcoderConfiguration;
+
 import org.littletonrobotics.junction.Logger;
 
 public class LoggedCANcoder {
@@ -18,9 +20,12 @@ public class LoggedCANcoder {
     private Alert bootDuringEnableAlert;
     private Alert undervoltageAlert;
 
-    public LoggedCANcoder(CANcoderIO io, String logPath) {
+    private CANcoderConfiguration config;
+
+    public LoggedCANcoder(CANcoderIO io, String logPath, CANcoderConfiguration config) {
         this.io = io;
         this.logPath = logPath;
+        this.config = config;
 
         disconnectedAlert = new Alert(logPath + " is disconnected", AlertType.kError);
 
@@ -28,6 +33,8 @@ public class LoggedCANcoder {
         hardwareAlert = new Alert(logPath + " encountered a hardware fault", AlertType.kWarning);
         bootDuringEnableAlert = new Alert(logPath + " booted during enable", AlertType.kWarning);
         undervoltageAlert = new Alert(logPath + " has insufficient voltage", AlertType.kWarning);
+
+        updateConfig();
     }
 
     public void periodic() {
@@ -48,5 +55,9 @@ public class LoggedCANcoder {
 
     public double getVelocity() {
         return inputs.velocityRadPerSec;
+    }
+
+    private void updateConfig() {
+        io.applyConfig(config);
     }
 }
