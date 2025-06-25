@@ -11,6 +11,8 @@ import com.ctre.phoenix6.controls.MotionMagicTorqueCurrentFOC;
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
 
+import frc.robot.io.TalonFXIO.TalonFXIOInputs;
+
 import static edu.wpi.first.units.Units.Radians;
 
 public class LoggedTalonFX {
@@ -72,7 +74,7 @@ public class LoggedTalonFX {
         reverseHardLimitAlert = new Alert(logPath + " reached its reverse hard limit", AlertType.kWarning);
         reverseSoftLimitAlert = new Alert(logPath + " reached its reverse soft limit", AlertType.kWarning);
 
-        String pidPath = "AdvantageKit/" + logPath.split("/")[0] + "/" + logPath.split("/")[0] + "PID";
+        String pidPath = logPath.split("/")[0] + "/" + logPath.split("/")[0] + "PID";
         kP = new LoggedNetworkNumber(pidPath + "/kP", config.Slot0.kP);
         kI = new LoggedNetworkNumber(pidPath + "/kI", config.Slot0.kI);
         kD = new LoggedNetworkNumber(pidPath + "/kD", config.Slot0.kD);
@@ -125,6 +127,10 @@ public class LoggedTalonFX {
 
     public double getGoal() {
         return inputs.setpointRad;
+    }
+
+    public TalonFXIOInputs getInputs() {
+        return inputs;
     }
 
     public void setSpeed(double value) {

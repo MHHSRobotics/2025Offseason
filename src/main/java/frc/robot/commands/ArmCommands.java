@@ -25,4 +25,8 @@ public class ArmCommands {
     public Command changeGoal(DoubleSupplier change) {
         return new InstantCommand(() -> arm.setGoal(arm.getGoal() + change.getAsDouble()), arm);
     }
+
+    public Command stop() {
+        return setSpeed(() -> 0);
+    }
 }

@@ -16,6 +16,7 @@ import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.mechanism.LoggedMechanism2d;
 import org.littletonrobotics.junction.mechanism.LoggedMechanismLigament2d;
 import org.littletonrobotics.junction.mechanism.LoggedMechanismRoot2d;
+import org.littletonrobotics.junction.networktables.LoggedNetworkBoolean;
 
 import frc.robot.io.CANcoderIO;
 import frc.robot.io.LoggedCANcoder;
@@ -34,8 +35,8 @@ public class Arm extends SubsystemBase {
         public static final double gearRatio = 700 / 9.;
         public static final double encoderRatio = 28 / 9.;
 
-        public static final double kP = 50;
-        public static final double kD = 200;
+        public static final double kP = 200;
+        public static final double kD = 20;
 
         public static final double kS = 0;
         public static final double kG = 0;
@@ -54,6 +55,8 @@ public class Arm extends SubsystemBase {
 
         public static final double rotorToSensorRatio = gearRatio / encoderRatio;
         public static final double armLength = Math.sqrt(3 * moi / mass);
+
+        public static final LoggedNetworkBoolean manualArm = new LoggedNetworkBoolean("Arm/Manual Arm", false);
     }
 
     /** Motor, uses TalonFXIO for simulation support */
@@ -63,11 +66,20 @@ public class Arm extends SubsystemBase {
 
     // Mechanism visualization
     private final LoggedMechanism2d mech = new LoggedMechanism2d(3, 3);
-    private final LoggedMechanismRoot2d root = mech.getRoot("ArmRoot", 1.5, 0.5);
+    private final LoggedMechanismRoot2d root = mech.getRoot("ArmRoot", 1, 1.5);
     private final LoggedMechanismLigament2d arm =
             root.append(new LoggedMechanismLigament2d("Arm", 1.0, 0, 6, new Color8Bit(Color.kRed)));
     private final LoggedMechanismLigament2d goalArm =
             root.append(new LoggedMechanismLigament2d("GoalArm", 1.0, 0, 6, new Color8Bit(Color.kYellow)));
+    private final LoggedMechanismRoot2d pRoot = mech.getRoot("PRoot", 2.5, 2);
+    private final LoggedMechanismRoot2d dRoot = mech.getRoot("DRoot", 2.6, 2);
+    private final LoggedMechanismRoot2d fRoot = mech.getRoot("FRoot", 2.7, 2);
+    private final LoggedMechanismLigament2d pAmount =
+            pRoot.append(new LoggedMechanismLigament2d("PAmount", 1.0, 90, 6, new Color8Bit(Color.kBlue)));
+    private final LoggedMechanismLigament2d dAmount =
+            dRoot.append(new LoggedMechanismLigament2d("DAmount", 1.0, 90, 6, new Color8Bit(Color.kGreen)));
+    private final LoggedMechanismLigament2d fAmount =
+            fRoot.append(new LoggedMechanismLigament2d("FAmount", 1.0, 90, 6, new Color8Bit(Color.kWhite)));
 
     public Arm(TalonFXIO motorIO, CANcoderIO encoderIO) {
         TalonFXConfiguration motorConfig = new TalonFXConfiguration();
@@ -112,10 +124,29 @@ public class Arm extends SubsystemBase {
 
     @Override
     public void periodic() {
+        // Call periodic methods
         motor.periodic();
         encoder.periodic();
+
+        // Visualization stuff
         arm.setAngle(Rotation2d.fromRadians(motor.getPositionRad()));
         goalArm.setAngle(Rotation2d.fromRadians(motor.getGoal()));
+        if (motor.getInputs().controlMode.equals("MotionMagicTorqueCurrentFOC")) {
+            goalArm.setLineWeight(6);
+            pAmount.setLineWeight(6);
+            dAmount.setLineWeight(6);
+            fAmount.setLineWeight(6);
+            pAmount.setLength(motor.getInputs().propOutput / 100);
+            dAmount.setLength(motor.getInputs().derivOutput / 100);
+            fAmount.setLength(motor.getInputs().feedforward / 100);
+        } else {
+            goalArm.setLineWeight(0);
+            pAmount.setLineWeight(0);
+            dAmount.setLineWeight(0);
+            fAmount.setLineWeight(0);
+        }
+
+        // Log the mechanism
         Logger.recordOutput("Arm/Mech", mech);
     }
 }

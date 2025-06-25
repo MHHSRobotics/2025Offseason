@@ -7,6 +7,8 @@ import com.ctre.phoenix6.configs.CANcoderConfiguration;
 
 import org.littletonrobotics.junction.Logger;
 
+import frc.robot.io.CANcoderIO.CANcoderIOInputs;
+
 public class LoggedCANcoder {
     private String logPath;
 
@@ -55,6 +57,10 @@ public class LoggedCANcoder {
 
     public double getVelocity() {
         return inputs.velocityRadPerSec;
+    }
+
+    public CANcoderIOInputs getInputs() {
+        return inputs;
     }
 
     private void updateConfig() {

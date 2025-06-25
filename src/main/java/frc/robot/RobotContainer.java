@@ -67,8 +67,24 @@ public class RobotContainer {
     }
 
     private void configureBindings() {
-        controller.cross().whileTrue(new RepeatCommand(armCommands.changeGoal(() -> 0.02)));
-        controller.circle().whileTrue(new RepeatCommand(armCommands.changeGoal(() -> -0.02)));
+        controller
+                .cross()
+                .and(() -> !Arm.Constants.manualArm.get())
+                .whileTrue(new RepeatCommand(armCommands.changeGoal(() -> 0.02)));
+        controller
+                .cross()
+                .and(() -> Arm.Constants.manualArm.get())
+                .onTrue(armCommands.setSpeed(() -> 0.2))
+                .onFalse(armCommands.stop());
+        controller
+                .circle()
+                .and(() -> !Arm.Constants.manualArm.get())
+                .whileTrue(new RepeatCommand(armCommands.changeGoal(() -> -0.02)));
+        controller
+                .circle()
+                .and(() -> Arm.Constants.manualArm.get())
+                .onTrue(armCommands.setSpeed(() -> -0.2))
+                .onFalse(armCommands.stop());
         // controller.cross().onTrue(armCommands.setSpeed(() -> 1)).onFalse(armCommands.setSpeed(() -> -1));
     }
 
