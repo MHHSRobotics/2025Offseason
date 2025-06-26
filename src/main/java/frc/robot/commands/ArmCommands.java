@@ -14,18 +14,22 @@ public class ArmCommands {
         this.arm = arm;
     }
 
+    // Command to set the speed of the arm
     public Command setSpeed(DoubleSupplier speed) {
         return new InstantCommand(() -> arm.setSpeed(speed.getAsDouble()));
     }
 
+    // Command to set the goal of the arm (in radians)
     public Command setGoal(DoubleSupplier goal) {
         return new InstantCommand(() -> arm.setGoal(goal.getAsDouble()), arm);
     }
 
+    // Command to change the goal of the arm by the given amount of radians
     public Command changeGoal(DoubleSupplier change) {
         return new InstantCommand(() -> arm.setGoal(arm.getGoal() + change.getAsDouble()), arm);
     }
 
+    // Command to stop all motor output to the arm
     public Command stop() {
         return setSpeed(() -> 0);
     }

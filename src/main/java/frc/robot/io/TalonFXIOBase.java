@@ -14,16 +14,22 @@ import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.DutyCycleOut;
 import com.ctre.phoenix6.controls.MotionMagicTorqueCurrentFOC;
+import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.ControlModeValue;
 
 import frc.robot.Constants;
 
+// TalonFXIO implementation that interfaces with a physical TalonFX. In sim this interfaces with a simulated TalonFX, so
+// TalonFXIOSim extends this.
 public class TalonFXIOBase extends TalonFXIO {
+    // Debounce to make sure motor disconnects are real
     private Debouncer connectedDebounce = new Debouncer(Constants.debounceTime);
 
+    // The actual TalonFX
     private TalonFX motor;
 
+    // A bunch of StatusSignals that monitor the motor
     private StatusSignal<Angle> position;
     private StatusSignal<AngularVelocity> velocity;
     private StatusSignal<AngularAcceleration> accel;
@@ -59,7 +65,8 @@ public class TalonFXIOBase extends TalonFXIO {
     public TalonFXIOBase(int motorId, String canBus) {
         motor = new TalonFX(motorId, canBus);
 
-        position = motor.getPosition(true);
+        // Initialize all the StatusSignals
+        position = motor.getPosition();
         velocity = motor.getVelocity();
         accel = motor.getAcceleration();
 
@@ -95,10 +102,13 @@ public class TalonFXIOBase extends TalonFXIO {
         this(motorId, "");
     }
 
+    // Updates the TalonFXIOInputs
     @Override
     public void updateInputs(TalonFXIOInputs inputs) {
+        // If we're in a simulation, update it
         updateSimulation();
 
+        // Refresh all the signals
         BaseStatusSignal.refreshAll(
                 position,
                 velocity,
@@ -126,8 +136,10 @@ public class TalonFXIOBase extends TalonFXIO {
                 reverseHardLimit,
                 reverseSoftLimit);
 
+        // Update all the inputs from the signal values
         inputs.connected = connectedDebounce.calculate(motor.isConnected());
 
+        // Some signals give rotations, so they have to be converted to radians
         inputs.positionRad = Units.rotationsToRadians(position.getValueAsDouble());
         inputs.velocityRadPerSec = Units.rotationsToRadians(velocity.getValueAsDouble());
         inputs.accelRadPerSecSquared = Units.rotationsToRadians(accel.getValueAsDouble());
@@ -160,6 +172,7 @@ public class TalonFXIOBase extends TalonFXIO {
         inputs.reverseSoftLimit = reverseSoftLimit.getValue();
     }
 
+    // Updates the simulation. Does nothing here, but can be overridden by subclasses
     public void updateSimulation() {}
 
     @Override
@@ -169,6 +182,11 @@ public class TalonFXIOBase extends TalonFXIO {
 
     @Override
     public void setControl(DutyCycleOut control) {
+        motor.setControl(control);
+    }
+
+    @Override
+    public void setControl(VoltageOut control) {
         motor.setControl(control);
     }
 

@@ -3,7 +3,10 @@ package frc.robot;
 import edu.wpi.first.wpilibj.RobotBase;
 
 public final class Constants {
+    // Should be Mode.REPLAY when replaying, else Mode.SIM
     public static final Mode simMode = Mode.SIM;
+
+    // Current mode the robot program is in
     public static final Mode currentMode = RobotBase.isReal() ? Mode.REAL : simMode;
 
     public static enum Mode {

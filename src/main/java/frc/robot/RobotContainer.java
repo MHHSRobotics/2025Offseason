@@ -34,6 +34,8 @@ public class RobotContainer {
     private void initSubsystems() {
         switch (Constants.currentMode) {
             case REAL:
+                // On a real bot, the arm should be using IO that interfaces with real motors (TalonFXIOBase,
+                // CANcoderIObase)
                 arm = new Arm(
                         new TalonFXIOBase(Arm.Constants.motorId, "rio"),
                         new CANcoderIOBase(
@@ -42,7 +44,9 @@ public class RobotContainer {
                                 Arm.Constants.encoderRatio,
                                 Arm.Constants.encoderOffset));
                 break;
+
             case SIM:
+                // In simulation, create the physics simulator for the arm
                 LinearSystemSim<N2, N1, N2> armMech = new SingleJointedArmSim(
                         DCMotor.getKrakenX60(1),
                         Arm.Constants.gearRatio,
@@ -52,6 +56,8 @@ public class RobotContainer {
                         Arm.Constants.maxAngle,
                         true,
                         Arm.Constants.startAngle);
+
+                // Arm interfaces with simulated TalonFX and CANcoders connected to the physics simulator
                 arm = new Arm(
                         new TalonFXIOSim(Arm.Constants.motorId, armMech, Arm.Constants.gearRatio),
                         new CANcoderIOSim(
@@ -60,32 +66,40 @@ public class RobotContainer {
                                 Arm.Constants.encoderRatio,
                                 Arm.Constants.encoderOffset));
                 break;
+
             default:
+                // In replay, arm doesn't interface with anything
                 arm = new Arm(new TalonFXIO(), new CANcoderIO());
                 break;
         }
     }
 
     private void configureBindings() {
+        // PID-based forward movement (CCW)
         controller
                 .cross()
                 .and(() -> !Arm.Constants.manualArm.get())
                 .whileTrue(new RepeatCommand(armCommands.changeGoal(() -> 0.02)));
+
+        // Manual forward movement (CCW)
         controller
                 .cross()
                 .and(() -> Arm.Constants.manualArm.get())
                 .onTrue(armCommands.setSpeed(() -> 0.2))
                 .onFalse(armCommands.stop());
+
+        // PID-based backward movement (CW)
         controller
                 .circle()
                 .and(() -> !Arm.Constants.manualArm.get())
                 .whileTrue(new RepeatCommand(armCommands.changeGoal(() -> -0.02)));
+
+        // Manual backward movement (CW)
         controller
                 .circle()
                 .and(() -> Arm.Constants.manualArm.get())
                 .onTrue(armCommands.setSpeed(() -> -0.2))
                 .onFalse(armCommands.stop());
-        // controller.cross().onTrue(armCommands.setSpeed(() -> 1)).onFalse(armCommands.setSpeed(() -> -1));
     }
 
     public Command getAutonomousCommand() {
