@@ -34,8 +34,8 @@ public class Arm extends SubsystemBase {
         public static final int encoderId = 1;
         public static final double encoderOffset = -1.052; // radians
 
-        public static final double gearRatio = 700 / 9.; // ratio of mechanism rotations to motor rotations
-        public static final double encoderRatio = 28 / 9.; // ratio of mechanism rotations to encoder rotations
+        public static final double gearRatio = 700 / 9.; // ratio of motor rotations to mechanism rotations
+        public static final double encoderRatio = 28 / 9.; // ratio of encoder rotations to mechanism rotations
 
         public static final double kP = 200; // amps per radian, current scales with distance to setpoint
         public static final double kD = 20; // amps per radian per sec
@@ -59,7 +59,7 @@ public class Arm extends SubsystemBase {
         public static final double startAngle = Units.degreesToRadians(90); // start angle for the simulated arm
 
         public static final double rotorToSensorRatio =
-                gearRatio / encoderRatio; // ratio of encoder rotations to motor rotations
+                gearRatio / encoderRatio; // ratio of motor rotations to encoder rotations
         public static final double armLength =
                 Math.sqrt(3 * moi / mass); // math to make WPILib simulate the arm correctly
 

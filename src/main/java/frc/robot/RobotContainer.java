@@ -20,14 +20,17 @@ import frc.robot.io.TalonFXIOSim;
 import frc.robot.subsystems.Arm;
 
 public class RobotContainer {
-
     private Arm arm;
     private final ArmCommands armCommands;
+
     private final CommandPS5Controller controller = new CommandPS5Controller(0);
 
     public RobotContainer() {
+        // Initialize all the IO objects, subsystems, and mechanism simulators
         initSubsystems();
         armCommands = new ArmCommands(arm);
+
+        // Add controller bindings
         configureBindings();
     }
 

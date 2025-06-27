@@ -29,7 +29,7 @@ public class TalonFXIOBase extends TalonFXIO {
     // The actual TalonFX
     private TalonFX motor;
 
-    // A bunch of StatusSignals that monitor the motor
+    // StatusSignals that get data from the motor
     private StatusSignal<Angle> position;
     private StatusSignal<AngularVelocity> velocity;
     private StatusSignal<AngularAcceleration> accel;

@@ -9,12 +9,18 @@ import org.littletonrobotics.junction.Logger;
 
 import frc.robot.io.CANcoderIO.CANcoderIOInputs;
 
+// Manages alerts, logging, and tuning of a CANcoderIO
 public class LoggedCANcoder {
+    // NetworkTables path to log to
     private String logPath;
 
+    // The CANcoder
     private final CANcoderIO io;
+
+    // Current inputs from the CANcoderIO
     private final CANcoderIOInputsAutoLogged inputs = new CANcoderIOInputsAutoLogged();
 
+    // Alerts for faults. These will appear on AdvantageScope/Elastic
     private Alert disconnectedAlert;
 
     private Alert badMagnetAlert;
@@ -22,6 +28,7 @@ public class LoggedCANcoder {
     private Alert bootDuringEnableAlert;
     private Alert undervoltageAlert;
 
+    // Current CANcoder config
     private CANcoderConfiguration config;
 
     public LoggedCANcoder(CANcoderIO io, String logPath, CANcoderConfiguration config) {
@@ -29,6 +36,7 @@ public class LoggedCANcoder {
         this.logPath = logPath;
         this.config = config;
 
+        // Initialize alerts
         disconnectedAlert = new Alert(logPath + " is disconnected", AlertType.kError);
 
         badMagnetAlert = new Alert(logPath + " has a bad magnet", AlertType.kWarning);
@@ -36,13 +44,16 @@ public class LoggedCANcoder {
         bootDuringEnableAlert = new Alert(logPath + " booted during enable", AlertType.kWarning);
         undervoltageAlert = new Alert(logPath + " has insufficient voltage", AlertType.kWarning);
 
+        // Apply the config
         updateConfig();
     }
 
     public void periodic() {
+        // Get new inputs from CANcoderIO and log them
         io.updateInputs(inputs);
         Logger.processInputs(logPath, inputs);
 
+        // Update alert status
         disconnectedAlert.set(!inputs.connected);
 
         badMagnetAlert.set(inputs.badMagnetFault);
