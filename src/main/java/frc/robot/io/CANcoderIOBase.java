@@ -68,15 +68,16 @@ public class CANcoderIOBase extends CANcoderIO {
         // Update the inputs
         inputs.connected = connectedDebounce.calculate(encoder.isConnected());
 
-        // CANcoder signals give data in encoder rotations. First convert to radians, then use encoderRatio to convert to mechanism units.
+        // CANcoder signals give data in encoder rotations. First convert to radians, then use encoderRatio to convert
+        // to mechanism units.
         inputs.positionRad = Units.rotationsToRadians(position.getValueAsDouble()) / encoderRatio;
         inputs.velocityRadPerSec = Units.rotationsToRadians(velocity.getValueAsDouble()) / encoderRatio;
 
         // Update fault inputs
-        inputs.badMagnetFault=badMagnetFault.getValue();
-        inputs.hardwareFault=hardwareFault.getValue();
-        inputs.bootDuringEnable=bootDuringEnable.getValue();
-        inputs.undervoltage=undervoltage.getValue();
+        inputs.badMagnetFault = badMagnetFault.getValue();
+        inputs.hardwareFault = hardwareFault.getValue();
+        inputs.bootDuringEnable = bootDuringEnable.getValue();
+        inputs.undervoltage = undervoltage.getValue();
     }
 
     // Updates the simulation. Does nothing here, but subclasses can override this.
@@ -84,7 +85,8 @@ public class CANcoderIOBase extends CANcoderIO {
 
     @Override
     public void applyConfig(CANcoderConfiguration config) {
-        // Add the offset to the CANcoder config. The offset is in mechanism radians, so it needs to be converted to encoder radians, then rotations.
+        // Add the offset to the CANcoder config. The offset is in mechanism radians, so it needs to be converted to
+        // encoder radians, then rotations.
         config.MagnetSensor.withMagnetOffset(Radians.of(offset * encoderRatio));
 
         // Apply the config

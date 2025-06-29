@@ -41,7 +41,7 @@ public class Arm extends SubsystemBase {
         public static final double kD = 20; // amps per radian per sec
 
         public static final double kS = 0; // amps, the current needed to overcome static friction
-        public static final double kG = 0; // amps, the current needed to overcome gravity when the arm is horizontal
+        public static final double kG = 20; // amps, the current needed to overcome gravity when the arm is horizontal
         public static final double kV =
                 0; // amps per radian per sec, current needed to overcome linear friction (scales with velocity)
         public static final double kA =

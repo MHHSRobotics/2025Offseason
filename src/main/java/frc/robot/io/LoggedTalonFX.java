@@ -123,7 +123,8 @@ public class LoggedTalonFX {
         reverseHardLimitAlert.set(inputs.reverseHardLimit);
         reverseSoftLimitAlert.set(inputs.reverseSoftLimit);
 
-        // Update the config if any tunable number has changed. If we update the config every frame then the bot will lag
+        // Update the config if any tunable number has changed. If we update the config every frame then the bot will
+        // lag
         if (kP.get() != lastkP
                 || kI.get() != lastkI
                 || kD.get() != lastkD
@@ -157,7 +158,7 @@ public class LoggedTalonFX {
         io.setControl(dutyCycle.withOutput(value));
     }
 
-    public void setVoltage(double volts){
+    public void setVoltage(double volts) {
         io.setControl(voltage.withOutput(volts));
     }
 

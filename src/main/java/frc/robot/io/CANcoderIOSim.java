@@ -15,7 +15,8 @@ public class CANcoderIOSim extends CANcoderIOBase {
     // Allows us to interface with the simulated physical CANcoder
     private CANcoderSimState encoderSim;
 
-    // Ratio of encoder radians to mech output. Generally for rotating systems radiansPerMechOutput should be the encoder:mechanism ratio, and for linear systems
+    // Ratio of encoder radians to mech output. Generally for rotating systems radiansPerMechOutput should be the
+    // encoder:mechanism ratio, and for linear systems
     // radiansPerMechOutput should be the encoderRatio/drumRadius.
     private double radiansPerMechOutput;
 
