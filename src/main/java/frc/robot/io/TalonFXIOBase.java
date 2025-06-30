@@ -140,9 +140,9 @@ public class TalonFXIOBase extends TalonFXIO {
         inputs.connected = connectedDebounce.calculate(motor.isConnected());
 
         // Some signals give rotations, so they have to be converted to radians
-        inputs.positionRad = Units.rotationsToRadians(position.getValueAsDouble());
-        inputs.velocityRadPerSec = Units.rotationsToRadians(velocity.getValueAsDouble());
-        inputs.accelRadPerSecSquared = Units.rotationsToRadians(accel.getValueAsDouble());
+        inputs.position = Units.rotationsToRadians(position.getValueAsDouble());
+        inputs.velocity = Units.rotationsToRadians(velocity.getValueAsDouble());
+        inputs.accel = Units.rotationsToRadians(accel.getValueAsDouble());
 
         inputs.appliedVoltage = appliedVoltage.getValueAsDouble();
         inputs.supplyVoltage = supplyVoltage.getValueAsDouble();
@@ -151,8 +151,8 @@ public class TalonFXIOBase extends TalonFXIO {
 
         inputs.controlMode = controlMode.getValue().toString();
 
-        inputs.setpointRad = Units.rotationsToRadians(closedLoopReference.getValueAsDouble());
-        inputs.errorRad = Units.rotationsToRadians(closedLoopError.getValueAsDouble());
+        inputs.setpoint = Units.rotationsToRadians(closedLoopReference.getValueAsDouble());
+        inputs.error = Units.rotationsToRadians(closedLoopError.getValueAsDouble());
         inputs.feedforward = feedforward.getValueAsDouble();
         inputs.derivOutput = derivOutput.getValueAsDouble();
         inputs.intOutput = intOutput.getValueAsDouble();

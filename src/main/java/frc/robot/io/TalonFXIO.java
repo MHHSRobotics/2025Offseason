@@ -20,9 +20,10 @@ public class TalonFXIO {
     public static class TalonFXIOInputs {
         public boolean connected;
 
-        public double positionRad; // radians of mechanism
-        public double velocityRadPerSec; // radians of mechanism per sec
-        public double accelRadPerSecSquared; // radians of mechanism per sec^2
+        // Mechanism units are radians for arms and flywheels and meters for elevators.
+        public double position; // mechanism units
+        public double velocity; // mechanism units per sec
+        public double accel; // mechanism units per sec^2
 
         public double appliedVoltage; // volts
         public double supplyVoltage; // volts
@@ -31,8 +32,8 @@ public class TalonFXIO {
 
         public String controlMode; // Current control type
 
-        public double setpointRad; // Current setpoint for the motor, radians of mechanism
-        public double errorRad; // Difference between current position and goal position, radians of mechanism
+        public double setpoint; // Current setpoint for the motor, mechanism units
+        public double error; // Difference between current position and goal position, mechanism units
         public double feedforward; // Current feedforward for the motor, amps
         public double derivOutput; // Current motor output from kD, amps
         public double intOutput; // Current motor output from kI, amps

@@ -138,16 +138,16 @@ public class LoggedTalonFX {
         }
     }
 
-    public double getPositionRad() {
-        return inputs.positionRad;
+    public double getPosition() {
+        return inputs.position;
     }
 
-    public double getVelocityRadPerSec() {
-        return inputs.velocityRadPerSec;
+    public double getVelocity() {
+        return inputs.velocity;
     }
 
     public double getGoal() {
-        return inputs.setpointRad;
+        return inputs.setpoint;
     }
 
     public TalonFXIOInputs getInputs() {

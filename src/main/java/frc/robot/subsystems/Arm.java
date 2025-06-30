@@ -167,7 +167,7 @@ public class Arm extends SubsystemBase {
         encoder.periodic();
 
         // Set angles of the visualization arm and goal arm
-        arm.setAngle(Rotation2d.fromRadians(motor.getPositionRad()));
+        arm.setAngle(Rotation2d.fromRadians(motor.getPosition()));
 
         if (motor.getInputs().controlMode.equals("MotionMagicTorqueCurrentFOC")) {
             // If motor is currently in PID mode, show all the lines
