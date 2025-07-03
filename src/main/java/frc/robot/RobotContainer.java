@@ -9,6 +9,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.RepeatCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandPS5Controller;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 
 import frc.robot.commands.ArmCommands;
 import frc.robot.io.CANcoderIO;
@@ -25,6 +26,9 @@ public class RobotContainer {
 
     private final CommandPS5Controller controller = new CommandPS5Controller(0);
 
+    // Controller for SysId commands
+    private final CommandPS5Controller sysIdController = new CommandPS5Controller(2);
+
     public RobotContainer() {
         // Initialize all the IO objects, subsystems, and mechanism simulators
         initSubsystems();
@@ -32,6 +36,9 @@ public class RobotContainer {
 
         // Add controller bindings
         configureBindings();
+
+        // Add SysId bindings
+        configureSysId();
     }
 
     private void initSubsystems() {
@@ -103,6 +110,11 @@ public class RobotContainer {
                 .and(() -> Arm.Constants.manualArm.get())
                 .onTrue(armCommands.setSpeed(() -> -0.2))
                 .onFalse(armCommands.stop());
+    }
+
+    private void configureSysId() {
+        sysIdController.cross().whileTrue(armCommands.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
+        sysIdController.circle().whileTrue(armCommands.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
     }
 
     public Command getAutonomousCommand() {

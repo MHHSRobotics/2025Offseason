@@ -6,6 +6,7 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
@@ -23,6 +24,12 @@ import frc.robot.io.CANcoderIO;
 import frc.robot.io.LoggedCANcoder;
 import frc.robot.io.LoggedTalonFX;
 import frc.robot.io.TalonFXIO;
+
+import static edu.wpi.first.units.Units.Radians;
+import static edu.wpi.first.units.Units.RadiansPerSecond;
+import static edu.wpi.first.units.Units.Second;
+import static edu.wpi.first.units.Units.Seconds;
+import static edu.wpi.first.units.Units.Volts;
 
 public class Arm extends SubsystemBase {
 
@@ -51,12 +58,22 @@ public class Arm extends SubsystemBase {
         public static final double maxVelocity = 100; // radians per sec, sets the max velocity MotionMagic will use
         public static final double maxAccel = 200; // radians per sec^2, sets the max acceleration MotionMagic will use
 
+        public static final double statorCurrentLimit = 70; // Limit on total torque output from the motor
+        public static final double supplyCurrentLimit = 60; // Limit on current pull from the motor
+        public static final double supplyCurrentLowerLimit =
+                40; // If the motor pulls >40 amps for >0.3 seconds, then the current limit will be set to 40 amps
+        public static final double supplyCurrentLowerTime = 0.3;
+
         public static final double moi = 4.8944; // kg m^2, how hard it is to rotate the arm
         public static final double mass = 10; // kg
 
         public static final double minAngle = Units.degreesToRadians(-45);
         public static final double maxAngle = Units.degreesToRadians(140);
         public static final double startAngle = Units.degreesToRadians(90); // start angle for the simulated arm
+
+        // Angle bounds for SysId tests
+        public static final double minSysIdAngle = Units.degreesToRadians(-30);
+        public static final double maxSysIdAngle = Units.degreesToRadians(125);
 
         public static final double rotorToSensorRatio =
                 gearRatio / encoderRatio; // ratio of motor rotations to encoder rotations
@@ -108,6 +125,24 @@ public class Arm extends SubsystemBase {
     private final LoggedMechanismLigament2d fAmount =
             fRoot.append(new LoggedMechanismLigament2d("FAmount", 1.0, 90, 6, new Color8Bit(Color.kWhite)));
 
+    // SysId routine
+    private final SysIdRoutine sysId = new SysIdRoutine(
+            new SysIdRoutine.Config(
+                    Volts.of(1).per(Second), // Ramp rate for quasistatic, volts/sec
+                    Volts.of(4), // Step voltage for dynamic
+                    Seconds.of(10), // Timeout
+                    (state) -> {
+                        Logger.recordOutput("Arm/SysId/State", state);
+                    }),
+            new SysIdRoutine.Mechanism(
+                    // Voltage setting function
+                    (voltage) -> motor.setVoltage(voltage.in(Volts)),
+                    // SysId logging function
+                    (log) -> log.motor("arm")
+                            .angularPosition(Radians.of(motor.getPosition()))
+                            .angularVelocity(RadiansPerSecond.of(motor.getVelocity())),
+                    this));
+
     public Arm(TalonFXIO motorIO, CANcoderIO encoderIO) {
         TalonFXConfiguration motorConfig = new TalonFXConfiguration();
 
@@ -138,6 +173,15 @@ public class Arm extends SubsystemBase {
         motorConfig.MotionMagic.MotionMagicCruiseVelocity = Constants.maxVelocity;
         motorConfig.MotionMagic.MotionMagicAcceleration = Constants.maxAccel;
 
+        // Current limits
+        motorConfig.CurrentLimits.StatorCurrentLimit = Constants.statorCurrentLimit;
+        motorConfig.CurrentLimits.StatorCurrentLimitEnable = true;
+
+        motorConfig.CurrentLimits.SupplyCurrentLimit = Constants.supplyCurrentLimit;
+        motorConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
+        motorConfig.CurrentLimits.SupplyCurrentLowerLimit = Constants.supplyCurrentLowerLimit;
+        motorConfig.CurrentLimits.SupplyCurrentLowerTime = Constants.supplyCurrentLowerTime;
+
         CANcoderConfiguration encoderConfig = new CANcoderConfiguration();
 
         // Create logged motors and encoders from the configs
@@ -158,6 +202,16 @@ public class Arm extends SubsystemBase {
     // Returns the goal of the arm
     public double getGoal() {
         return motor.getGoal();
+    }
+
+    // Gets the SysId routine
+    public SysIdRoutine getSysId() {
+        return sysId;
+    }
+
+    // Checks if the arm is in safe SysId range
+    public boolean withinSysIdLimits() {
+        return motor.getPosition() < Constants.maxSysIdAngle && motor.getPosition() > Constants.minSysIdAngle;
     }
 
     @Override
