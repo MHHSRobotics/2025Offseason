@@ -47,15 +47,15 @@ public class Arm extends SubsystemBase {
         public static final double gearRatio = 700 / 9.; // ratio of motor rotations to mechanism rotations
         public static final double encoderRatio = 28 / 9.; // ratio of encoder rotations to mechanism rotations
 
-        public static final double kP = 200; // amps per radian, current scales with distance to setpoint
-        public static final double kD = 20; // amps per radian per sec
+        public static final double kP = 53.777; // amps per radian, current scales with distance to setpoint
+        public static final double kD = 12.029; // amps per radian per sec
 
-        public static final double kS = 0; // amps, the current needed to overcome static friction
-        public static final double kG = 20; // amps, the current needed to overcome gravity when the arm is horizontal
+        public static final double kS = 0.0875; // amps, the current needed to overcome static friction
+        public static final double kG = 4; // amps, the current needed to overcome gravity when the arm is horizontal
         public static final double kV =
-                0; // amps per radian per sec, current needed to overcome linear friction (scales with velocity)
+                8.0969; // amps per radian per sec, current needed to overcome linear friction (scales with velocity)
         public static final double kA =
-                0; // amps per radian per sec^2, current needed to overcome quadratic friction (scales with
+                1.251; // amps per radian per sec^2, current needed to overcome quadratic friction (scales with
         // acceleration)
 
         public static final double maxVelocity = 100; // radians per sec, sets the max velocity MotionMagic will use
@@ -134,17 +134,15 @@ public class Arm extends SubsystemBase {
             new SysIdRoutine.Config(
                     Volts.of(1).per(Second), // Ramp rate for quasistatic, volts/sec
                     Volts.of(4), // Step voltage for dynamic
-                    Seconds.of(10), // Timeout
-                    (state) -> {
-                        Logger.recordOutput("Arm/SysId/State", state.toString());
-                    }),
+                    Seconds.of(10)), // Timeout
             new SysIdRoutine.Mechanism(
                     // Voltage setting function
                     (voltage) -> motor.setVoltage(voltage.in(Volts)),
                     // SysId logging function
                     (log) -> log.motor("arm")
                             .angularPosition(Radians.of(motor.getPosition()))
-                            .angularVelocity(RadiansPerSecond.of(motor.getVelocity())),
+                            .angularVelocity(RadiansPerSecond.of(motor.getVelocity()))
+                            .voltage(Volts.of(motor.getInputs().appliedVoltage)),
                     this));
 
     public Arm(TalonFXIO motorIO, CANcoderIO encoderIO) {
@@ -231,7 +229,7 @@ public class Arm extends SubsystemBase {
         // Set angles of the visualization arm and goal arm
         arm.setAngle(Rotation2d.fromRadians(motor.getPosition()));
 
-        if (motor.getInputs().controlMode.equals("MotionMagicTorqueCurrentFOC")) {
+        if (motor.getInputs().controlMode.startsWith("MotionMagic")) {
             // If motor is currently in PID mode, show all the lines
             goalArm.setLineWeight(6);
             pAmount.setLineWeight(6);

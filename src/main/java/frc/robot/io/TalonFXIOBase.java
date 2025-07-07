@@ -14,6 +14,7 @@ import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.DutyCycleOut;
 import com.ctre.phoenix6.controls.MotionMagicTorqueCurrentFOC;
+import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.ControlModeValue;
@@ -192,6 +193,11 @@ public class TalonFXIOBase extends TalonFXIO {
 
     @Override
     public void setControl(MotionMagicTorqueCurrentFOC control) {
+        motor.setControl(control);
+    }
+
+    @Override
+    public void setControl(MotionMagicVoltage control) {
         motor.setControl(control);
     }
 

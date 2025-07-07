@@ -3,6 +3,7 @@ package frc.robot.io;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.DutyCycleOut;
 import com.ctre.phoenix6.controls.MotionMagicTorqueCurrentFOC;
+import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.controls.VoltageOut;
 
 import org.littletonrobotics.junction.AutoLog;
@@ -67,6 +68,9 @@ public class TalonFXIO {
     // Sets the voltage output of the motor
     public void setControl(VoltageOut control) {}
 
-    // Uses MotionMagic to target a position
+    // Uses MotionMagic to target a position, with torque current
     public void setControl(MotionMagicTorqueCurrentFOC control) {}
+
+    // Uses MotionMagic to target a position, with voltage
+    public void setControl(MotionMagicVoltage control) {}
 }

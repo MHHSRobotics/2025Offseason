@@ -115,6 +115,8 @@ public class RobotContainer {
     private void configureSysId() {
         sysIdController.cross().whileTrue(armCommands.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
         sysIdController.circle().whileTrue(armCommands.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
+        sysIdController.square().whileTrue(armCommands.sysIdDynamic(SysIdRoutine.Direction.kForward));
+        sysIdController.triangle().whileTrue(armCommands.sysIdDynamic(SysIdRoutine.Direction.kReverse));
     }
 
     public Command getAutonomousCommand() {

@@ -6,7 +6,7 @@ import edu.wpi.first.wpilibj.Alert.AlertType;
 
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.DutyCycleOut;
-import com.ctre.phoenix6.controls.MotionMagicTorqueCurrentFOC;
+import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.controls.VoltageOut;
 
 import org.littletonrobotics.junction.Logger;
@@ -30,7 +30,8 @@ public class LoggedTalonFX {
     // Control objects
     private DutyCycleOut dutyCycle = new DutyCycleOut(0);
     private VoltageOut voltage = new VoltageOut(0);
-    private MotionMagicTorqueCurrentFOC motionMagic = new MotionMagicTorqueCurrentFOC(0);
+    // private MotionMagicTorqueCurrentFOC motionMagic = new MotionMagicTorqueCurrentFOC(0);
+    private MotionMagicVoltage motionMagic = new MotionMagicVoltage(0);
 
     // Alerts for faults. These will appear on AdvantageScope/Elastic
     private Alert disconnectedAlert;
@@ -161,6 +162,10 @@ public class LoggedTalonFX {
     public void setVoltage(double volts) {
         io.setControl(voltage.withOutput(volts));
     }
+
+    // public void setGoal(double position) {
+    //     io.setControl(motionMagic.withPosition(Radians.of(position)));
+    // }
 
     public void setGoal(double position) {
         io.setControl(motionMagic.withPosition(Radians.of(position)));
