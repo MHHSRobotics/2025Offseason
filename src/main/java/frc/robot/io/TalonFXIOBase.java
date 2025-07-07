@@ -14,6 +14,7 @@ import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.DutyCycleOut;
 import com.ctre.phoenix6.controls.MotionMagicTorqueCurrentFOC;
+import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.ControlModeValue;
@@ -29,7 +30,7 @@ public class TalonFXIOBase extends TalonFXIO {
     // The actual TalonFX
     private TalonFX motor;
 
-    // A bunch of StatusSignals that monitor the motor
+    // StatusSignals that get data from the motor
     private StatusSignal<Angle> position;
     private StatusSignal<AngularVelocity> velocity;
     private StatusSignal<AngularAcceleration> accel;
@@ -140,9 +141,9 @@ public class TalonFXIOBase extends TalonFXIO {
         inputs.connected = connectedDebounce.calculate(motor.isConnected());
 
         // Some signals give rotations, so they have to be converted to radians
-        inputs.positionRad = Units.rotationsToRadians(position.getValueAsDouble());
-        inputs.velocityRadPerSec = Units.rotationsToRadians(velocity.getValueAsDouble());
-        inputs.accelRadPerSecSquared = Units.rotationsToRadians(accel.getValueAsDouble());
+        inputs.position = Units.rotationsToRadians(position.getValueAsDouble());
+        inputs.velocity = Units.rotationsToRadians(velocity.getValueAsDouble());
+        inputs.accel = Units.rotationsToRadians(accel.getValueAsDouble());
 
         inputs.appliedVoltage = appliedVoltage.getValueAsDouble();
         inputs.supplyVoltage = supplyVoltage.getValueAsDouble();
@@ -151,8 +152,8 @@ public class TalonFXIOBase extends TalonFXIO {
 
         inputs.controlMode = controlMode.getValue().toString();
 
-        inputs.setpointRad = Units.rotationsToRadians(closedLoopReference.getValueAsDouble());
-        inputs.errorRad = Units.rotationsToRadians(closedLoopError.getValueAsDouble());
+        inputs.setpoint = Units.rotationsToRadians(closedLoopReference.getValueAsDouble());
+        inputs.error = Units.rotationsToRadians(closedLoopError.getValueAsDouble());
         inputs.feedforward = feedforward.getValueAsDouble();
         inputs.derivOutput = derivOutput.getValueAsDouble();
         inputs.intOutput = intOutput.getValueAsDouble();
@@ -192,6 +193,11 @@ public class TalonFXIOBase extends TalonFXIO {
 
     @Override
     public void setControl(MotionMagicTorqueCurrentFOC control) {
+        motor.setControl(control);
+    }
+
+    @Override
+    public void setControl(MotionMagicVoltage control) {
         motor.setControl(control);
     }
 

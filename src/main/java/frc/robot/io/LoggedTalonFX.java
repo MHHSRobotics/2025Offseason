@@ -6,7 +6,8 @@ import edu.wpi.first.wpilibj.Alert.AlertType;
 
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.DutyCycleOut;
-import com.ctre.phoenix6.controls.MotionMagicTorqueCurrentFOC;
+import com.ctre.phoenix6.controls.MotionMagicVoltage;
+import com.ctre.phoenix6.controls.VoltageOut;
 
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
@@ -15,14 +16,24 @@ import frc.robot.io.TalonFXIO.TalonFXIOInputs;
 
 import static edu.wpi.first.units.Units.Radians;
 
+// Manages alerts, logging, and tuning of a TalonFXIO
 public class LoggedTalonFX {
+    // NetworkTables path to log to
     private String logPath;
+
+    // The TalonFX
     private final TalonFXIO io;
+
+    // Current inputs from the TalonFXIO
     private final TalonFXIOInputsAutoLogged inputs = new TalonFXIOInputsAutoLogged();
 
+    // Control objects
     private DutyCycleOut dutyCycle = new DutyCycleOut(0);
-    private MotionMagicTorqueCurrentFOC motionMagic = new MotionMagicTorqueCurrentFOC(0);
+    private VoltageOut voltage = new VoltageOut(0);
+    // private MotionMagicTorqueCurrentFOC motionMagic = new MotionMagicTorqueCurrentFOC(0);
+    private MotionMagicVoltage motionMagic = new MotionMagicVoltage(0);
 
+    // Alerts for faults. These will appear on AdvantageScope/Elastic
     private Alert disconnectedAlert;
 
     private Alert hardwareAlert;
@@ -35,6 +46,7 @@ public class LoggedTalonFX {
     private Alert reverseHardLimitAlert;
     private Alert reverseSoftLimitAlert;
 
+    // Tunable numbers for PID, feedforward, and MotionMagic
     private LoggedNetworkNumber kP;
     private LoggedNetworkNumber kI;
     private LoggedNetworkNumber kD;
@@ -45,6 +57,7 @@ public class LoggedTalonFX {
     private LoggedNetworkNumber cruiseVelocity;
     private LoggedNetworkNumber maxAccel;
 
+    // Variables to check if tunable numbers have changed
     private double lastkP;
     private double lastkI;
     private double lastkD;
@@ -55,6 +68,7 @@ public class LoggedTalonFX {
     private double lastCruiseVelocity;
     private double lastAccel;
 
+    // Current TalonFX config
     private TalonFXConfiguration config;
 
     public LoggedTalonFX(TalonFXIO io, String logPath, TalonFXConfiguration config) {
@@ -62,6 +76,7 @@ public class LoggedTalonFX {
         this.logPath = logPath;
         this.config = config;
 
+        // Initialize alerts
         disconnectedAlert = new Alert(logPath + " is disconnected", AlertType.kError);
 
         hardwareAlert = new Alert(logPath + " encountered a hardware fault", AlertType.kWarning);
@@ -74,7 +89,8 @@ public class LoggedTalonFX {
         reverseHardLimitAlert = new Alert(logPath + " reached its reverse hard limit", AlertType.kWarning);
         reverseSoftLimitAlert = new Alert(logPath + " reached its reverse soft limit", AlertType.kWarning);
 
-        String pidPath = logPath.split("/")[0] + "/" + logPath.split("/")[0] + "PID";
+        // Initialize tunable constants
+        String pidPath = logPath.split("/")[0] + "Settings";
         kP = new LoggedNetworkNumber(pidPath + "/kP", config.Slot0.kP);
         kI = new LoggedNetworkNumber(pidPath + "/kI", config.Slot0.kI);
         kD = new LoggedNetworkNumber(pidPath + "/kD", config.Slot0.kD);
@@ -86,12 +102,16 @@ public class LoggedTalonFX {
                 new LoggedNetworkNumber(pidPath + "/cruiseVelocity", config.MotionMagic.MotionMagicCruiseVelocity);
         maxAccel = new LoggedNetworkNumber(pidPath + "/maxAccel", config.MotionMagic.MotionMagicAcceleration);
 
+        // Apply the config to the TalonFX
         updateConfig();
     }
 
     public void periodic() {
+        // Get the new inputs from TalonFXIO and log them
         io.updateInputs(inputs);
         Logger.processInputs(logPath, inputs);
+
+        // Display any alerts that are currently active
         disconnectedAlert.set(!inputs.connected);
 
         hardwareAlert.set(inputs.hardwareFault);
@@ -104,6 +124,8 @@ public class LoggedTalonFX {
         reverseHardLimitAlert.set(inputs.reverseHardLimit);
         reverseSoftLimitAlert.set(inputs.reverseSoftLimit);
 
+        // Update the config if any tunable number has changed. If we update the config every frame then the bot will
+        // lag
         if (kP.get() != lastkP
                 || kI.get() != lastkI
                 || kD.get() != lastkD
@@ -117,16 +139,16 @@ public class LoggedTalonFX {
         }
     }
 
-    public double getPositionRad() {
-        return inputs.positionRad;
+    public double getPosition() {
+        return inputs.position;
     }
 
-    public double getVelocityRadPerSec() {
-        return inputs.velocityRadPerSec;
+    public double getVelocity() {
+        return inputs.velocity;
     }
 
     public double getGoal() {
-        return inputs.setpointRad;
+        return inputs.setpoint;
     }
 
     public TalonFXIOInputs getInputs() {
@@ -137,12 +159,21 @@ public class LoggedTalonFX {
         io.setControl(dutyCycle.withOutput(value));
     }
 
+    public void setVoltage(double volts) {
+        io.setControl(voltage.withOutput(volts));
+    }
+
+    // public void setGoal(double position) {
+    //     io.setControl(motionMagic.withPosition(Radians.of(position)));
+    // }
+
     public void setGoal(double position) {
         io.setControl(motionMagic.withPosition(Radians.of(position)));
     }
 
-    // Loads the data from the tunable values into config and applies it, also updates the last tunable values
+    // Applies the config with tunable values
     private void updateConfig() {
+        // Update the last tunable values
         lastkP = kP.get();
         lastkI = kI.get();
         lastkD = kD.get();
@@ -153,6 +184,7 @@ public class LoggedTalonFX {
         lastCruiseVelocity = cruiseVelocity.get();
         lastAccel = maxAccel.get();
 
+        // Update the config
         config.Slot0.kP = Units.rotationsToRadians(kP.get());
         config.Slot0.kI = Units.rotationsToRadians(kI.get());
         config.Slot0.kD = Units.rotationsToRadians(kD.get());
@@ -162,6 +194,8 @@ public class LoggedTalonFX {
         config.Slot0.kA = Units.rotationsToRadians(kA.get());
         config.MotionMagic.MotionMagicCruiseVelocity = Units.rotationsToRadians(cruiseVelocity.get());
         config.MotionMagic.MotionMagicAcceleration = Units.rotationsToRadians(maxAccel.get());
+
+        // Apply the config
         io.applyConfig(config);
     }
 }

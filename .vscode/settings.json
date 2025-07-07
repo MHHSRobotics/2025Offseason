@@ -1,5 +1,5 @@
 {
-  "java.configuration.updateBuildConfiguration": "automatic",
+  "java.configuration.updateBuildConfiguration": "disabled",
   "java.server.launchMode": "Standard",
   "files.exclude": {
     "**/.git": true,
@@ -57,5 +57,9 @@
     "edu.wpi.first.math.**.proto.*",
     "edu.wpi.first.math.**.struct.*",
   ],
-  "wpilib.skipSelectSimulateExtension": true
+  "wpilib.skipSelectSimulateExtension": true,
+  "java.project.referencedLibraries": [
+    "build/generated/sources/annotationProcessor/java/main/**/*.java"
+  ],
+  "java.project.sourcePaths": ["src/main/java"],  // Remove generated paths
 }

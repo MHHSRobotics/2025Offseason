@@ -17,7 +17,7 @@ public class TalonFXIOSim extends TalonFXIOBase {
     private TalonFXSimState motorSim;
 
     // Ratio of motor radians to mechanism output. Mechanism output can be in radians (for arms) or meters (for
-    // elevators). Generally for rotating systems tradiansPerMechOutput should be the gear ratio, and for linear systems
+    // elevators). Generally for rotating systems radiansPerMechOutput should be the gear ratio, and for linear systems
     // radiansPerMechOutput should be gearRatio/drumRadius.
     private double radiansPerMechOutput;
 

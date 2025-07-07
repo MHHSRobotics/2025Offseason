@@ -14,11 +14,15 @@ import frc.robot.Constants;
 
 import static edu.wpi.first.units.Units.Radians;
 
+// CANcoderIO implementation that interfaces with a physical CANcoder
 public class CANcoderIOBase extends CANcoderIO {
+    // Debounce to make sure motor disconnects are real
     private Debouncer connectedDebounce = new Debouncer(Constants.debounceTime);
 
+    // The actual CANcoder
     private CANcoder encoder;
 
+    // Status signals to get data from the encoder
     private StatusSignal<Angle> position;
     private StatusSignal<AngularVelocity> velocity;
 
@@ -27,7 +31,10 @@ public class CANcoderIOBase extends CANcoderIO {
     private StatusSignal<Boolean> bootDuringEnable;
     private StatusSignal<Boolean> undervoltage;
 
+    // Offset of the encoder in mechanism radians
     private double offset;
+
+    // Ratio of encoder rotations to mechanism rotations
     private double encoderRatio;
 
     public CANcoderIOBase(int encoderId, String canBus, double encoderRatio, double offset) {
@@ -36,6 +43,7 @@ public class CANcoderIOBase extends CANcoderIO {
         this.offset = offset;
         this.encoderRatio = encoderRatio;
 
+        // Initialize status signals
         position = encoder.getPosition();
         velocity = encoder.getVelocity();
 
@@ -51,18 +59,37 @@ public class CANcoderIOBase extends CANcoderIO {
 
     @Override
     public void updateInputs(CANcoderIOInputs inputs) {
+        // Update the simulation if we're in one
         updateSimulation();
+
+        // Refresh all the status signals
         BaseStatusSignal.refreshAll(position, velocity, badMagnetFault, hardwareFault, bootDuringEnable, undervoltage);
+
+        // Update the inputs
         inputs.connected = connectedDebounce.calculate(encoder.isConnected());
+
+        // CANcoder signals give data in encoder rotations. First convert to radians, then use encoderRatio to convert
+        // to mechanism units.
         inputs.positionRad = Units.rotationsToRadians(position.getValueAsDouble()) / encoderRatio;
         inputs.velocityRadPerSec = Units.rotationsToRadians(velocity.getValueAsDouble()) / encoderRatio;
+
+        // Update fault inputs
+        inputs.badMagnetFault = badMagnetFault.getValue();
+        inputs.hardwareFault = hardwareFault.getValue();
+        inputs.bootDuringEnable = bootDuringEnable.getValue();
+        inputs.undervoltage = undervoltage.getValue();
     }
 
+    // Updates the simulation. Does nothing here, but subclasses can override this.
     public void updateSimulation() {}
 
     @Override
     public void applyConfig(CANcoderConfiguration config) {
+        // Add the offset to the CANcoder config. The offset is in mechanism radians, so it needs to be converted to
+        // encoder radians, then rotations.
         config.MagnetSensor.withMagnetOffset(Radians.of(offset * encoderRatio));
+
+        // Apply the config
         encoder.getConfigurator().apply(config);
     }
 

@@ -8,6 +8,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.wpilibj.DriverStation;
 
+// Utility functions used it multiple places
 public class RobotUtils {
     /**
      * Checks if the robot is on the red alliance.

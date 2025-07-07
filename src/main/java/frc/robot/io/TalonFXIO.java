@@ -3,6 +3,7 @@ package frc.robot.io;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.DutyCycleOut;
 import com.ctre.phoenix6.controls.MotionMagicTorqueCurrentFOC;
+import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.controls.VoltageOut;
 
 import org.littletonrobotics.junction.AutoLog;
@@ -20,9 +21,10 @@ public class TalonFXIO {
     public static class TalonFXIOInputs {
         public boolean connected;
 
-        public double positionRad; // radians of mechanism
-        public double velocityRadPerSec; // radians of mechanism per sec
-        public double accelRadPerSecSquared; // radians of mechanism per sec^2
+        // Mechanism units are radians for arms and flywheels and meters for elevators.
+        public double position; // mechanism units
+        public double velocity; // mechanism units per sec
+        public double accel; // mechanism units per sec^2
 
         public double appliedVoltage; // volts
         public double supplyVoltage; // volts
@@ -31,8 +33,8 @@ public class TalonFXIO {
 
         public String controlMode; // Current control type
 
-        public double setpointRad; // Current setpoint for the motor, radians of mechanism
-        public double errorRad; // Difference between current position and goal position, radians of mechanism
+        public double setpoint; // Current setpoint for the motor, mechanism units
+        public double error; // Difference between current position and goal position, mechanism units
         public double feedforward; // Current feedforward for the motor, amps
         public double derivOutput; // Current motor output from kD, amps
         public double intOutput; // Current motor output from kI, amps
@@ -66,6 +68,9 @@ public class TalonFXIO {
     // Sets the voltage output of the motor
     public void setControl(VoltageOut control) {}
 
-    // Uses MotionMagic to target a position
+    // Uses MotionMagic to target a position, with torque current
     public void setControl(MotionMagicTorqueCurrentFOC control) {}
+
+    // Uses MotionMagic to target a position, with voltage
+    public void setControl(MotionMagicVoltage control) {}
 }

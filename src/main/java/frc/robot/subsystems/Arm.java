@@ -6,12 +6,14 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
 import com.ctre.phoenix6.signals.GravityTypeValue;
 import com.ctre.phoenix6.signals.InvertedValue;
+import com.ctre.phoenix6.signals.SensorDirectionValue;
 
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.mechanism.LoggedMechanism2d;
@@ -24,6 +26,12 @@ import frc.robot.io.LoggedCANcoder;
 import frc.robot.io.LoggedTalonFX;
 import frc.robot.io.TalonFXIO;
 
+import static edu.wpi.first.units.Units.Radians;
+import static edu.wpi.first.units.Units.RadiansPerSecond;
+import static edu.wpi.first.units.Units.Second;
+import static edu.wpi.first.units.Units.Seconds;
+import static edu.wpi.first.units.Units.Volts;
+
 public class Arm extends SubsystemBase {
 
     public static class Constants {
@@ -31,25 +39,33 @@ public class Arm extends SubsystemBase {
 
         public static final int motorId = 22;
         public static final boolean motorInverted = false;
+
         public static final int encoderId = 1;
         public static final double encoderOffset = -1.052; // radians
+        public static final boolean encoderInverted = false;
 
-        public static final double gearRatio = 700 / 9.; // ratio of mechanism rotations to motor rotations
-        public static final double encoderRatio = 28 / 9.; // ratio of mechanism rotations to encoder rotations
+        public static final double gearRatio = 700 / 9.; // ratio of motor rotations to mechanism rotations
+        public static final double encoderRatio = 28 / 9.; // ratio of encoder rotations to mechanism rotations
 
-        public static final double kP = 200; // amps per radian, current scales with distance to setpoint
-        public static final double kD = 20; // amps per radian per sec
+        public static final double kP = 53.777; // amps per radian, current scales with distance to setpoint
+        public static final double kD = 12.029; // amps per radian per sec
 
-        public static final double kS = 0; // amps, the current needed to overcome static friction
-        public static final double kG = 0; // amps, the current needed to overcome gravity when the arm is horizontal
+        public static final double kS = 0.0875; // amps, the current needed to overcome static friction
+        public static final double kG = 4; // amps, the current needed to overcome gravity when the arm is horizontal
         public static final double kV =
-                0; // amps per radian per sec, current needed to overcome linear friction (scales with velocity)
+                8.0969; // amps per radian per sec, current needed to overcome linear friction (scales with velocity)
         public static final double kA =
-                0; // amps per radian per sec^2, current needed to overcome quadratic friction (scales with
+                1.251; // amps per radian per sec^2, current needed to overcome quadratic friction (scales with
         // acceleration)
 
         public static final double maxVelocity = 100; // radians per sec, sets the max velocity MotionMagic will use
         public static final double maxAccel = 200; // radians per sec^2, sets the max acceleration MotionMagic will use
+
+        public static final double statorCurrentLimit = 70; // Limit on total torque output from the motor
+        public static final double supplyCurrentLimit = 60; // Limit on current pull from the motor
+        public static final double supplyCurrentLowerLimit =
+                40; // If the motor pulls >40 amps for >0.3 seconds, then the current limit will be set to 40 amps
+        public static final double supplyCurrentLowerTime = 0.3;
 
         public static final double moi = 4.8944; // kg m^2, how hard it is to rotate the arm
         public static final double mass = 10; // kg
@@ -58,13 +74,18 @@ public class Arm extends SubsystemBase {
         public static final double maxAngle = Units.degreesToRadians(140);
         public static final double startAngle = Units.degreesToRadians(90); // start angle for the simulated arm
 
+        // Angle bounds for SysId tests (if the arm hits its physical limit during SysId then the identification will
+        // fail)
+        public static final double minSysIdAngle = Units.degreesToRadians(-30);
+        public static final double maxSysIdAngle = Units.degreesToRadians(125);
+
         public static final double rotorToSensorRatio =
-                gearRatio / encoderRatio; // ratio of encoder rotations to motor rotations
+                gearRatio / encoderRatio; // ratio of motor rotations to encoder rotations
         public static final double armLength =
                 Math.sqrt(3 * moi / mass); // math to make WPILib simulate the arm correctly
 
-        public static final LoggedNetworkBoolean manualArm =
-                new LoggedNetworkBoolean("Arm/Manual Arm", false); // toggles whether the arm is in manual control
+        public static final LoggedNetworkBoolean manualArm = new LoggedNetworkBoolean(
+                "ArmSettings/Manual Arm", false); // toggles whether the arm is in manual control
     }
 
     // Motor, uses LoggedTalonFX to automatically handle simulation
@@ -108,6 +129,22 @@ public class Arm extends SubsystemBase {
     private final LoggedMechanismLigament2d fAmount =
             fRoot.append(new LoggedMechanismLigament2d("FAmount", 1.0, 90, 6, new Color8Bit(Color.kWhite)));
 
+    // SysId routine
+    private final SysIdRoutine sysId = new SysIdRoutine(
+            new SysIdRoutine.Config(
+                    Volts.of(1).per(Second), // Ramp rate for quasistatic, volts/sec
+                    Volts.of(4), // Step voltage for dynamic
+                    Seconds.of(10)), // Timeout
+            new SysIdRoutine.Mechanism(
+                    // Voltage setting function
+                    (voltage) -> motor.setVoltage(voltage.in(Volts)),
+                    // SysId logging function
+                    (log) -> log.motor("arm")
+                            .angularPosition(Radians.of(motor.getPosition()))
+                            .angularVelocity(RadiansPerSecond.of(motor.getVelocity()))
+                            .voltage(Volts.of(motor.getInputs().appliedVoltage)),
+                    this));
+
     public Arm(TalonFXIO motorIO, CANcoderIO encoderIO) {
         TalonFXConfiguration motorConfig = new TalonFXConfiguration();
 
@@ -138,7 +175,20 @@ public class Arm extends SubsystemBase {
         motorConfig.MotionMagic.MotionMagicCruiseVelocity = Constants.maxVelocity;
         motorConfig.MotionMagic.MotionMagicAcceleration = Constants.maxAccel;
 
+        // Current limits
+        motorConfig.CurrentLimits.StatorCurrentLimit = Constants.statorCurrentLimit;
+
+        motorConfig.CurrentLimits.SupplyCurrentLimit = Constants.supplyCurrentLimit;
+        motorConfig.CurrentLimits.SupplyCurrentLowerLimit = Constants.supplyCurrentLowerLimit;
+        motorConfig.CurrentLimits.SupplyCurrentLowerTime = Constants.supplyCurrentLowerTime;
+
+        // There are no useful encoder configs
         CANcoderConfiguration encoderConfig = new CANcoderConfiguration();
+
+        // Inverts the encoder depending on Constants.encoderInverted
+        encoderConfig.MagnetSensor.SensorDirection = Constants.encoderInverted
+                ? SensorDirectionValue.Clockwise_Positive
+                : SensorDirectionValue.CounterClockwise_Positive;
 
         // Create logged motors and encoders from the configs
         motor = new LoggedTalonFX(motorIO, "Arm/Motor", motorConfig);
@@ -160,6 +210,16 @@ public class Arm extends SubsystemBase {
         return motor.getGoal();
     }
 
+    // Gets the SysId routine
+    public SysIdRoutine getSysId() {
+        return sysId;
+    }
+
+    // Checks if the arm is in safe SysId range
+    public boolean withinSysIdLimits() {
+        return motor.getPosition() < Constants.maxSysIdAngle && motor.getPosition() > Constants.minSysIdAngle;
+    }
+
     @Override
     public void periodic() {
         // Call periodic methods
@@ -167,9 +227,9 @@ public class Arm extends SubsystemBase {
         encoder.periodic();
 
         // Set angles of the visualization arm and goal arm
-        arm.setAngle(Rotation2d.fromRadians(motor.getPositionRad()));
+        arm.setAngle(Rotation2d.fromRadians(motor.getPosition()));
 
-        if (motor.getInputs().controlMode.equals("MotionMagicTorqueCurrentFOC")) {
+        if (motor.getInputs().controlMode.startsWith("MotionMagic")) {
             // If motor is currently in PID mode, show all the lines
             goalArm.setLineWeight(6);
             pAmount.setLineWeight(6);
@@ -182,7 +242,7 @@ public class Arm extends SubsystemBase {
             dAmount.setLength(motor.getInputs().derivOutput / 100);
             fAmount.setLength(motor.getInputs().feedforward / 100);
         } else {
-            // Make all the lines invisible
+            // Make all the lines invisible by setting their width to 0
             goalArm.setLineWeight(0);
             pAmount.setLineWeight(0);
             dAmount.setLineWeight(0);
