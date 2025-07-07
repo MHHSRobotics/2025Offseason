@@ -13,6 +13,7 @@ import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
 import com.ctre.phoenix6.signals.GravityTypeValue;
 import com.ctre.phoenix6.signals.InvertedValue;
+import com.ctre.phoenix6.signals.SensorDirectionValue;
 
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.mechanism.LoggedMechanism2d;
@@ -38,8 +39,10 @@ public class Arm extends SubsystemBase {
 
         public static final int motorId = 22;
         public static final boolean motorInverted = false;
+
         public static final int encoderId = 1;
         public static final double encoderOffset = -1.052; // radians
+        public static final boolean encoderInverted = false;
 
         public static final double gearRatio = 700 / 9.; // ratio of motor rotations to mechanism rotations
         public static final double encoderRatio = 28 / 9.; // ratio of encoder rotations to mechanism rotations
@@ -71,7 +74,8 @@ public class Arm extends SubsystemBase {
         public static final double maxAngle = Units.degreesToRadians(140);
         public static final double startAngle = Units.degreesToRadians(90); // start angle for the simulated arm
 
-        // Angle bounds for SysId tests
+        // Angle bounds for SysId tests (if the arm hits its physical limit during SysId then the identification will
+        // fail)
         public static final double minSysIdAngle = Units.degreesToRadians(-30);
         public static final double maxSysIdAngle = Units.degreesToRadians(125);
 
@@ -132,7 +136,7 @@ public class Arm extends SubsystemBase {
                     Volts.of(4), // Step voltage for dynamic
                     Seconds.of(10), // Timeout
                     (state) -> {
-                        Logger.recordOutput("Arm/SysId/State", state);
+                        Logger.recordOutput("Arm/SysId/State", state.toString());
                     }),
             new SysIdRoutine.Mechanism(
                     // Voltage setting function
@@ -175,14 +179,18 @@ public class Arm extends SubsystemBase {
 
         // Current limits
         motorConfig.CurrentLimits.StatorCurrentLimit = Constants.statorCurrentLimit;
-        motorConfig.CurrentLimits.StatorCurrentLimitEnable = true;
 
         motorConfig.CurrentLimits.SupplyCurrentLimit = Constants.supplyCurrentLimit;
-        motorConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
         motorConfig.CurrentLimits.SupplyCurrentLowerLimit = Constants.supplyCurrentLowerLimit;
         motorConfig.CurrentLimits.SupplyCurrentLowerTime = Constants.supplyCurrentLowerTime;
 
+        // There are no useful encoder configs
         CANcoderConfiguration encoderConfig = new CANcoderConfiguration();
+
+        // Inverts the encoder depending on Constants.encoderInverted
+        encoderConfig.MagnetSensor.SensorDirection = Constants.encoderInverted
+                ? SensorDirectionValue.Clockwise_Positive
+                : SensorDirectionValue.CounterClockwise_Positive;
 
         // Create logged motors and encoders from the configs
         motor = new LoggedTalonFX(motorIO, "Arm/Motor", motorConfig);
@@ -236,7 +244,7 @@ public class Arm extends SubsystemBase {
             dAmount.setLength(motor.getInputs().derivOutput / 100);
             fAmount.setLength(motor.getInputs().feedforward / 100);
         } else {
-            // Make all the lines invisible
+            // Make all the lines invisible by setting their width to 0
             goalArm.setLineWeight(0);
             pAmount.setLineWeight(0);
             dAmount.setLineWeight(0);
