@@ -84,8 +84,8 @@ public class Arm extends SubsystemBase {
         public static final double armLength =
                 Math.sqrt(3 * moi / mass); // math to make WPILib simulate the arm correctly
 
-        public static final LoggedNetworkBoolean manualArm =
-                new LoggedNetworkBoolean("Arm/Manual Arm", false); // toggles whether the arm is in manual control
+        public static final LoggedNetworkBoolean manualArm = new LoggedNetworkBoolean(
+                "ArmSettings/Manual Arm", false); // toggles whether the arm is in manual control
     }
 
     // Motor, uses LoggedTalonFX to automatically handle simulation

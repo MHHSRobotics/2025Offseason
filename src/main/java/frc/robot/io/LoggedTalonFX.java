@@ -89,7 +89,7 @@ public class LoggedTalonFX {
         reverseSoftLimitAlert = new Alert(logPath + " reached its reverse soft limit", AlertType.kWarning);
 
         // Initialize tunable constants
-        String pidPath = logPath.split("/")[0] + "/" + logPath.split("/")[0] + "PID";
+        String pidPath = logPath.split("/")[0] + "Settings";
         kP = new LoggedNetworkNumber(pidPath + "/kP", config.Slot0.kP);
         kI = new LoggedNetworkNumber(pidPath + "/kI", config.Slot0.kI);
         kD = new LoggedNetworkNumber(pidPath + "/kD", config.Slot0.kD);
