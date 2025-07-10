@@ -1,4 +1,5 @@
 {
+    "java.configuration.updateBuildConfiguration": "automatic",
     "java.server.launchMode": "Standard",
     "files.exclude": {
       "**/.git": true,
@@ -17,14 +18,20 @@
       {
         "name": "WPIlibUnitTests",
         "workingDirectory": "${workspaceFolder}/build/jni/release",
-        "vmargs": [ "-Djava.library.path=${workspaceFolder}/build/jni/release" ],
+        "vmargs": [
+          "-Djava.library.path=${workspaceFolder}/build/jni/release"
+        ],
         "env": {
-          "LD_LIBRARY_PATH": "${workspaceFolder}/build/jni/release" ,
+          "LD_LIBRARY_PATH": "${workspaceFolder}/build/jni/release",
           "DYLD_LIBRARY_PATH": "${workspaceFolder}/build/jni/release"
         }
       },
+      null
     ],
     "java.test.defaultConfig": "WPIlibUnitTests",
+    "spotlessGradle.format.enable": true,
+    "spotlessGradle.diagnostics.enable": false,
+    "java.import.gradle.annotationProcessing.enabled": false,
     "java.completion.favoriteStaticMembers": [
       "org.junit.Assert.*",
       "org.junit.Assume.*",
@@ -53,13 +60,7 @@
       "javax.smartcardio.*",
       "edu.wpi.first.math.proto.*",
       "edu.wpi.first.math.**.proto.*",
-      "edu.wpi.first.math.**.struct.*",
+      "edu.wpi.first.math.**.struct.*"
     ],
-    "wpilib.skipSelectSimulateExtension": true,
-    "java.project.referencedLibraries": [],
-    "java.configuration.updateBuildConfiguration": "automatic",  // Change back
-    "java.import.gradle.annotationProcessing.enabled": true,     // Re-enable
-    "java.project.outputPath": "",  // Use Gradle's output
-    "java.project.sourcePaths": []  // Let Gradle manage this
+    "wpilib.skipSelectSimulateExtension": true
   }
-  
