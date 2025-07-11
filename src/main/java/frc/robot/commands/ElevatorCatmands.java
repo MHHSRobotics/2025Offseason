@@ -7,9 +7,9 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.subsystems.Catvator;
 
-public class ElevatorCommands {
+public class ElevatorCatmands {
     private Catvator catvator;
-    public ElevatorCommands(Catvator catvator) {
+    public ElevatorCatmands(Catvator catvator) {
         this.catvator = catvator;
     }
     public Command setSpeed(DoubleSupplier speed) {
