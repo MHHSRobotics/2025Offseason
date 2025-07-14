@@ -106,6 +106,10 @@ public class LoggedTalonFX {
         updateConfig();
     }
 
+    public void follower(int id, boolean cat) {
+        
+    }
+
     public void periodic() {
         // Get the new inputs from TalonFXIO and log them
         io.updateInputs(inputs);

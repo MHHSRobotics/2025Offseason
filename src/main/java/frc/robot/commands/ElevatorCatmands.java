@@ -5,15 +5,18 @@ import java.util.function.DoubleSupplier;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
+
 import frc.robot.subsystems.Catvator;
 
 public class ElevatorCatmands {
     private Catvator catvator;
+
     public ElevatorCatmands(Catvator catvator) {
         this.catvator = catvator;
     }
+
     public Command setSpeed(DoubleSupplier speed) {
-        return new InstantCommand(()-> catvator.setSpeed(speed.getAsDouble()));
+        return new InstantCommand(() -> catvator.setSpeed(speed.getAsDouble()));
     }
 
     public Command setGoal(DoubleSupplier goal) {
@@ -21,11 +24,13 @@ public class ElevatorCatmands {
     }
 
     public Command changeGoal(DoubleSupplier change) {
-        return new InstantCommand(()->catvator.setGoal(catvator.getGoal() + change.getAsDouble()));
+        return new InstantCommand(() -> catvator.setGoal(catvator.getGoal() + change.getAsDouble()));
     }
+
     public Command stop() {
-        return setSpeed(()->0);
+        return setSpeed(() -> 0);
     }
+
     public Command sysIdQuasistatic(SysIdRoutine.Direction dir) {
         return catvator.getSysId().quasistatic(dir).until(() -> !catvator.withinSysIdLimits());
     }
@@ -34,5 +39,4 @@ public class ElevatorCatmands {
     public Command sysIdDynamic(SysIdRoutine.Direction dir) {
         return catvator.getSysId().dynamic(dir).until(() -> !catvator.withinSysIdLimits());
     }
-    
 }

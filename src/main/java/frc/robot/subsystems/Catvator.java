@@ -4,7 +4,6 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -36,7 +35,7 @@ import static edu.wpi.first.units.Units.Volts;
 
 public class Catvator extends SubsystemBase {
     public static class Constants {
-        //SysID var
+        // SysID var
         public static final int leftMotorId = 20;
         public static final int rightMotorId = 21;
 
@@ -170,17 +169,18 @@ public class Catvator extends SubsystemBase {
         CANcoderConfiguration encoderConfig = new CANcoderConfiguration();
 
         // Inverts the encoder depending on Constants.encoderInverted
-        encoderConfig.MagnetSensor.SensorDirection = 
-        Constants.encoderInverted ?
-                 SensorDirectionValue.Clockwise_Positive
+        encoderConfig.MagnetSensor.SensorDirection = Constants.encoderInverted
+                ? SensorDirectionValue.Clockwise_Positive
                 : SensorDirectionValue.CounterClockwise_Positive;
 
         // Create logged motors and encoders from the configs
         leftMotor = new LoggedTalonFX(motorIO, "Elevator/LeftMotor", config);
-        rightMotor = new LoggedTalonFX(motorIO, "Elevator/RightMotor", config);
+        rightMotor = new LoggedTalonFX(motorIO2, "Elevator/RightMotor", config);
+        
         encoder = new LoggedCANcoder(encoderIO, "Elevator/Encoder", encoderConfig);
     }
-    public void set_Speed(double speed){
+
+    public void setSpeed(double speed) {
         leftMotor.setSpeed(speed);
     }
 
@@ -232,5 +232,4 @@ public class Catvator extends SubsystemBase {
         // Log the mechanism
         Logger.recordOutput("Elevator/Mech", mech);
     }
-
 }
