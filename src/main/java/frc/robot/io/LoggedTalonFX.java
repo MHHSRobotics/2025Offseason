@@ -71,10 +71,10 @@ public class LoggedTalonFX {
     // Current TalonFX config
     private TalonFXConfiguration config;
 
-    public LoggedTalonFX(TalonFXIO io, String logPath, TalonFXConfiguration config) {
+    public LoggedTalonFX(TalonFXIO io, String logPath) {
         this.io = io;
         this.logPath = logPath;
-        this.config = config;
+        this.config = new TalonFXConfiguration();
 
         // Initialize alerts
         disconnectedAlert = new Alert(logPath + " is disconnected", AlertType.kError);
@@ -88,6 +88,7 @@ public class LoggedTalonFX {
         forwardSoftLimitAlert = new Alert(logPath + " reached its forward soft limit", AlertType.kWarning);
         reverseHardLimitAlert = new Alert(logPath + " reached its reverse hard limit", AlertType.kWarning);
         reverseSoftLimitAlert = new Alert(logPath + " reached its reverse soft limit", AlertType.kWarning);
+
 
         // Initialize tunable constants
         String pidPath = logPath.split("/")[0] + "Settings";
@@ -175,31 +176,8 @@ public class LoggedTalonFX {
         io.setControl(motionMagic.withPosition(Radians.of(position)));
     }
 
-    // Applies the config with tunable values
+    // Applies the current config
     private void updateConfig() {
-        // Update the last tunable values
-        lastkP = kP.get();
-        lastkI = kI.get();
-        lastkD = kD.get();
-        lastkG = kG.get();
-        lastkS = kS.get();
-        lastkV = kV.get();
-        lastkA = kA.get();
-        lastCruiseVelocity = cruiseVelocity.get();
-        lastAccel = maxAccel.get();
-
-        // Update the config
-        config.Slot0.kP = Units.rotationsToRadians(kP.get());
-        config.Slot0.kI = Units.rotationsToRadians(kI.get());
-        config.Slot0.kD = Units.rotationsToRadians(kD.get());
-        config.Slot0.kG = kG.get();
-        config.Slot0.kS = kS.get();
-        config.Slot0.kV = Units.rotationsToRadians(kV.get());
-        config.Slot0.kA = Units.rotationsToRadians(kA.get());
-        config.MotionMagic.MotionMagicCruiseVelocity = Units.rotationsToRadians(cruiseVelocity.get());
-        config.MotionMagic.MotionMagicAcceleration = Units.rotationsToRadians(maxAccel.get());
-
-        // Apply the config
         io.applyConfig(config);
     }
 }

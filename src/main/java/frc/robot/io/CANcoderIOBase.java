@@ -5,12 +5,12 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 
-import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.hardware.CANcoder;
 
 import frc.robot.Constants;
+import frc.robot.util.PhoenixUtil;
 
 import static edu.wpi.first.units.Units.Radians;
 
@@ -51,6 +51,16 @@ public class CANcoderIOBase extends CANcoderIO {
         hardwareFault = encoder.getFault_Hardware();
         bootDuringEnable = encoder.getFault_BootDuringEnable();
         undervoltage = encoder.getFault_Undervoltage();
+
+        // Register signals to be automatically refreshed
+        PhoenixUtil.registerSignals(
+                canBus.equals("canivore"),
+                position,
+                velocity,
+                badMagnetFault,
+                hardwareFault,
+                bootDuringEnable,
+                undervoltage);
     }
 
     public CANcoderIOBase(int encoderId, double encoderRatio, double offset) {
@@ -61,9 +71,6 @@ public class CANcoderIOBase extends CANcoderIO {
     public void updateInputs(CANcoderIOInputs inputs) {
         // Update the simulation if we're in one
         updateSimulation();
-
-        // Refresh all the status signals
-        BaseStatusSignal.refreshAll(position, velocity, badMagnetFault, hardwareFault, bootDuringEnable, undervoltage);
 
         // Update the inputs
         inputs.connected = connectedDebounce.calculate(encoder.isConnected());
