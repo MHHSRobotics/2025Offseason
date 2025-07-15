@@ -48,14 +48,14 @@ public class Arm extends SubsystemBase {
         public static final double encoderRatio = 28 / 9.; // ratio of encoder rotations to mechanism rotations
 
         public static final double kP = 53.777; // amps per radian, current scales with distance to setpoint
-        public static final double kD = 12.029; // amps per radian per sec
+        public static final double kD = 1; // amps per radian per sec
 
         public static final double kS = 0.0875; // amps, the current needed to overcome static friction
         public static final double kG = 4; // amps, the current needed to overcome gravity when the arm is horizontal
         public static final double kV =
-                8.0969; // amps per radian per sec, current needed to overcome linear friction (scales with velocity)
+                0; // amps per radian per sec, current needed to overcome linear friction (scales with velocity)
         public static final double kA =
-                1.251; // amps per radian per sec^2, current needed to overcome quadratic friction (scales with
+                0; // amps per radian per sec^2, current needed to overcome quadratic friction (scales with
         // acceleration)
 
         public static final double maxVelocity = 100; // radians per sec, sets the max velocity MotionMagic will use

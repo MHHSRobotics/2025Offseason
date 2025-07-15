@@ -1,4 +1,4 @@
-package frc.robot.utils;
+package frc.robot.util;
 
 public class Field {
     // Field dimensions
