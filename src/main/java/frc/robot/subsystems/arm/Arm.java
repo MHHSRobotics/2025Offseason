@@ -22,7 +22,6 @@ import frc.robot.io.LoggedTalonFX;
 import frc.robot.io.TalonFXIO;
 import frc.robot.util.LoggedTunableNumber;
 
-import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static edu.wpi.first.units.Units.Second;
@@ -45,24 +44,26 @@ public class Arm extends SubsystemBase {
         public static final double encoderRatio = 28 / 9.; // ratio of encoder rotations to mechanism rotations
 
         public static final LoggedTunableNumber kP =
-                new LoggedTunableNumber("Arm/kP", 20); // amps per radian, current scales with distance to setpoint
-        public static final LoggedTunableNumber kD = new LoggedTunableNumber("Arm/kD", 0); // amps per radian per sec
+                new LoggedTunableNumber("Arm/kP", 29.84); // amps per radian, current scales with distance to setpoint
+        public static final LoggedTunableNumber kD =
+                new LoggedTunableNumber("Arm/kD", 3.9867); // amps per radian per sec
 
         public static final LoggedTunableNumber kS =
-                new LoggedTunableNumber("Arm/kS", 0); // amps, the current needed to overcome static friction
+                new LoggedTunableNumber("Arm/kS", 0.0138); // amps, the current needed to overcome static friction
         public static final LoggedTunableNumber kG = new LoggedTunableNumber(
-                "Arm/kG", 1.3); // amps, the current needed to overcome gravity when the arm is horizontal
+                "Arm/kG", 1.308); // amps, the current needed to overcome gravity when the arm is horizontal
         public static final LoggedTunableNumber kV = new LoggedTunableNumber(
                 "Arm/kV",
-                0); // amps per radian per sec, current needed to overcome linear friction (scales with velocity)
+                9.2006); // amps per radian per sec, current needed to overcome linear friction (scales with velocity)
         public static final LoggedTunableNumber kA = new LoggedTunableNumber(
-                "Arm/kA", 0); // amps per radian per sec^2, current needed to overcome quadratic friction (scales with
+                "Arm/kA",
+                0.76272); // amps per radian per sec^2, current needed to overcome quadratic friction (scales with
         // acceleration)
 
         public static final LoggedTunableNumber maxVelocity = new LoggedTunableNumber(
                 "Arm/maxVelocity", 100); // radians per sec, sets the max velocity MotionMagic will use
         public static final LoggedTunableNumber maxAccel = new LoggedTunableNumber(
-                "Arm/maxAccel", 12); // radians per sec^2, sets the max acceleration MotionMagic will use
+                "Arm/maxAccel", 200); // radians per sec^2, sets the max acceleration MotionMagic will use
 
         public static final double statorCurrentLimit = 70; // Limit on total torque output from the motor
         public static final double supplyCurrentLimit = 60; // Limit on current pull from the motor
