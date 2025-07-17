@@ -12,11 +12,9 @@ import com.ctre.phoenix6.hardware.CANcoder;
 import frc.robot.Constants;
 import frc.robot.util.PhoenixUtil;
 
-import static edu.wpi.first.units.Units.Radians;
-
 // CANcoderIO implementation that interfaces with a physical CANcoder
 public class CANcoderIOBase extends CANcoderIO {
-    // Debounce to make sure motor disconnects are real
+    // Debounce to make sure encoder disconnects are real
     private Debouncer connectedDebounce = new Debouncer(Constants.debounceTime);
 
     // The actual CANcoder
@@ -31,17 +29,11 @@ public class CANcoderIOBase extends CANcoderIO {
     private StatusSignal<Boolean> bootDuringEnable;
     private StatusSignal<Boolean> undervoltage;
 
-    // Offset of the encoder in mechanism radians
-    private double offset;
-
     // Ratio of encoder rotations to mechanism rotations
-    private double encoderRatio;
+    private double encoderRatio = 1;
 
-    public CANcoderIOBase(int encoderId, String canBus, double encoderRatio, double offset) {
+    public CANcoderIOBase(int encoderId, String canBus) {
         encoder = new CANcoder(encoderId, canBus);
-
-        this.offset = offset;
-        this.encoderRatio = encoderRatio;
 
         // Initialize status signals
         position = encoder.getPosition();
@@ -52,7 +44,7 @@ public class CANcoderIOBase extends CANcoderIO {
         bootDuringEnable = encoder.getFault_BootDuringEnable();
         undervoltage = encoder.getFault_Undervoltage();
 
-        // Register signals to be automatically refreshed
+        // Register signals to be automatically refreshed every 20ms
         PhoenixUtil.registerSignals(
                 canBus.equals("canivore"),
                 position,
@@ -63,15 +55,12 @@ public class CANcoderIOBase extends CANcoderIO {
                 undervoltage);
     }
 
-    public CANcoderIOBase(int encoderId, double encoderRatio, double offset) {
-        this(encoderId, "", encoderRatio, offset);
+    public CANcoderIOBase(int encoderId) {
+        this(encoderId, "");
     }
 
     @Override
     public void updateInputs(CANcoderIOInputs inputs) {
-        // Update the simulation if we're in one
-        updateSimulation();
-
         // Update the inputs
         inputs.connected = connectedDebounce.calculate(encoder.isConnected());
 
@@ -87,20 +76,17 @@ public class CANcoderIOBase extends CANcoderIO {
         inputs.undervoltage = undervoltage.getValue();
     }
 
-    // Updates the simulation. Does nothing here, but subclasses can override this.
-    public void updateSimulation() {}
-
     @Override
     public void applyConfig(CANcoderConfiguration config) {
-        // Add the offset to the CANcoder config. The offset is in mechanism radians, so it needs to be converted to
-        // encoder radians, then rotations.
-        config.MagnetSensor.withMagnetOffset(Radians.of(offset * encoderRatio));
-
-        // Apply the config
         encoder.getConfigurator().apply(config);
     }
 
     public CANcoder getCANcoder() {
         return encoder;
+    }
+
+    @Override
+    public void setEncoderRatio(double encoderRatio) {
+        this.encoderRatio = encoderRatio;
     }
 }

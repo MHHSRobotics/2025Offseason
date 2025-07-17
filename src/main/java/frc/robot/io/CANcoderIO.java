@@ -25,4 +25,7 @@ public class CANcoderIO {
 
     // Applies a config to the encoder
     public void applyConfig(CANcoderConfiguration config) {}
+
+    // CTRE doesn't let us set the gear ratio through the config so we have to do it manually
+    public void setEncoderRatio(double encoderRatio) {}
 }

@@ -137,9 +137,6 @@ public class TalonFXIOBase extends TalonFXIO {
     // Updates the TalonFXIOInputs
     @Override
     public void updateInputs(TalonFXIOInputs inputs) {
-        // If we're in a simulation, update it
-        updateSimulation();
-
         // Update all the inputs from the signal values
         inputs.connected = connectedDebounce.calculate(motor.isConnected());
 
@@ -176,9 +173,6 @@ public class TalonFXIOBase extends TalonFXIO {
         inputs.reverseSoftLimit = reverseSoftLimit.getValue();
     }
 
-    // Updates the simulation. Does nothing here, but can be overridden by subclasses
-    public void updateSimulation() {}
-
     @Override
     public void applyConfig(TalonFXConfiguration config) {
         motor.getConfigurator().apply(config);
@@ -214,7 +208,7 @@ public class TalonFXIOBase extends TalonFXIO {
         motor.setControl(control);
     }
 
-    protected TalonFX getMotor() {
+    public TalonFX getMotor() {
         return motor;
     }
 }

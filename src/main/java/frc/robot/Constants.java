@@ -22,4 +22,6 @@ public final class Constants {
 
     public static final double debounceTime =
             0.5; // time in seconds to wait before reporting a motor or encoder disconnected
+
+    public static final boolean tuningMode = true;
 }
