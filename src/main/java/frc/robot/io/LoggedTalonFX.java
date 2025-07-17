@@ -22,12 +22,12 @@ import frc.robot.io.TalonFXIO.TalonFXIOInputs;
 
 import static edu.wpi.first.units.Units.Radians;
 
-// Manages alerts, logging, and tuning of a TalonFXIO
+// Manages alerts, logging, and control of a TalonFXIO
 public class LoggedTalonFX {
     // NetworkTables path to log to
     private String logPath;
 
-    // The TalonFX
+    // The TalonFX interface
     private final TalonFXIO io;
 
     // Current inputs from the TalonFXIO
@@ -64,7 +64,7 @@ public class LoggedTalonFX {
         this.io = io;
         this.logPath = logPath;
 
-        // Create a new config
+        // Create an empty config
         config = new TalonFXConfiguration();
 
         // Initialize alerts
@@ -107,21 +107,22 @@ public class LoggedTalonFX {
         }
     }
 
-    // Returns the position of the motor in mechanism radians
+    // Returns the position of the motor in mechanism units
     public double getPosition() {
         return inputs.position;
     }
 
-    // Returns the velocity of the motor in mechanism radians
+    // Returns the velocity of the motor in mechanism units/s
     public double getVelocity() {
         return inputs.velocity;
     }
 
-    // Returns the current goal of the motor
+    // Returns the current goal of the motor in mechanism units
     public double getGoal() {
         return inputs.setpoint;
     }
 
+    // Gets the current input object. Use this to get all the motor info that isn't given by the above three getters.
     public TalonFXIOInputs getInputs() {
         return inputs;
     }
@@ -131,17 +132,17 @@ public class LoggedTalonFX {
         io.setControl(dutyCycle.withOutput(value));
     }
 
-    // Sets the output voltage of the motor
+    // Sets the output voltage of the motor. This is basically the same as setSpeed but scaled by 12, so -12 is full reverse and 12 is full forward.
     public void setVoltage(double volts) {
         io.setControl(voltage.withOutput(volts));
     }
 
-    // Sets the torque current of the motor in amps
+    // Sets the torque current of the motor in amps. This is sometimes more useful than setting voltage, since it automatically compensates for battery voltage and the motor's back EMF
     public void setTorqueCurrent(double current) {
         io.setControl(torqueCurrent.withOutput(current));
     }
 
-    // Sets the goal of the motor using MotionMagic TorqueCurrentFOC output
+    // Sets the goal of the motor using MotionMagic TorqueCurrentFOC output. Don't use this, use setGoalWithVoltage. TorqueCUrrentFOC can't be characterized with SysId.
     public void setGoalWithCurrent(double position) {
         io.setControl(motionMagicTorqueCurrent.withPosition(Radians.of(position)));
     }
@@ -170,6 +171,7 @@ public class LoggedTalonFX {
         configChanged = true;
     }
 
+    // Setters for PID and feedforward tuning
     public void setkP(double kP) {
         double newkP = Units.rotationsToRadians(kP);
         if (newkP != config.Slot0.kP) {
@@ -240,6 +242,7 @@ public class LoggedTalonFX {
         }
     }
 
+    // Sets whether continuous wrap should be enabled for the motor. This basically tells the TalonFX that it's attached to a mechanism that can go the full 360 degrees, so it can move in either direction to reach its goal. The swerve angle motors use this.
     public void setContinuousWrap(boolean continuousWrap) {
         config.ClosedLoopGeneral.ContinuousWrap = continuousWrap;
         configChanged = true;
@@ -271,6 +274,7 @@ public class LoggedTalonFX {
         configChanged = true;
     }
 
+    // How TalonFX current limits work: the stator current limit is the limit on how much force can be applied by the motor. The supply current limit is the limit on how many amps the motor can pull from the battery. To prevent brownouts, if the current pulled by the motor exceeds SupplyCurrentLowerLimit for SupplyCurrentLowerTime seconds then the motor output will be clamped to SupplyCurrentLowerLimit.
     public void setStatorCurrentLimit(double statorCurrentLimit) {
         config.CurrentLimits.StatorCurrentLimit = statorCurrentLimit;
         configChanged = true;

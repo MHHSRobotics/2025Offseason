@@ -23,8 +23,7 @@ import com.ctre.phoenix6.signals.ControlModeValue;
 import frc.robot.Constants;
 import frc.robot.util.PhoenixUtil;
 
-// TalonFXIO implementation that interfaces with a physical TalonFX. In sim this interfaces with a simulated TalonFX, so
-// TalonFXIOSim extends this.
+// TalonFXIO implementation that interfaces with a physical TalonFX. In sim this interfaces with a simulated TalonFX.
 public class TalonFXIOBase extends TalonFXIO {
     // Debounce to make sure motor disconnects are real
     private Debouncer connectedDebounce = new Debouncer(Constants.debounceTime);
@@ -32,7 +31,9 @@ public class TalonFXIOBase extends TalonFXIO {
     // The actual TalonFX
     private TalonFX motor;
 
-    // StatusSignals that get data from the motor
+    // All data here is measured in mech units, which are radians for arms and meters for elevators. TalonFX's native signals are scaled by 2pi, so they have to be fixed when the inputs are recorded.
+
+    // StatusSignals that get data from the motor, see TalonFXIO for an explanation of each
     private StatusSignal<Angle> position;
     private StatusSignal<AngularVelocity> velocity;
     private StatusSignal<AngularAcceleration> accel;

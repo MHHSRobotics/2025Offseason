@@ -44,20 +44,20 @@ public class Arm extends SubsystemBase {
         public static final double encoderRatio = 28 / 9.; // ratio of encoder rotations to mechanism rotations
 
         public static final LoggedTunableNumber kP =
-                new LoggedTunableNumber("Arm/kP", 29.84); // amps per radian, current scales with distance to setpoint
+                new LoggedTunableNumber("Arm/kP", 29.84); // volts per radian, current scales with distance to setpoint
         public static final LoggedTunableNumber kD =
-                new LoggedTunableNumber("Arm/kD", 3.9867); // amps per radian per sec
+                new LoggedTunableNumber("Arm/kD", 3.9867); // volts per radian per sec
 
         public static final LoggedTunableNumber kS =
-                new LoggedTunableNumber("Arm/kS", 0.0138); // amps, the current needed to overcome static friction
+                new LoggedTunableNumber("Arm/kS", 0.0138); // volts, the current needed to overcome static friction
         public static final LoggedTunableNumber kG = new LoggedTunableNumber(
-                "Arm/kG", 1.308); // amps, the current needed to overcome gravity when the arm is horizontal
+                "Arm/kG", 1.308); // volts, the current needed to overcome gravity when the arm is horizontal
         public static final LoggedTunableNumber kV = new LoggedTunableNumber(
                 "Arm/kV",
-                9.2006); // amps per radian per sec, current needed to overcome linear friction (scales with velocity)
+                9.2006); // volts per radian per sec, current needed to overcome linear friction (scales with velocity)
         public static final LoggedTunableNumber kA = new LoggedTunableNumber(
                 "Arm/kA",
-                0.76272); // amps per radian per sec^2, current needed to overcome quadratic friction (scales with
+                0.76272); // volts per radian per sec^2, current needed to overcome quadratic friction (scales with
         // acceleration)
 
         public static final LoggedTunableNumber maxVelocity = new LoggedTunableNumber(
@@ -78,8 +78,8 @@ public class Arm extends SubsystemBase {
         public static final double maxAngle = Units.degreesToRadians(140);
         public static final double startAngle = Units.degreesToRadians(90); // start angle for the simulated arm
 
-        // Angle bounds for SysId tests (if the arm hits its physical limit during SysId then the identification will
-        // fail)
+        // Angle bounds for SysId tests. If the arm hits its physical limit during SysId then the identification will
+        // fail. These bounds should be close to the mechanical bounds but with a few degrees of clearance.
         public static final double minSysIdAngle = Units.degreesToRadians(-30);
         public static final double maxSysIdAngle = Units.degreesToRadians(125);
 

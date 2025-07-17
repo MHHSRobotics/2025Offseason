@@ -72,10 +72,12 @@ public class LoggedCANcoder {
         }
     }
 
+    // Gets position in mechanism units
     public double getPosition() {
         return inputs.positionRad;
     }
 
+    // Gets velocity in mechanism units/s
     public double getVelocity() {
         return inputs.velocityRadPerSec;
     }
@@ -84,12 +86,14 @@ public class LoggedCANcoder {
         return inputs;
     }
 
+    // Sets the ratio and offset of this encoder. The ratio is (encoder radians)/(mechanism unit), and the offset is measured in mechanism units.
     public void setRatioAndOffset(double ratio, double offset) {
         io.setEncoderRatio(ratio);
         config.MagnetSensor.withMagnetOffset(Radians.of(offset * ratio));
         configChanged = true;
     }
 
+    // Sets whether the encoder is inverted
     public void setInverted(boolean inverted) {
         config.MagnetSensor.SensorDirection =
                 inverted ? SensorDirectionValue.Clockwise_Positive : SensorDirectionValue.CounterClockwise_Positive;

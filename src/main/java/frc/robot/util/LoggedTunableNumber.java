@@ -1,12 +1,5 @@
 package frc.robot.util;
 
-// Copyright (c) 2025 FRC 6328
-// http://github.com/Mechanical-Advantage
-//
-// Use of this source code is governed by an MIT-style
-// license that can be found in the LICENSE file at
-// the root directory of this project.
-
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.DoubleSupplier;
@@ -15,6 +8,7 @@ import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
 
 import frc.robot.Constants;
 
+// Code from team 6328
 /**
  * Class for a tunable number. Gets value from dashboard in tuning mode, returns default if not or
  * value not in dashboard.
