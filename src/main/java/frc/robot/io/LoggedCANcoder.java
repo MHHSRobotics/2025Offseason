@@ -3,23 +3,6 @@ package frc.robot.io;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 
-import com.ctre.phoenix6.configs.CANcoderConfiguration;
-
-import org.littletonrobotics.junction.Logger;
-
-import frc.robot.io.CANcoderIO.CANcoderIOInputs;
-
-// Manages alerts, logging, and tuning of a CANcoderIO
-public class LoggedCANcoder {
-    // NetworkTables path to log to
-    private String logPath;
-
-    // The CANcoder
-    private final CANcoderIO io;
-
-    // Current inputs from the CANcoderIO
-    private final CANcoderIOInputsAutoLogged inputs = new CANcoderIOInputsAutoLogged();
-
     // Alerts for faults. These will appear on AdvantageScope/Elastic
     private Alert disconnectedAlert;
 
