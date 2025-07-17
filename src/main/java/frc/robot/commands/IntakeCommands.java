@@ -12,14 +12,6 @@ import frc.robot.subsystems.Intake;
 public class IntakeCommands {
     private Intake intake;
 
-    public static class Constants {
-        public static final int motorId = 24;
-        public static final double intakeSpeed = 0.9;
-        public static final double outtakeTime = 0.5;
-        public static final double intakeTime = 0.5;
-        public static boolean motorInverted = false;
-    }
-
     public IntakeCommands(Intake intake) {
         this.intake = intake;
     }
@@ -34,8 +26,8 @@ public class IntakeCommands {
 
     public Command intake() {
         Command command = new SequentialCommandGroup(
-            new InstantCommand(() -> intake.setSpeed(Constants.intakeSpeed)), // Start the intake
-            new WaitCommand(Constants.intakeTime),                                                   // Wait for 1 second
+            new InstantCommand(() -> intake.setSpeed(Intake.Constants.intakeSpeed)), // Start the intake
+            new WaitCommand(Intake.Constants.intakeTime),                                                   // Wait for 1 second
             stop()                                                                // Stop the intake
         );
         command.addRequirements(intake);
@@ -45,7 +37,7 @@ public class IntakeCommands {
      public Command pulseIntake() {
         Command command = new RepeatCommand(
             new SequentialCommandGroup(
-                setSpeed(() -> Constants.intakeSpeed),
+                setSpeed(() -> Intake.Constants.intakeSpeed),
                 new WaitCommand(0.1),
                 stop(),
                 new WaitCommand(0.15)
@@ -57,8 +49,8 @@ public class IntakeCommands {
 
     public Command outtake() {
         Command command = new SequentialCommandGroup(
-            new InstantCommand(() -> intake.setSpeed(-Constants.intakeSpeed)), // Start the intake
-            new WaitCommand(Constants.outtakeTime),                                                   // Wait for 1 second
+            new InstantCommand(() -> intake.setSpeed(-Intake.Constants.intakeSpeed)), // Start the intake
+            new WaitCommand(Intake.Constants.outtakeTime),                                                   // Wait for 1 second
             stop()                                                                // Stop the intake
         );
         command.addRequirements(intake);
@@ -67,7 +59,7 @@ public class IntakeCommands {
 
     public Command outtake(DoubleSupplier time) {
         Command command = new SequentialCommandGroup(
-            new InstantCommand(() -> intake.setSpeed(-Constants.intakeSpeed)), // Start the intake
+            new InstantCommand(() -> intake.setSpeed(-Intake.Constants.intakeSpeed)), // Start the intake
             new WaitCommand(time.getAsDouble()),                                                   // Wait for 1 second
             stop()                                                                // Stop the intake
         );
