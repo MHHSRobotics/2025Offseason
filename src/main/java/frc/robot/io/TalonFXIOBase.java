@@ -9,20 +9,21 @@ import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Temperature;
 import edu.wpi.first.units.measure.Voltage;
 
-import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.DutyCycleOut;
+import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.MotionMagicTorqueCurrentFOC;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
+import com.ctre.phoenix6.controls.TorqueCurrentFOC;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.ControlModeValue;
 
 import frc.robot.Constants;
+import frc.robot.util.PhoenixUtil;
 
-// TalonFXIO implementation that interfaces with a physical TalonFX. In sim this interfaces with a simulated TalonFX, so
-// TalonFXIOSim extends this.
+// TalonFXIO implementation that interfaces with a physical TalonFX. In sim this interfaces with a simulated TalonFX.
 public class TalonFXIOBase extends TalonFXIO {
     // Debounce to make sure motor disconnects are real
     private Debouncer connectedDebounce = new Debouncer(Constants.debounceTime);
@@ -30,7 +31,9 @@ public class TalonFXIOBase extends TalonFXIO {
     // The actual TalonFX
     private TalonFX motor;
 
-    // StatusSignals that get data from the motor
+    // All data here is measured in mech units, which are radians for arms and meters for elevators. TalonFX's native signals are scaled by 2pi, so they have to be fixed when the inputs are recorded.
+
+    // StatusSignals that get data from the motor, see TalonFXIO for an explanation of each
     private StatusSignal<Angle> position;
     private StatusSignal<AngularVelocity> velocity;
     private StatusSignal<AngularAcceleration> accel;
@@ -97,20 +100,10 @@ public class TalonFXIOBase extends TalonFXIO {
         forwardSoftLimit = motor.getFault_ForwardSoftLimit();
         reverseHardLimit = motor.getFault_ReverseHardLimit();
         reverseSoftLimit = motor.getFault_ReverseSoftLimit();
-    }
 
-    public TalonFXIOBase(int motorId) {
-        this(motorId, "");
-    }
-
-    // Updates the TalonFXIOInputs
-    @Override
-    public void updateInputs(TalonFXIOInputs inputs) {
-        // If we're in a simulation, update it
-        updateSimulation();
-
-        // Refresh all the signals
-        BaseStatusSignal.refreshAll(
+        // Register all the signals to be refreshed every 20ms
+        PhoenixUtil.registerSignals(
+                canBus.equals("canivore"),
                 position,
                 velocity,
                 accel,
@@ -136,7 +129,15 @@ public class TalonFXIOBase extends TalonFXIO {
                 forwardSoftLimit,
                 reverseHardLimit,
                 reverseSoftLimit);
+    }
 
+    public TalonFXIOBase(int motorId) {
+        this(motorId, "");
+    }
+
+    // Updates the TalonFXIOInputs
+    @Override
+    public void updateInputs(TalonFXIOInputs inputs) {
         // Update all the inputs from the signal values
         inputs.connected = connectedDebounce.calculate(motor.isConnected());
 
@@ -173,9 +174,6 @@ public class TalonFXIOBase extends TalonFXIO {
         inputs.reverseSoftLimit = reverseSoftLimit.getValue();
     }
 
-    // Updates the simulation. Does nothing here, but can be overridden by subclasses
-    public void updateSimulation() {}
-
     @Override
     public void applyConfig(TalonFXConfiguration config) {
         motor.getConfigurator().apply(config);
@@ -201,7 +199,17 @@ public class TalonFXIOBase extends TalonFXIO {
         motor.setControl(control);
     }
 
-    protected TalonFX getMotor() {
+    @Override
+    public void setControl(TorqueCurrentFOC control) {
+        motor.setControl(control);
+    }
+
+    @Override
+    public void setControl(Follower control) {
+        motor.setControl(control);
+    }
+
+    public TalonFX getMotor() {
         return motor;
     }
 }

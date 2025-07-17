@@ -1,4 +1,4 @@
-package frc.robot.subsystems;
+package frc.robot.subsystems.arm;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -8,12 +8,7 @@ import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 
-import com.ctre.phoenix6.configs.CANcoderConfiguration;
-import com.ctre.phoenix6.configs.TalonFXConfiguration;
-import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
 import com.ctre.phoenix6.signals.GravityTypeValue;
-import com.ctre.phoenix6.signals.InvertedValue;
-import com.ctre.phoenix6.signals.SensorDirectionValue;
 
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.mechanism.LoggedMechanism2d;
@@ -25,9 +20,10 @@ import frc.robot.io.CANcoderIO;
 import frc.robot.io.LoggedCANcoder;
 import frc.robot.io.LoggedTalonFX;
 import frc.robot.io.TalonFXIO;
+import frc.robot.util.LoggedTunableNumber;
 
-import static edu.wpi.first.units.Units.Radians;
-import static edu.wpi.first.units.Units.RadiansPerSecond;
+import static edu.wpi.first.units.Units.Rotations;
+import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static edu.wpi.first.units.Units.Second;
 import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.units.Units.Volts;
@@ -47,19 +43,27 @@ public class Arm extends SubsystemBase {
         public static final double gearRatio = 700 / 9.; // ratio of motor rotations to mechanism rotations
         public static final double encoderRatio = 28 / 9.; // ratio of encoder rotations to mechanism rotations
 
-        public static final double kP = 53.777; // amps per radian, current scales with distance to setpoint
-        public static final double kD = 12.029; // amps per radian per sec
+        public static final LoggedTunableNumber kP =
+                new LoggedTunableNumber("Arm/kP", 29.84); // volts per radian, current scales with distance to setpoint
+        public static final LoggedTunableNumber kD =
+                new LoggedTunableNumber("Arm/kD", 3.9867); // volts per radian per sec
 
-        public static final double kS = 0.0875; // amps, the current needed to overcome static friction
-        public static final double kG = 4; // amps, the current needed to overcome gravity when the arm is horizontal
-        public static final double kV =
-                8.0969; // amps per radian per sec, current needed to overcome linear friction (scales with velocity)
-        public static final double kA =
-                1.251; // amps per radian per sec^2, current needed to overcome quadratic friction (scales with
+        public static final LoggedTunableNumber kS =
+                new LoggedTunableNumber("Arm/kS", 0.0138); // volts, the current needed to overcome static friction
+        public static final LoggedTunableNumber kG = new LoggedTunableNumber(
+                "Arm/kG", 1.308); // volts, the current needed to overcome gravity when the arm is horizontal
+        public static final LoggedTunableNumber kV = new LoggedTunableNumber(
+                "Arm/kV",
+                9.2006); // volts per radian per sec, current needed to overcome linear friction (scales with velocity)
+        public static final LoggedTunableNumber kA = new LoggedTunableNumber(
+                "Arm/kA",
+                0.76272); // volts per radian per sec^2, current needed to overcome quadratic friction (scales with
         // acceleration)
 
-        public static final double maxVelocity = 100; // radians per sec, sets the max velocity MotionMagic will use
-        public static final double maxAccel = 200; // radians per sec^2, sets the max acceleration MotionMagic will use
+        public static final LoggedTunableNumber maxVelocity = new LoggedTunableNumber(
+                "Arm/maxVelocity", 100); // radians per sec, sets the max velocity MotionMagic will use
+        public static final LoggedTunableNumber maxAccel = new LoggedTunableNumber(
+                "Arm/maxAccel", 200); // radians per sec^2, sets the max acceleration MotionMagic will use
 
         public static final double statorCurrentLimit = 70; // Limit on total torque output from the motor
         public static final double supplyCurrentLimit = 60; // Limit on current pull from the motor
@@ -74,8 +78,8 @@ public class Arm extends SubsystemBase {
         public static final double maxAngle = Units.degreesToRadians(140);
         public static final double startAngle = Units.degreesToRadians(90); // start angle for the simulated arm
 
-        // Angle bounds for SysId tests (if the arm hits its physical limit during SysId then the identification will
-        // fail)
+        // Angle bounds for SysId tests. If the arm hits its physical limit during SysId then the identification will
+        // fail. These bounds should be close to the mechanical bounds but with a few degrees of clearance.
         public static final double minSysIdAngle = Units.degreesToRadians(-30);
         public static final double maxSysIdAngle = Units.degreesToRadians(125);
 
@@ -140,59 +144,21 @@ public class Arm extends SubsystemBase {
                     (voltage) -> motor.setVoltage(voltage.in(Volts)),
                     // SysId logging function
                     (log) -> log.motor("arm")
-                            .angularPosition(Radians.of(motor.getPosition()))
-                            .angularVelocity(RadiansPerSecond.of(motor.getVelocity()))
+                            .angularPosition(Rotations.of(motor.getPosition()))
+                            .angularVelocity(RotationsPerSecond.of(motor.getVelocity()))
                             .voltage(Volts.of(motor.getInputs().appliedVoltage)),
                     this));
 
     public Arm(TalonFXIO motorIO, CANcoderIO encoderIO) {
-        TalonFXConfiguration motorConfig = new TalonFXConfiguration();
+        motor = new LoggedTalonFX(motorIO, "Arm/Motor");
+        motor.setInverted(Constants.motorInverted);
+        motor.connectCANcoder(Constants.encoderId, Constants.rotorToSensorRatio, Constants.encoderRatio);
 
-        // Inverts the motor depending on Constants.motorInverted
-        motorConfig.MotorOutput.Inverted =
-                Constants.motorInverted ? InvertedValue.Clockwise_Positive : InvertedValue.CounterClockwise_Positive;
+        motor.setFeedforwardType(GravityTypeValue.Arm_Cosine);
 
-        // Fuses the motor to the encoder. Note: don't put the offset here, it's already handled by CANcoderIOBase
-        motorConfig.Feedback.FeedbackRemoteSensorID = Constants.encoderId;
-        motorConfig.Feedback.RotorToSensorRatio = Constants.rotorToSensorRatio;
-        motorConfig.Feedback.SensorToMechanismRatio = Constants.encoderRatio;
-        motorConfig.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.FusedCANcoder;
-
-        // PID setup
-        motorConfig.Slot0.kP = Constants.kP;
-        motorConfig.Slot0.kD = Constants.kD;
-
-        // Sets feedforward type to arm
-        motorConfig.Slot0.GravityType = GravityTypeValue.Arm_Cosine;
-
-        // Feedforward contants
-        motorConfig.Slot0.kS = Constants.kS;
-        motorConfig.Slot0.kG = Constants.kG;
-        motorConfig.Slot0.kV = Constants.kV;
-        motorConfig.Slot0.kA = Constants.kA;
-
-        // Motion magic constants
-        motorConfig.MotionMagic.MotionMagicCruiseVelocity = Constants.maxVelocity;
-        motorConfig.MotionMagic.MotionMagicAcceleration = Constants.maxAccel;
-
-        // Current limits
-        motorConfig.CurrentLimits.StatorCurrentLimit = Constants.statorCurrentLimit;
-
-        motorConfig.CurrentLimits.SupplyCurrentLimit = Constants.supplyCurrentLimit;
-        motorConfig.CurrentLimits.SupplyCurrentLowerLimit = Constants.supplyCurrentLowerLimit;
-        motorConfig.CurrentLimits.SupplyCurrentLowerTime = Constants.supplyCurrentLowerTime;
-
-        // There are no useful encoder configs
-        CANcoderConfiguration encoderConfig = new CANcoderConfiguration();
-
-        // Inverts the encoder depending on Constants.encoderInverted
-        encoderConfig.MagnetSensor.SensorDirection = Constants.encoderInverted
-                ? SensorDirectionValue.Clockwise_Positive
-                : SensorDirectionValue.CounterClockwise_Positive;
-
-        // Create logged motors and encoders from the configs
-        motor = new LoggedTalonFX(motorIO, "Arm/Motor", motorConfig);
-        encoder = new LoggedCANcoder(encoderIO, "Arm/Encoder", encoderConfig);
+        encoder = new LoggedCANcoder(encoderIO, "Arm/Encoder");
+        encoder.setInverted(Constants.encoderInverted);
+        encoder.setRatioAndOffset(Constants.encoderRatio, Constants.encoderOffset);
     }
 
     // Sets the speed of the arm. Speed is from -1 (full backward) to 1 (full forward)
@@ -202,7 +168,7 @@ public class Arm extends SubsystemBase {
 
     // Sets the goal of the arm in radians
     public void setGoal(double pos) {
-        motor.setGoal(MathUtil.clamp(pos, Constants.minAngle, Constants.maxAngle));
+        motor.setGoalWithVoltage(MathUtil.clamp(pos, Constants.minAngle, Constants.maxAngle));
     }
 
     // Returns the goal of the arm
@@ -251,5 +217,31 @@ public class Arm extends SubsystemBase {
 
         // Log the mechanism
         Logger.recordOutput("Arm/Mech", mech);
+
+        // Update the tuning constants if applicable
+        if (Constants.kP.hasChanged(hashCode())) {
+            motor.setkP(Constants.kP.get());
+        }
+        if (Constants.kD.hasChanged(hashCode())) {
+            motor.setkD(Constants.kD.get());
+        }
+        if (Constants.kG.hasChanged(hashCode())) {
+            motor.setkG(Constants.kG.get());
+        }
+        if (Constants.kS.hasChanged(hashCode())) {
+            motor.setkS(Constants.kS.get());
+        }
+        if (Constants.kV.hasChanged(hashCode())) {
+            motor.setkV(Constants.kV.get());
+        }
+        if (Constants.kA.hasChanged(hashCode())) {
+            motor.setkA(Constants.kA.get());
+        }
+        if (Constants.maxVelocity.hasChanged(hashCode())) {
+            motor.setMaxVelocity(Constants.maxVelocity.get());
+        }
+        if (Constants.maxAccel.hasChanged(hashCode())) {
+            motor.setMaxAccel(Constants.maxAccel.get());
+        }
     }
 }

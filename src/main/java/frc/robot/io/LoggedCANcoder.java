@@ -4,10 +4,13 @@ import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
+import com.ctre.phoenix6.signals.SensorDirectionValue;
 
 import org.littletonrobotics.junction.Logger;
 
 import frc.robot.io.CANcoderIO.CANcoderIOInputs;
+
+import static edu.wpi.first.units.Units.Radians;
 
 // Manages alerts, logging, and tuning of a CANcoderIO
 public class LoggedCANcoder {
@@ -31,10 +34,14 @@ public class LoggedCANcoder {
     // Current CANcoder config
     private CANcoderConfiguration config;
 
-    public LoggedCANcoder(CANcoderIO io, String logPath, CANcoderConfiguration config) {
+    // Whether the config has changed since the last update
+    private boolean configChanged = true;
+
+    public LoggedCANcoder(CANcoderIO io, String logPath) {
         this.io = io;
         this.logPath = logPath;
-        this.config = config;
+
+        config = new CANcoderConfiguration();
 
         // Initialize alerts
         disconnectedAlert = new Alert(logPath + " is disconnected", AlertType.kError);
@@ -43,9 +50,6 @@ public class LoggedCANcoder {
         hardwareAlert = new Alert(logPath + " encountered a hardware fault", AlertType.kWarning);
         bootDuringEnableAlert = new Alert(logPath + " booted during enable", AlertType.kWarning);
         undervoltageAlert = new Alert(logPath + " has insufficient voltage", AlertType.kWarning);
-
-        // Apply the config
-        updateConfig();
     }
 
     public void periodic() {
@@ -60,12 +64,20 @@ public class LoggedCANcoder {
         hardwareAlert.set(inputs.hardwareFault);
         bootDuringEnableAlert.set(inputs.bootDuringEnable);
         undervoltageAlert.set(inputs.undervoltage);
+
+        // If the config was changed, apply it
+        if (configChanged) {
+            io.applyConfig(config);
+            configChanged = false;
+        }
     }
 
+    // Gets position in mechanism units
     public double getPosition() {
         return inputs.positionRad;
     }
 
+    // Gets velocity in mechanism units/s
     public double getVelocity() {
         return inputs.velocityRadPerSec;
     }
@@ -74,7 +86,17 @@ public class LoggedCANcoder {
         return inputs;
     }
 
-    private void updateConfig() {
-        io.applyConfig(config);
+    // Sets the ratio and offset of this encoder. The ratio is (encoder radians)/(mechanism unit), and the offset is measured in mechanism units.
+    public void setRatioAndOffset(double ratio, double offset) {
+        io.setEncoderRatio(ratio);
+        config.MagnetSensor.withMagnetOffset(Radians.of(offset * ratio));
+        configChanged = true;
+    }
+
+    // Sets whether the encoder is inverted
+    public void setInverted(boolean inverted) {
+        config.MagnetSensor.SensorDirection =
+                inverted ? SensorDirectionValue.Clockwise_Positive : SensorDirectionValue.CounterClockwise_Positive;
+        configChanged = true;
     }
 }

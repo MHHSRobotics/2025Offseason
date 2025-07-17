@@ -2,15 +2,15 @@ package frc.robot.io;
 
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.DutyCycleOut;
+import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.MotionMagicTorqueCurrentFOC;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
+import com.ctre.phoenix6.controls.TorqueCurrentFOC;
 import com.ctre.phoenix6.controls.VoltageOut;
 
 import org.littletonrobotics.junction.AutoLog;
 
-// This is a generic class for all IO objects that access a TalonFX. The abstraction allows us to use different
-// subclasses depending on if we're in the real bot or simulation, so we don't have to worry about simulation in the
-// main robot code.
+// This is a generic class for all IO objects that access a TalonFX. The abstraction allows us to use this class without worrying if we're in a real bot, simulation, or replay. The TalonFXIOBase subclass is used for the real bot and simulation, and an empty instance of this class is used for replay.
 public class TalonFXIO {
 
     // Creates a TalonFXIOInputsAutoLogged class that logs all inputs every periodic(). That constructor should be used
@@ -68,9 +68,15 @@ public class TalonFXIO {
     // Sets the voltage output of the motor
     public void setControl(VoltageOut control) {}
 
+    // Sets the torque current output of the motor
+    public void setControl(TorqueCurrentFOC control) {}
+
     // Uses MotionMagic to target a position, with torque current
     public void setControl(MotionMagicTorqueCurrentFOC control) {}
 
     // Uses MotionMagic to target a position, with voltage
     public void setControl(MotionMagicVoltage control) {}
+
+    // Follows another motor
+    public void setControl(Follower control) {}
 }
