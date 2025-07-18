@@ -67,6 +67,8 @@ public class RobotContainer {
                 armMotor = _armMotor;
                 armEncoder = _armEncoder;
 
+                intakeMotor = null;
+
                 // Arm interfaces with simulated TalonFX and CANcoders connected to the physics simulator
                 new ArmSim(_armMotor, _armEncoder);
                 break;
@@ -74,10 +76,13 @@ public class RobotContainer {
             default:
                 armMotor = new TalonFXIO();
                 armEncoder = new CANcoderIO();
+
+                intakeMotor = new TalonFXIO();
                 break;
         }
 
         arm = new Arm(armMotor, armEncoder);
+        intake = new Intake(intakeMotor);
     }
 
     private void configureBindings() {
