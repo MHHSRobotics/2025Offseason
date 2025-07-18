@@ -12,11 +12,12 @@ public class Intake extends SubsystemBase{
         public static final double intakeSpeed = 0.9;
         public static final double outtakeTime = 0.5;
         public static final double intakeTime = 0.5;
-        public static boolean motorInverted = false;
+        public static boolean motorInverted = false; 
     }
 
     public Intake(TalonFXIO motorIO){
-        motor = new LoggedTalonFX(motorIO, "Intake/Motor");  
+        motor = new LoggedTalonFX(motorIO, "Intake/Motor");
+        motor.setInverted(Constants.motorInverted);  
     }
 
     public void setSpeed(double value) {
