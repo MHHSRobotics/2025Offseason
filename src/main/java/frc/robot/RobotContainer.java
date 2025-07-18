@@ -6,16 +6,21 @@ import edu.wpi.first.wpilibj2.command.button.CommandPS5Controller;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 
 import frc.robot.commands.ArmCommands;
+import frc.robot.commands.IntakeCommands;
 import frc.robot.io.CANcoderIO;
 import frc.robot.io.CANcoderIOBase;
 import frc.robot.io.TalonFXIO;
 import frc.robot.io.TalonFXIOBase;
+import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.arm.Arm;
 import frc.robot.subsystems.arm.ArmSim;
 
 public class RobotContainer {
     private Arm arm;
+    private Intake intake;
+
     private final ArmCommands armCommands;
+    private final IntakeCommands intakeCommands;
 
     private final CommandPS5Controller controller = new CommandPS5Controller(0);
 
@@ -25,7 +30,9 @@ public class RobotContainer {
     public RobotContainer() {
         // Initialize all the IO objects, subsystems, and mechanism simulators
         initSubsystems();
+
         armCommands = new ArmCommands(arm);
+        intakeCommands = new IntakeCommands(intake);
 
         // Add controller bindings
         configureBindings();
@@ -38,6 +45,10 @@ public class RobotContainer {
         // Create variables for all motors and encoders
         TalonFXIO armMotor;
         CANcoderIO armEncoder;
+
+        TalonFXIO intakeMotor;
+
+
         switch (Constants.currentMode) {
             case REAL:
                 // On a real bot, the arm should be using IO that interfaces with real motors (TalonFXIOBase,
@@ -45,6 +56,9 @@ public class RobotContainer {
                 armMotor = new TalonFXIOBase(Arm.Constants.motorId, "rio");
                 armEncoder = new CANcoderIOBase(Arm.Constants.encoderId, "rio");
                 arm = new Arm(armMotor, armEncoder);
+
+                intakeMotor = new TalonFXIOBase(Intake.Constants.motorId, "rio");
+                intake = new Intake(intakeMotor);
                 break;
 
             case SIM:
