@@ -12,6 +12,7 @@ import frc.robot.io.TalonFXIO;
 import frc.robot.io.TalonFXIOBase;
 import frc.robot.subsystems.arm.Arm;
 import frc.robot.subsystems.arm.ArmSim;
+import frc.robot.subsystems.swerve.Swerve;
 
 public class RobotContainer {
     private Arm arm;
@@ -26,6 +27,7 @@ public class RobotContainer {
         // Initialize all the IO objects, subsystems, and mechanism simulators
         initSubsystems();
         armCommands = new ArmCommands(arm);
+        new Swerve(null);
 
         // Add controller bindings
         configureBindings();

@@ -86,7 +86,8 @@ public class LoggedCANcoder {
         return inputs;
     }
 
-    // Sets the ratio and offset of this encoder. The ratio is (encoder radians)/(mechanism unit), and the offset is measured in mechanism units.
+    // Sets the ratio and offset of this encoder. The ratio is (encoder radians)/(mechanism unit), and the offset is
+    // measured in mechanism units.
     public void setRatioAndOffset(double ratio, double offset) {
         io.setEncoderRatio(ratio);
         config.MagnetSensor.withMagnetOffset(Radians.of(offset * ratio));
