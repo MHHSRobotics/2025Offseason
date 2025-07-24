@@ -4,10 +4,13 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 
+import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.DutyCycleOut;
 import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.MotionMagicTorqueCurrentFOC;
+import com.ctre.phoenix6.controls.MotionMagicVelocityTorqueCurrentFOC;
+import com.ctre.phoenix6.controls.MotionMagicVelocityVoltage;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.controls.TorqueCurrentFOC;
 import com.ctre.phoenix6.controls.VoltageOut;
@@ -21,6 +24,7 @@ import org.littletonrobotics.junction.Logger;
 import frc.robot.io.TalonFXIO.TalonFXIOInputs;
 
 import static edu.wpi.first.units.Units.Radians;
+import static edu.wpi.first.units.Units.RadiansPerSecond;
 
 // Manages alerts, logging, and control of a TalonFXIO
 public class LoggedTalonFX {
@@ -39,6 +43,8 @@ public class LoggedTalonFX {
     private MotionMagicTorqueCurrentFOC motionMagicTorqueCurrent = new MotionMagicTorqueCurrentFOC(0);
     private MotionMagicVoltage motionMagicVoltage = new MotionMagicVoltage(0);
     private TorqueCurrentFOC torqueCurrent = new TorqueCurrentFOC(0);
+    private MotionMagicVelocityVoltage velocityVoltage = new MotionMagicVelocityVoltage(0);
+    private MotionMagicVelocityTorqueCurrentFOC velocityTorqueCurrent = new MotionMagicVelocityTorqueCurrentFOC(0);
     private Follower follow = new Follower(0, false);
 
     // Alerts for faults. These will appear on AdvantageScope/Elastic
@@ -145,7 +151,7 @@ public class LoggedTalonFX {
     }
 
     // Sets the goal of the motor using MotionMagic TorqueCurrentFOC output. Don't use this, use setGoalWithVoltage.
-    // TorqueCUrrentFOC can't be characterized with SysId.
+    // TorqueCurrentFOC can't be characterized with SysId.
     public void setGoalWithCurrent(double position) {
         io.setControl(motionMagicTorqueCurrent.withPosition(Radians.of(position)));
     }
@@ -153,6 +159,18 @@ public class LoggedTalonFX {
     // Sets the goal of the motor using MotionMagic Voltage output
     public void setGoalWithVoltage(double position) {
         io.setControl(motionMagicVoltage.withPosition(Radians.of(position)));
+    }
+
+    // Sets the goal velocity of the motor using MotionMagic TorqueCurrentFOC output. Don't use this, use setVelocityWithVoltage.
+    // TorqueCurrentFOC can't be characterized with SysId.
+    public void setVelocityWithCurrent(double velocity) {
+        io.setControl(velocityTorqueCurrent.withVelocity(RadiansPerSecond.of(velocity)));
+    }
+
+    // Sets the goal velocity of the motor using MotionMagic TorqueCurrentFOC output. Don't use this, use setVelocityWithVoltage.
+    // TorqueCurrentFOC can't be characterized with SysId.
+    public void setVelocityWithVoltage(double velocity) {
+        io.setControl(velocityVoltage.withVelocity(RadiansPerSecond.of(velocity)));
     }
 
     // Makes this motor follow another motor with the given ID. Set invert to true to follow the other motor inverted.
@@ -227,6 +245,11 @@ public class LoggedTalonFX {
             config.Slot0.kA = newkA;
             configChanged = true;
         }
+    }
+
+    public void setGains(Slot0Configs gains) {
+        config.Slot0 = gains;
+        configChanged = true;
     }
 
     public void setMaxVelocity(double maxVelocity) {

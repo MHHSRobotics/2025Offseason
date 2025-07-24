@@ -4,6 +4,8 @@ import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.DutyCycleOut;
 import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.MotionMagicTorqueCurrentFOC;
+import com.ctre.phoenix6.controls.MotionMagicVelocityTorqueCurrentFOC;
+import com.ctre.phoenix6.controls.MotionMagicVelocityVoltage;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.controls.TorqueCurrentFOC;
 import com.ctre.phoenix6.controls.VoltageOut;
@@ -78,6 +80,12 @@ public class TalonFXIO {
 
     // Uses MotionMagic to target a position, with voltage
     public void setControl(MotionMagicVoltage control) {}
+
+    // Uses MotionMagic to target a velocity, with voltage
+    public void setControl(MotionMagicVelocityVoltage control) {}
+
+    // Uses MotionMagic to target a velocity, with torque current
+    public void setControl(MotionMagicVelocityTorqueCurrentFOC control) {}
 
     // Follows another motor
     public void setControl(Follower control) {}

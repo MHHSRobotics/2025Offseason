@@ -1,16 +1,9 @@
 package frc.robot.subsystems.swerve;
 
-import java.io.File;
-import java.io.FileReader;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-import edu.wpi.first.wpilibj.Filesystem;
-
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-
-public class Swerve {
-    public static class Constants {
-    }
+public class Swerve extends SubsystemBase {
+    public static class Constants {}
 
     private SwerveModule[] modules = new SwerveModule[4];
 
