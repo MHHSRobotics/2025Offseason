@@ -11,6 +11,8 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.signals.DifferentialSensorSourceValue;
+import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
 import com.ctre.phoenix6.signals.GravityTypeValue;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
@@ -151,6 +153,45 @@ public class Catvator extends SubsystemBase {
         config.Slot0.kA = Constants.kA;
         config.Slot0.GravityType = GravityTypeValue.Elevator_Static;
 
+        config.ClosedLoopGeneral. = 0;
+
+        config.ClosedLoopRamps. = 0;
+
+        config.CurrentLimits.StatorCurrentLimit = Constants.SupplyCurrentLimit;
+        config.CurrentLimits.StatorCurrentLimitEnable = true;
+
+        config.CustomParams. = 0;
+
+        config.DifferentialConstants.Peak = 0;
+
+        config.DifferentialSensors.DifferentialSensorSource = DifferentialSensorSourceValue.RemoteCANcoder;
+        config.DifferentialSensors.DifferentialRemoteSensorID = Constants.encoderId;
+
+        config.Feedback.FeedbackRotorOffset = 0; //min -1 max 1
+        config.Feedback.SensorToMechanismRatio = 1.0; //min -1000 max 1000
+        config.Feedback.RotorToSensorRatio = Constants.rotorToSensorRatio; //min -1000 max 1000
+        config.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.FusedCANcoder;
+
+        config.FutureProofConfigs = true;
+
+        config.HardwareLimitSwitch. = 0;
+
+        config.MotionMagic. = 0;
+
+        //config.MotorOutput. = 0;
+
+        config.OpenLoopRamps. = 0;
+
+        config.SoftwareLimitSwitch. = 0;
+
+        config.TorqueCurrent.PeakForwardTorqueCurrent = 400;
+        config.TorqueCurrent.PeakReverseTorqueCurrent = -400; //min -800 max 800
+        config.TorqueCurrent.TorqueNeutralDeadband = 0; //min 0 max 25
+
+        config.Voltage.SupplyVoltageTimeConstant = 0;
+        config.Voltage.PeakForwardVoltage = Constants.MaxVolt;
+        config.Voltage.PeakReverseVoltage = -1 * Constants.MaxVolt;
+
         config.Feedback.FeedbackRemoteSensorID = Constants.encoderId;
         config.Feedback.RotorToSensorRatio = Constants.rotorToSensorRatio;
         config.Feedback.SensorToMechanismRatio = Constants.encoderRatio;
@@ -166,6 +207,24 @@ public class Catvator extends SubsystemBase {
         config.Voltage.PeakForwardVoltage = Constants.MaxVolt;
         config.Voltage.PeakReverseVoltage = -1 * Constants.MaxVolt;
 
+        config.deserialize(getName());
+        config.serialize();
+        config.toString();
+        config.withClosedLoopGeneral(null);
+        config.withClosedLoopRamps(null);
+        config.withCurrentLimits(null);
+        config.withCustomParams(null);
+        config.withDifferentialConstants(null);
+        config.withDifferentialSensors(null);
+        config.withFeedback(null);
+        config.withHardwareLimitSwitch(null);
+        config.withMotionMagic(null);
+        config.withMotorOutput(null);
+        config.withOpenLoopRamps(null);
+        config.withSlot0(null);
+        config.withSoftwareLimitSwitch(null);
+        config.withTorqueCurrent(null);
+        config.withVoltage(null);
         CANcoderConfiguration encoderConfig = new CANcoderConfiguration();
 
         // Inverts the encoder depending on Constants.encoderInverted
@@ -176,7 +235,7 @@ public class Catvator extends SubsystemBase {
         // Create logged motors and encoders from the configs
         leftMotor = new LoggedTalonFX(motorIO, "Elevator/LeftMotor", config);
         rightMotor = new LoggedTalonFX(motorIO2, "Elevator/RightMotor", config);
-        
+        rightMotor.follow(Constants.leftMotorId, false);
         encoder = new LoggedCANcoder(encoderIO, "Elevator/Encoder", encoderConfig);
     }
 

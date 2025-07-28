@@ -6,6 +6,7 @@ import edu.wpi.first.wpilibj.Alert.AlertType;
 
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.DutyCycleOut;
+import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.controls.VoltageOut;
 
@@ -32,6 +33,7 @@ public class LoggedTalonFX {
     private VoltageOut voltage = new VoltageOut(0);
     // private MotionMagicTorqueCurrentFOC motionMagic = new MotionMagicTorqueCurrentFOC(0);
     private MotionMagicVoltage motionMagic = new MotionMagicVoltage(0);
+    private Follower follower = new Follower(0, false);
 
     // Alerts for faults. These will appear on AdvantageScope/Elastic
     private Alert disconnectedAlert;
@@ -71,10 +73,10 @@ public class LoggedTalonFX {
     // Current TalonFX config
     private TalonFXConfiguration config;
 
-    public LoggedTalonFX(TalonFXIO io, String logPath) {
+    public LoggedTalonFX(TalonFXIO io, String logPath, TalonFXConfiguration config) {
         this.io = io;
         this.logPath = logPath;
-        this.config = new TalonFXConfiguration();
+        this.config = config;
 
         // Initialize alerts
         disconnectedAlert = new Alert(logPath + " is disconnected", AlertType.kError);
@@ -107,8 +109,8 @@ public class LoggedTalonFX {
         updateConfig();
     }
 
-    public void follower(int id, boolean cat) {
-        
+    public void follow(int motorId, boolean invert) {
+        io.setControl(follower.withMasterID(motorId).withOpposeMasterDirection(invert));
     }
 
     public void periodic() {
