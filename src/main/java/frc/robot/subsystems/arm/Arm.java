@@ -16,10 +16,8 @@ import org.littletonrobotics.junction.mechanism.LoggedMechanismLigament2d;
 import org.littletonrobotics.junction.mechanism.LoggedMechanismRoot2d;
 import org.littletonrobotics.junction.networktables.LoggedNetworkBoolean;
 
-import frc.robot.io.CANcoderIO;
-import frc.robot.io.LoggedCANcoder;
-import frc.robot.io.LoggedTalonFX;
-import frc.robot.io.TalonFXIO;
+import frc.robot.io.EncoderIO;
+import frc.robot.io.MotorIO;
 import frc.robot.util.LoggedTunableNumber;
 
 import static edu.wpi.first.units.Units.Rotations;
@@ -93,10 +91,10 @@ public class Arm extends SubsystemBase {
     }
 
     // Motor, uses LoggedTalonFX to automatically handle simulation
-    private LoggedTalonFX motor;
+    private MotorIO motor;
 
     // LoggedCANcoder automatically handles simulation
-    private LoggedCANcoder encoder;
+    private EncoderIO encoder;
 
     // Mechanism visualization
     private final LoggedMechanism2d mech = new LoggedMechanism2d(3, 3);
@@ -144,19 +142,20 @@ public class Arm extends SubsystemBase {
                     (voltage) -> motor.setVoltage(voltage.in(Volts)),
                     // SysId logging function
                     (log) -> log.motor("arm")
-                            .angularPosition(Rotations.of(motor.getPosition()))
-                            .angularVelocity(RotationsPerSecond.of(motor.getVelocity()))
+                            .angularPosition(Rotations.of(motor.getInputs().position))
+                            .angularVelocity(RotationsPerSecond.of(motor.getInputs().velocity))
                             .voltage(Volts.of(motor.getInputs().appliedVoltage)),
                     this));
 
-    public Arm(TalonFXIO motorIO, CANcoderIO encoderIO) {
-        motor = new LoggedTalonFX(motorIO, "Arm/Motor");
+    public Arm(MotorIO motorIO, EncoderIO encoderIO) {
+        motor = motorIO;
+
         motor.setInverted(Constants.motorInverted);
         motor.connectCANcoder(Constants.encoderId, Constants.rotorToSensorRatio, Constants.encoderRatio);
 
         motor.setFeedforwardType(GravityTypeValue.Arm_Cosine);
 
-        encoder = new LoggedCANcoder(encoderIO, "Arm/Encoder");
+        encoder = encoderIO;
         encoder.setInverted(Constants.encoderInverted);
         encoder.setRatioAndOffset(Constants.encoderRatio, Constants.encoderOffset);
     }
@@ -173,7 +172,7 @@ public class Arm extends SubsystemBase {
 
     // Returns the goal of the arm
     public double getGoal() {
-        return motor.getGoal();
+        return motor.getInputs().setpoint;
     }
 
     // Gets the SysId routine
@@ -183,17 +182,21 @@ public class Arm extends SubsystemBase {
 
     // Checks if the arm is in safe SysId range
     public boolean withinSysIdLimits() {
-        return motor.getPosition() < Constants.maxSysIdAngle && motor.getPosition() > Constants.minSysIdAngle;
+        return motor.getInputs().position < Constants.maxSysIdAngle
+                && motor.getInputs().position > Constants.minSysIdAngle;
     }
 
     @Override
     public void periodic() {
         // Call periodic methods
-        motor.periodic();
-        encoder.periodic();
+        motor.updateInputs();
+        encoder.updateInputs();
+
+        Logger.processInputs("Arm/Motor", motor.getInputs());
+        Logger.processInputs("Arm/Encoder", encoder.getInputs());
 
         // Set angles of the visualization arm and goal arm
-        arm.setAngle(Rotation2d.fromRadians(motor.getPosition()));
+        arm.setAngle(Rotation2d.fromRadians(motor.getInputs().position));
 
         if (motor.getInputs().controlMode.startsWith("MotionMagic")) {
             // If motor is currently in PID mode, show all the lines
@@ -203,7 +206,7 @@ public class Arm extends SubsystemBase {
             fAmount.setLineWeight(6);
 
             // Set the angles/lengths of the lines
-            goalArm.setAngle(Rotation2d.fromRadians(motor.getGoal()));
+            goalArm.setAngle(Rotation2d.fromRadians(motor.getInputs().setpoint));
             pAmount.setLength(motor.getInputs().propOutput / 100);
             dAmount.setLength(motor.getInputs().derivOutput / 100);
             fAmount.setLength(motor.getInputs().feedforward / 100);
@@ -218,30 +221,14 @@ public class Arm extends SubsystemBase {
         // Log the mechanism
         Logger.recordOutput("Arm/Mech", mech);
 
-        // Update the tuning constants if applicable
-        if (Constants.kP.hasChanged(hashCode())) {
-            motor.setkP(Constants.kP.get());
-        }
-        if (Constants.kD.hasChanged(hashCode())) {
-            motor.setkD(Constants.kD.get());
-        }
-        if (Constants.kG.hasChanged(hashCode())) {
-            motor.setkG(Constants.kG.get());
-        }
-        if (Constants.kS.hasChanged(hashCode())) {
-            motor.setkS(Constants.kS.get());
-        }
-        if (Constants.kV.hasChanged(hashCode())) {
-            motor.setkV(Constants.kV.get());
-        }
-        if (Constants.kA.hasChanged(hashCode())) {
-            motor.setkA(Constants.kA.get());
-        }
-        if (Constants.maxVelocity.hasChanged(hashCode())) {
-            motor.setMaxVelocity(Constants.maxVelocity.get());
-        }
-        if (Constants.maxAccel.hasChanged(hashCode())) {
-            motor.setMaxAccel(Constants.maxAccel.get());
-        }
+        // Update the tuning constants
+        motor.setkP(Constants.kP.get());
+        motor.setkD(Constants.kD.get());
+        motor.setkG(Constants.kG.get());
+        motor.setkS(Constants.kS.get());
+        motor.setkV(Constants.kV.get());
+        motor.setkA(Constants.kA.get());
+        motor.setMaxVelocity(Constants.maxVelocity.get());
+        motor.setMaxAccel(Constants.maxAccel.get());
     }
 }

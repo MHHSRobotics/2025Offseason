@@ -12,7 +12,7 @@ import frc.robot.io.CANcoderIO.CANcoderIOInputs;
 
 import static edu.wpi.first.units.Units.Radians;
 
-// Manages alerts, logging, and tuning of a CANcoderIO
+// Manages alerts and logging of a CANcoderIO
 public class LoggedCANcoder {
     // NetworkTables path to log to
     private String logPath;

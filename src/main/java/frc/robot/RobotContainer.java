@@ -6,13 +6,12 @@ import edu.wpi.first.wpilibj2.command.button.CommandPS5Controller;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 
 import frc.robot.commands.ArmCommands;
-import frc.robot.io.CANcoderIO;
-import frc.robot.io.CANcoderIOBase;
-import frc.robot.io.TalonFXIO;
-import frc.robot.io.TalonFXIOBase;
+import frc.robot.io.EncoderIO;
+import frc.robot.io.EncoderIOCANcoder;
+import frc.robot.io.MotorIO;
+import frc.robot.io.MotorIOTalonFX;
 import frc.robot.subsystems.arm.Arm;
 import frc.robot.subsystems.arm.ArmSim;
-import frc.robot.subsystems.swerve.Swerve;
 
 public class RobotContainer {
     private Arm arm;
@@ -27,7 +26,6 @@ public class RobotContainer {
         // Initialize all the IO objects, subsystems, and mechanism simulators
         initSubsystems();
         armCommands = new ArmCommands(arm);
-        new Swerve(null);
 
         // Add controller bindings
         configureBindings();
@@ -38,20 +36,17 @@ public class RobotContainer {
 
     private void initSubsystems() {
         // Create variables for all motors and encoders
-        TalonFXIO armMotor;
-        CANcoderIO armEncoder;
+        MotorIO armMotor;
+        EncoderIO armEncoder;
         switch (Constants.currentMode) {
             case REAL:
-                // On a real bot, the arm should be using IO that interfaces with real motors (TalonFXIOBase,
-                // CANcoderIObase)
-                armMotor = new TalonFXIOBase(Arm.Constants.motorId, "rio");
-                armEncoder = new CANcoderIOBase(Arm.Constants.encoderId, "rio");
-                arm = new Arm(armMotor, armEncoder);
+                armMotor = new MotorIOTalonFX(Arm.Constants.motorId, "rio");
+                armEncoder = new EncoderIOCANcoder(Arm.Constants.encoderId, "rio");
                 break;
 
             case SIM:
-                TalonFXIOBase _armMotor = new TalonFXIOBase(Arm.Constants.motorId);
-                CANcoderIOBase _armEncoder = new CANcoderIOBase(Arm.Constants.encoderId);
+                MotorIOTalonFX _armMotor = new MotorIOTalonFX(Arm.Constants.motorId);
+                EncoderIOCANcoder _armEncoder = new EncoderIOCANcoder(Arm.Constants.encoderId);
                 armMotor = _armMotor;
                 armEncoder = _armEncoder;
 
@@ -60,8 +55,8 @@ public class RobotContainer {
                 break;
 
             default:
-                armMotor = new TalonFXIO();
-                armEncoder = new CANcoderIO();
+                armMotor = new MotorIO();
+                armEncoder = new EncoderIO();
                 break;
         }
 
