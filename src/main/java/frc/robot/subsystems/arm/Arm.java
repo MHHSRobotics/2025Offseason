@@ -3,6 +3,8 @@ package frc.robot.subsystems.arm;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.Alert;
+import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -90,10 +92,10 @@ public class Arm extends SubsystemBase {
                 "ArmSettings/Manual Arm", false); // toggles whether the arm is in manual control
     }
 
-    // Motor, uses LoggedTalonFX to automatically handle simulation
+    // Motor, uses MotorIO to automatically handle simulation
     private MotorIO motor;
 
-    // LoggedCANcoder automatically handles simulation
+    // EncoderIO automatically handles simulation
     private EncoderIO encoder;
 
     // Mechanism visualization
@@ -146,6 +148,18 @@ public class Arm extends SubsystemBase {
                             .angularVelocity(RotationsPerSecond.of(motor.getInputs().velocity))
                             .voltage(Volts.of(motor.getInputs().appliedVoltage)),
                     this));
+
+    private Alert motorDisconnect = new Alert("The arm motor is disconnected", AlertType.kError);
+    private Alert motorHardwareFault =
+            new Alert("The arm motor encountered an internal hardware fault", AlertType.kError);
+    private Alert motorOverheat = new Alert("The arm motor is overheating!", AlertType.kWarning);
+    private Alert motorForwardLimit = new Alert("The arm motor hit its forward limit", AlertType.kWarning);
+    private Alert motorReverseLimit = new Alert("The arm motor hit its reverse limit", AlertType.kWarning);
+
+    private Alert encoderDisconnect = new Alert("The arm encoder is disconnected", AlertType.kError);
+    private Alert encoderHardwareFault =
+            new Alert("The arm encoder encountered an internal hardware fault", AlertType.kError);
+    private Alert encoderMagnetFault = new Alert("The arm encoder magnet is not functioning", AlertType.kError);
 
     public Arm(MotorIO motorIO, EncoderIO encoderIO) {
         motor = motorIO;
@@ -230,5 +244,16 @@ public class Arm extends SubsystemBase {
         motor.setkA(Constants.kA.get());
         motor.setMaxVelocity(Constants.maxVelocity.get());
         motor.setMaxAccel(Constants.maxAccel.get());
+
+        // Update the alerts
+        motorDisconnect.set(!motor.getInputs().connected);
+        motorOverheat.set(motor.getInputs().tempFault);
+        motorHardwareFault.set(motor.getInputs().hardwareFault);
+        motorForwardLimit.set(motor.getInputs().forwardLimitFault);
+        motorReverseLimit.set(motor.getInputs().reverseLimitFault);
+
+        encoderDisconnect.set(!encoder.getInputs().connected);
+        encoderHardwareFault.set(encoder.getInputs().hardwareFault);
+        encoderMagnetFault.set(encoder.getInputs().badMagnetFault);
     }
 }
