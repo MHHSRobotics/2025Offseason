@@ -11,12 +11,12 @@ public class GyroIO {
         public boolean hardwareFault;
     }
 
-    protected GyroIOInputsAutoLogged inputs;
+    protected GyroIOInputsAutoLogged inputs = new GyroIOInputsAutoLogged();
 
     public void updateInputs() {}
 
     public GyroIOInputsAutoLogged getInputs() {
-        return null;
+        return inputs;
     }
 
     public void setMechYaw(double yaw) {}

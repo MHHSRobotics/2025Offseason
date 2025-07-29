@@ -19,7 +19,7 @@ public class EncoderIO {
     public void updateInputs() {}
 
     public EncoderIOInputsAutoLogged getInputs() {
-        return null;
+        return inputs;
     }
 
     public void setRatioAndOffset(double ratio, double offset) {}
