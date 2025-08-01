@@ -8,7 +8,9 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.RobotController;
+import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 import org.littletonrobotics.junction.AutoLogOutput;
@@ -27,6 +29,9 @@ public class Swerve extends SubsystemBase {
     private SwerveDriveKinematics kinematics = new SwerveDriveKinematics(getModuleTranslations());
     private SwerveDrivePoseEstimator estimator =
             new SwerveDrivePoseEstimator(kinematics, gyroAngle, getWheelPositions(), new Pose2d());
+
+    private Alert gyroDisconnect=new Alert("The gyro is disconnected",AlertType.kError);
+    private Alert gyroHardwareFault=new Alert("The gyro has encountered a hardware fault",AlertType.kError);
 
     public Swerve(GyroIO gyro, SwerveModule fl, SwerveModule fr, SwerveModule bl, SwerveModule br) {
         this.gyro = gyro;
@@ -79,6 +84,8 @@ public class Swerve extends SubsystemBase {
         }
         gyro.updateInputs();
         Logger.processInputs("Drive/Gyro", gyro.getInputs());
+        gyroDisconnect.set(!gyro.getInputs().connected);
+        gyroHardwareFault.set(gyro.getInputs().hardwareFault);
         estimator.updateWithTime(RobotController.getFPGATime(), gyroAngle, getWheelPositions());
     }
 }
