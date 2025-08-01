@@ -13,21 +13,23 @@ public class ArmSim extends SubsystemBase {
     private MotorIO motor;
     private EncoderIO encoder;
 
+    private static final DCMotor armGearbox = DCMotor.getKrakenX60Foc(1);
     // The simulation model for the arm. This has one input, the voltage applied by the motor, and two outputs, the
     // position and velocity of the arm.
-    private SingleJointedArmSim armMech = new SingleJointedArmSim(
-            DCMotor.getKrakenX60(1),
-            Arm.Constants.gearRatio,
-            Arm.Constants.moi,
-            Arm.Constants.armLength,
-            Arm.Constants.minAngle,
-            Arm.Constants.maxAngle,
-            true,
-            Arm.Constants.startAngle);
+    private SingleJointedArmSim armMech;
 
     public ArmSim(MotorIO motor, EncoderIO encoder) {
         this.motor = motor;
         this.encoder = encoder;
+        armMech = new SingleJointedArmSim(
+                armGearbox,
+                Arm.Constants.gearRatio,
+                Arm.Constants.moi,
+                Arm.Constants.armLength,
+                Arm.Constants.minAngle,
+                Arm.Constants.maxAngle,
+                true,
+                Arm.Constants.startAngle);
     }
 
     @Override
