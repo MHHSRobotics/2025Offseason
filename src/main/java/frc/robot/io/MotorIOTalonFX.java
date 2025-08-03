@@ -2,6 +2,7 @@ package frc.robot.io;
 
 import edu.wpi.first.math.util.Units;
 
+import com.ctre.phoenix6.CANBus;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.DutyCycleOut;
@@ -39,13 +40,17 @@ public class MotorIOTalonFX extends MotorIO {
     private MotionMagicVelocityTorqueCurrentFOC velocityTorqueCurrent = new MotionMagicVelocityTorqueCurrentFOC(0);
     private Follower follow = new Follower(0, false);
 
-    public MotorIOTalonFX(int id, String canBus) {
+    public MotorIOTalonFX(int id,CANBus canBus){
         motor = new TalonFX(id, canBus);
         sim = motor.getSimState();
     }
 
+    public MotorIOTalonFX(int id, String canBus) {
+        this(id,new CANBus(canBus));
+    }
+
     public MotorIOTalonFX(int id) {
-        this(id, "");
+        this(id, new CANBus());
     }
 
     @Override

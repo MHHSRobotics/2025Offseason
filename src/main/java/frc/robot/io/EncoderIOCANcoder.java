@@ -2,6 +2,7 @@ package frc.robot.io;
 
 import edu.wpi.first.math.util.Units;
 
+import com.ctre.phoenix6.CANBus;
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.signals.SensorDirectionValue;
@@ -18,13 +19,17 @@ public class EncoderIOCANcoder extends EncoderIO {
 
     private CANcoderSimState sim;
 
-    public EncoderIOCANcoder(int id, String canBus) {
+    public EncoderIOCANcoder(int id,CANBus canBus){
         encoder = new CANcoder(id, canBus);
         sim = encoder.getSimState();
     }
 
+    public EncoderIOCANcoder(int id, String canBus) {
+        this(id,new CANBus(canBus));
+    }
+
     public EncoderIOCANcoder(int id) {
-        this(id, "");
+        this(id, new CANBus());
     }
 
     @Override

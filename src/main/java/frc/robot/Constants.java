@@ -1,5 +1,7 @@
 package frc.robot;
 
+import com.ctre.phoenix6.CANBus;
+
 import edu.wpi.first.wpilibj.RobotBase;
 
 public final class Constants {
@@ -25,4 +27,7 @@ public final class Constants {
 
     // Whether LoggedTunableNumbers should be published to NT
     public static final boolean tuningMode = true;
+
+    public static final CANBus defaultBus=new CANBus("rio");
+    public static final CANBus swerveBus=new CANBus("rhino");
 }

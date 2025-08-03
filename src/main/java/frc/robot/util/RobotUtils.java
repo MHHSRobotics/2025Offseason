@@ -85,4 +85,18 @@ public class RobotUtils {
             return trans;
         }
     }
+
+    // Rotates a Rotation2d 180 degrees around the center of the field
+    public static Rotation2d invert(Rotation2d rot) {
+        return rot.rotateBy(Rotation2d.k180deg);
+    }
+
+    // Inverts a Translation3d if on the red alliance
+    public static Rotation2d invertToAlliance(Rotation2d rot) {
+        if (onRedAlliance()) {
+            return invert(rot);
+        } else {
+            return rot;
+        }
+    }
 }
