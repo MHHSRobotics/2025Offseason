@@ -1,4 +1,4 @@
-package frc.robot.subsystems;//test
+package frc.robot.subsystems; // test
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -9,14 +9,7 @@ import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 
-import com.ctre.phoenix6.configs.CANcoderConfiguration;
-import com.ctre.phoenix6.configs.TalonFXConfiguration;
-import com.ctre.phoenix6.signals.DifferentialSensorSourceValue;
-import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
 import com.ctre.phoenix6.signals.GravityTypeValue;
-import com.ctre.phoenix6.signals.InvertedValue;
-import com.ctre.phoenix6.signals.NeutralModeValue;
-import com.ctre.phoenix6.signals.SensorDirectionValue;
 
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.mechanism.LoggedMechanism2d;
@@ -24,10 +17,8 @@ import org.littletonrobotics.junction.mechanism.LoggedMechanismLigament2d;
 import org.littletonrobotics.junction.mechanism.LoggedMechanismRoot2d;
 
 import frc.robot.Robot;
-import frc.robot.io.CANcoderIO;
-import frc.robot.io.LoggedCANcoder;
-import frc.robot.io.LoggedTalonFX;
-import frc.robot.io.TalonFXIO;
+import frc.robot.io.EncoderIO;
+import frc.robot.io.MotorIO;
 
 import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
@@ -42,6 +33,10 @@ public class Catvator extends SubsystemBase {
         public static final int rightMotorId = 21;
 
         public static final boolean inverted = false;
+        public static final boolean rightInverted = false;
+
+        public static final double offset = 0.0;
+        public static final double rightOffset = 0.0;
 
         // Encoder ID
         public static final int encoderId = 2;
@@ -59,6 +54,9 @@ public class Catvator extends SubsystemBase {
         public static final double kG = 0.36;
         public static final double kV = 0.88;
         public static final double kA = 0.02;
+
+        public static final double MotorToSensorRatio = 0.0;
+        public static final double SensorToMechanismRatio = 0.0;
 
         public static final int SupplyCurrentLimit = 40;
         public static final int MaxVolt = 12;
@@ -87,9 +85,9 @@ public class Catvator extends SubsystemBase {
         public static final double rotorToSensorRatio = gearRatio / (encoderRatio); // +encoderOffset
     }
 
-    LoggedTalonFX leftMotor;
-    LoggedTalonFX rightMotor;
-    LoggedCANcoder encoder;
+    MotorIO leftMotor;
+    MotorIO rightMotor;
+    EncoderIO encoder;
 
     LoggedMechanism2d mech = new LoggedMechanism2d(1.0, 5.0);
 
@@ -131,112 +129,32 @@ public class Catvator extends SubsystemBase {
                     (voltage) -> leftMotor.setVoltage(voltage.in(Volts)),
                     // SysId logging function
                     (log) -> log.motor("arm")
-                            .angularPosition(Radians.of(leftMotor.getPosition()))
-                            .angularVelocity(RadiansPerSecond.of(leftMotor.getVelocity()))
+                            .angularPosition(Radians.of(leftMotor.getInputs().position))
+                            .angularVelocity(RadiansPerSecond.of(leftMotor.getInputs().velocity))
                             .voltage(Volts.of(leftMotor.getInputs().appliedVoltage)),
                     this));
 
-    public Catvator(TalonFXIO motorIO, TalonFXIO motorIO2, CANcoderIO encoderIO) {
+    public Catvator(MotorIO leftMotorIO, MotorIO rightMotorIO, EncoderIO encoderIO) {
+        leftMotor = leftMotorIO;
+        rightMotor = rightMotorIO;
+        encoder = encoderIO;
 
-        TalonFXConfiguration config = new TalonFXConfiguration();
+        leftMotor.setInverted(Constants.inverted);
+        leftMotor.connectCANcoder(
+                Constants.leftMotorId, Constants.MotorToSensorRatio, Constants.SensorToMechanismRatio);
+        leftMotor.setOffset(Constants.offset);
 
-        config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
-        config.MotorOutput.Inverted =
-                Constants.inverted ? InvertedValue.Clockwise_Positive : InvertedValue.CounterClockwise_Positive;
+        leftMotor.setFeedforwardType(GravityTypeValue.Elevator_Static);
 
-        config.Slot0.kP = Constants.kP;
-        config.Slot0.kI = Constants.kI;
-        config.Slot0.kD = Constants.kD;
-        config.Slot0.kG = Constants.kG;
-        config.Slot0.kS = Constants.kS;
-        config.Slot0.kV = Constants.kV;
-        config.Slot0.kA = Constants.kA;
-        config.Slot0.GravityType = GravityTypeValue.Elevator_Static;
+        rightMotor.setInverted(Constants.rightInverted);
+        rightMotor.connectCANcoder(
+                Constants.rightMotorId, Constants.MotorToSensorRatio, Constants.SensorToMechanismRatio);
+        rightMotor.setOffset(Constants.rightOffset);
 
-        config.ClosedLoopGeneral. = 0;
+        rightMotor.setFeedforwardType(GravityTypeValue.Elevator_Static);
 
-        config.ClosedLoopRamps. = 0;
-
-        config.CurrentLimits.StatorCurrentLimit = Constants.SupplyCurrentLimit;
-        config.CurrentLimits.StatorCurrentLimitEnable = true;
-
-        config.CustomParams. = 0;
-
-        config.DifferentialConstants.Peak = 0;
-
-        config.DifferentialSensors.DifferentialSensorSource = DifferentialSensorSourceValue.RemoteCANcoder;
-        config.DifferentialSensors.DifferentialRemoteSensorID = Constants.encoderId;
-
-        config.Feedback.FeedbackRotorOffset = 0; //min -1 max 1
-        config.Feedback.SensorToMechanismRatio = 1.0; //min -1000 max 1000
-        config.Feedback.RotorToSensorRatio = Constants.rotorToSensorRatio; //min -1000 max 1000
-        config.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.FusedCANcoder;
-
-        config.FutureProofConfigs = true;
-
-        config.HardwareLimitSwitch. = 0;
-
-        config.MotionMagic. = 0;
-
-        //config.MotorOutput. = 0;
-
-        config.OpenLoopRamps. = 0;
-
-        config.SoftwareLimitSwitch. = 0;
-
-        config.TorqueCurrent.PeakForwardTorqueCurrent = 400;
-        config.TorqueCurrent.PeakReverseTorqueCurrent = -400; //min -800 max 800
-        config.TorqueCurrent.TorqueNeutralDeadband = 0; //min 0 max 25
-
-        config.Voltage.SupplyVoltageTimeConstant = 0;
-        config.Voltage.PeakForwardVoltage = Constants.MaxVolt;
-        config.Voltage.PeakReverseVoltage = -1 * Constants.MaxVolt;
-
-        config.Feedback.FeedbackRemoteSensorID = Constants.encoderId;
-        config.Feedback.RotorToSensorRatio = Constants.rotorToSensorRatio;
-        config.Feedback.SensorToMechanismRatio = Constants.encoderRatio;
-
-        config.MotionMagic.MotionMagicCruiseVelocity = Constants.maxVelocity;
-        config.MotionMagic.MotionMagicAcceleration = Constants.maxAcceleration;
-        // config.MotionMagic.MotionMagicJerk = Constants.maxJerk;
-
-        // motorConfig.CurrentLimits.StatorCurrentLimit = 0;
-        // motorConfig.CurrentLimits.StatorCurrentLimitEnable = true;
-        config.CurrentLimits.SupplyCurrentLimit = Constants.SupplyCurrentLimit;
-        config.CurrentLimits.SupplyCurrentLimitEnable = true;
-        config.Voltage.PeakForwardVoltage = Constants.MaxVolt;
-        config.Voltage.PeakReverseVoltage = -1 * Constants.MaxVolt;
-
-        config.deserialize(getName());
-        config.serialize();
-        config.toString();
-        config.withClosedLoopGeneral(null);
-        config.withClosedLoopRamps(null);
-        config.withCurrentLimits(null);
-        config.withCustomParams(null);
-        config.withDifferentialConstants(null);
-        config.withDifferentialSensors(null);
-        config.withFeedback(null);
-        config.withHardwareLimitSwitch(null);
-        config.withMotionMagic(null);
-        config.withMotorOutput(null);
-        config.withOpenLoopRamps(null);
-        config.withSlot0(null);
-        config.withSoftwareLimitSwitch(null);
-        config.withTorqueCurrent(null);
-        config.withVoltage(null);
-        CANcoderConfiguration encoderConfig = new CANcoderConfiguration();
-
-        // Inverts the encoder depending on Constants.encoderInverted
-        encoderConfig.MagnetSensor.SensorDirection = Constants.encoderInverted
-                ? SensorDirectionValue.Clockwise_Positive
-                : SensorDirectionValue.CounterClockwise_Positive;
-
-        // Create logged motors and encoders from the configs
-        leftMotor = new LoggedTalonFX(motorIO, "Elevator/LeftMotor", config);
-        rightMotor = new LoggedTalonFX(motorIO2, "Elevator/RightMotor", config);
-        rightMotor.follow(Constants.leftMotorId, false);
-        encoder = new LoggedCANcoder(encoderIO, "Elevator/Encoder", encoderConfig);
+        encoder.setInverted(Constants.encoderInverted);
+        encoder.setRatio(Constants.encoderRatio);
     }
 
     public void setSpeed(double speed) {
@@ -244,11 +162,11 @@ public class Catvator extends SubsystemBase {
     }
 
     public void setGoal(double pos) {
-        leftMotor.setGoal(MathUtil.clamp(pos, Constants.minHeight, Constants.maxHeight));
+        leftMotor.setGoalWithVoltageMagic(MathUtil.clamp(pos, Constants.minHeight, Constants.maxHeight));
     }
 
     public double getGoal() {
-        return leftMotor.getGoal();
+        return leftMotor.getInputs().setpoint;
     }
 
     public SysIdRoutine getSysId() {
@@ -256,17 +174,18 @@ public class Catvator extends SubsystemBase {
     }
 
     public boolean withinSysIdLimits() {
-        return leftMotor.getPosition() < Constants.maxSysIdHeight && leftMotor.getPosition() > Constants.minSysIdHeight;
+        return leftMotor.getInputs().position < Constants.maxSysIdHeight
+                && leftMotor.getInputs().position > Constants.minSysIdHeight;
     }
 
     @Override
     public void periodic() {
         // Call periodic methods
-        leftMotor.periodic();
-        encoder.periodic();
+        leftMotor.updateInputs();
+        encoder.updateInputs();
 
         // Set angles of the visualization arm and goal arm
-        elevator.setAngle(Rotation2d.fromRadians(leftMotor.getPosition()));
+        elevator.setAngle(Rotation2d.fromRadians(leftMotor.getInputs().position));
 
         if (leftMotor.getInputs().controlMode.startsWith("MotionMagic")) {
             // If motor is currently in PID mode, show all the lines
@@ -276,7 +195,7 @@ public class Catvator extends SubsystemBase {
             fAmount.setLineWeight(6);
 
             // Set the angles/lengths of the lines
-            goalElevator.setLength(leftMotor.getGoal());
+            goalElevator.setLength(getGoal());
             pAmount.setLength(leftMotor.getInputs().propOutput / 100);
             dAmount.setLength(leftMotor.getInputs().derivOutput / 100);
             fAmount.setLength(leftMotor.getInputs().feedforward / 100);
