@@ -52,7 +52,8 @@ public class EncoderIOCANcoder extends EncoderIO {
     }
 
     // Sets the ratio and offset of this encoder. The ratio is (encoder radians)/(mechanism unit), and the offset is
-    // measured in mechanism units. Note: this is purely aesthetic (it modifies the displayed encoder reading in AdvntageScope) so changing it won't affect actual robot behavior.
+    // measured in mechanism units. Note: this is purely aesthetic (it modifies the displayed encoder reading in
+    // AdvntageScope) so changing it won't affect actual robot behavior.
     @Override
     public void setRatio(double ratio) {
         encoderRatio = ratio;
@@ -68,11 +69,19 @@ public class EncoderIOCANcoder extends EncoderIO {
 
     @Override
     public void setMechPosition(double position) {
-        sim.setRawPosition(Units.radiansToRotations(position * encoderRatio));
+        double encoderPos = Units.radiansToRotations(position * encoderRatio);
+        encoderPos = config.MagnetSensor.SensorDirection.equals(SensorDirectionValue.Clockwise_Positive)
+                ? -encoderPos
+                : encoderPos;
+        sim.setRawPosition(encoderPos);
     }
 
     @Override
     public void setMechVelocity(double velocity) {
-        sim.setVelocity(Units.radiansToRotations(velocity * encoderRatio));
+        double encoderVel = Units.radiansToRotations(velocity * encoderRatio);
+        encoderVel = config.MagnetSensor.SensorDirection.equals(SensorDirectionValue.Clockwise_Positive)
+                ? -encoderVel
+                : encoderVel;
+        sim.setVelocity(encoderVel);
     }
 }

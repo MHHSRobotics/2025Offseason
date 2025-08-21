@@ -17,6 +17,7 @@ import frc.robot.io.MotorIOTalonFX;
 import frc.robot.subsystems.arm.Arm;
 import frc.robot.subsystems.arm.ArmSim;
 import frc.robot.subsystems.swerve.Swerve;
+import frc.robot.subsystems.swerve.SwerveModule;
 import frc.robot.subsystems.swerve.SwerveModuleSim;
 import frc.robot.subsystems.swerve.TunerConstants;
 
@@ -37,7 +38,7 @@ public class RobotContainer {
         // Initialize all the IO objects, subsystems, and mechanism simulators
         initSubsystems();
         armCommands = new ArmCommands(arm);
-        // swerveCommands = new SwerveCommands(swerve);
+        swerveCommands = new SwerveCommands(swerve);
 
         // // Add controller bindings
         configureBindings();
@@ -127,12 +128,12 @@ public class RobotContainer {
 
         arm = new Arm(armMotor, armEncoder);
 
-        // SwerveModule fl = new SwerveModule(flDriveMotor, flAngleMotor, flEncoder, 0, TunerConstants.FrontLeft);
-        // SwerveModule fr = new SwerveModule(frDriveMotor, frAngleMotor, frEncoder, 1, TunerConstants.FrontRight);
-        // SwerveModule bl = new SwerveModule(blDriveMotor, blAngleMotor, blEncoder, 2, TunerConstants.BackLeft);
-        // SwerveModule br = new SwerveModule(brDriveMotor, brAngleMotor, brEncoder, 3, TunerConstants.BackRight);
+        SwerveModule fl = new SwerveModule(flDriveMotor, flAngleMotor, flEncoder, 0, TunerConstants.FrontLeft);
+        SwerveModule fr = new SwerveModule(frDriveMotor, frAngleMotor, frEncoder, 1, TunerConstants.FrontRight);
+        SwerveModule bl = new SwerveModule(blDriveMotor, blAngleMotor, blEncoder, 2, TunerConstants.BackLeft);
+        SwerveModule br = new SwerveModule(brDriveMotor, brAngleMotor, brEncoder, 3, TunerConstants.BackRight);
 
-        // swerve = new Swerve(gyro, fl, fr, bl, br);
+        swerve = new Swerve(gyro, fl, fr, bl, br);
     }
 
     private void configureBindings() {
@@ -156,9 +157,8 @@ public class RobotContainer {
                 .onTrue(armCommands.setSpeed(() -> -0.2))
                 .onFalse(armCommands.stop());
 
-        // swerve.setDefaultCommand(swerveCommands.drive(
-        //         () -> -controller.getLeftY(), () -> -controller.getLeftX(), () -> -controller.getRightX(), () ->
-        // true));
+        swerve.setDefaultCommand(swerveCommands.drive(
+                () -> -controller.getLeftY(), () -> -controller.getLeftX(), () -> -controller.getRightX(), () -> true));
     }
 
     private void configureSysId() {

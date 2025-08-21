@@ -49,7 +49,7 @@ public class MotorIOTalonFX extends MotorIO {
     private VelocityTorqueCurrentFOC velocityCurrent = new VelocityTorqueCurrentFOC(0);
     private Follower follow = new Follower(0, false);
 
-    private double offset=0;
+    private double offset = 0;
 
     public MotorIOTalonFX(int id, CANBus canBus) {
         motor = new TalonFX(id, canBus);
@@ -75,7 +75,7 @@ public class MotorIOTalonFX extends MotorIO {
         inputs.connected = motor.isConnected();
 
         // Some signals give rotations, so they have to be converted to radians
-        inputs.position = Units.rotationsToRadians(motor.getPosition().getValueAsDouble())-offset;
+        inputs.position = Units.rotationsToRadians(motor.getPosition().getValueAsDouble()) - offset;
         inputs.velocity = Units.rotationsToRadians(motor.getVelocity().getValueAsDouble());
         inputs.accel = Units.rotationsToRadians(motor.getAcceleration().getValueAsDouble());
 
@@ -87,7 +87,7 @@ public class MotorIOTalonFX extends MotorIO {
         inputs.controlMode = motor.getControlMode().getValue().toString();
 
         inputs.setpoint =
-                Units.rotationsToRadians(motor.getClosedLoopReference().getValueAsDouble())-offset;
+                Units.rotationsToRadians(motor.getClosedLoopReference().getValueAsDouble()) - offset;
         inputs.error = Units.rotationsToRadians(motor.getClosedLoopError().getValueAsDouble());
         inputs.feedforward = motor.getClosedLoopFeedForward().getValueAsDouble();
         inputs.derivOutput = motor.getClosedLoopDerivativeOutput().getValueAsDouble();
@@ -128,13 +128,13 @@ public class MotorIOTalonFX extends MotorIO {
     // Sets the goal of the motor using MotionMagic TorqueCurrentFOC output.
     @Override
     public void setGoalWithCurrentMagic(double position) {
-        motor.setControl(motionMagicTorqueCurrent.withPosition(Radians.of(position+offset)));
+        motor.setControl(motionMagicTorqueCurrent.withPosition(Radians.of(position + offset)));
     }
 
     // Sets the goal of the motor using MotionMagic Voltage output
     @Override
     public void setGoalWithVoltageMagic(double position) {
-        motor.setControl(motionMagicVoltage.withPosition(Radians.of(position+offset)));
+        motor.setControl(motionMagicVoltage.withPosition(Radians.of(position + offset)));
     }
 
     // Sets the goal velocity of the motor using MotionMagic TorqueCurrentFOC output.
@@ -152,13 +152,13 @@ public class MotorIOTalonFX extends MotorIO {
     // Sets the goal of the motor using TorqueCurrentFOC output.
     @Override
     public void setGoalWithCurrent(double position) {
-        motor.setControl(positionCurrent.withPosition(Radians.of(position+offset)));
+        motor.setControl(positionCurrent.withPosition(Radians.of(position + offset)));
     }
 
     // Sets the goal of the motor using Voltage output
     @Override
     public void setGoalWithVoltage(double position) {
-        motor.setControl(positionVoltage.withPosition(Radians.of(position+offset)));
+        motor.setControl(positionVoltage.withPosition(Radians.of(position + offset)));
     }
 
     // Sets the goal velocity of the motor using TorqueCurrentFOC output.
@@ -321,7 +321,7 @@ public class MotorIOTalonFX extends MotorIO {
 
     @Override
     public void setOffset(double offset) {
-        this.offset=offset;
+        this.offset = offset;
     }
 
     // How TalonFX current limits work: the stator current limit is the limit on how much force can be applied by the
@@ -368,13 +368,17 @@ public class MotorIOTalonFX extends MotorIO {
 
     @Override
     public void setMechPosition(double position) {
-        sim.setRawRotorPosition(Units.radiansToRotations(
-                (position+offset) * config.Feedback.RotorToSensorRatio * config.Feedback.SensorToMechanismRatio));
+        double rotorPos = Units.radiansToRotations(
+                (position + offset) * config.Feedback.RotorToSensorRatio * config.Feedback.SensorToMechanismRatio);
+        rotorPos = config.MotorOutput.Inverted.equals(InvertedValue.Clockwise_Positive) ? -rotorPos : rotorPos;
+        sim.setRawRotorPosition(rotorPos);
     }
 
     @Override
     public void setMechVelocity(double velocity) {
-        sim.setRotorVelocity(Units.radiansToRotations(
-                velocity * config.Feedback.RotorToSensorRatio * config.Feedback.SensorToMechanismRatio));
+        double rotorVel = Units.radiansToRotations(
+                velocity * config.Feedback.RotorToSensorRatio * config.Feedback.SensorToMechanismRatio);
+        rotorVel = config.MotorOutput.Inverted.equals(InvertedValue.Clockwise_Positive) ? -rotorVel : rotorVel;
+        sim.setRotorVelocity(rotorVel);
     }
 }
