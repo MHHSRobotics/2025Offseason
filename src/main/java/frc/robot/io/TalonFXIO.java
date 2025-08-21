@@ -82,3 +82,4 @@ public class TalonFXIO {
     // Follows another motor
     public void setControl(Follower control) {}
 }
+

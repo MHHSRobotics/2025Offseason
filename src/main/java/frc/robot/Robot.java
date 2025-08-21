@@ -14,8 +14,6 @@ import org.littletonrobotics.junction.networktables.NT4Publisher;
 import org.littletonrobotics.junction.wpilog.WPILOGReader;
 import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 
-import frc.robot.util.PhoenixUtil;
-
 public class Robot extends LoggedRobot {
     private Command autonomousCommand;
 
@@ -66,9 +64,6 @@ public class Robot extends LoggedRobot {
     @Override
     public void robotPeriodic() {
         CommandScheduler.getInstance().run();
-
-        // Refresh all registered Phoenix signals
-        PhoenixUtil.refreshAll();
     }
 
     @Override

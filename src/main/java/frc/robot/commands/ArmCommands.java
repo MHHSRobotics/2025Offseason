@@ -18,7 +18,7 @@ public class ArmCommands {
 
     // Command to set the speed of the arm
     public Command setSpeed(DoubleSupplier speed) {
-        return new InstantCommand(() -> arm.setSpeed(speed.getAsDouble()));
+        return new InstantCommand(() -> arm.setSpeed(speed.getAsDouble()), arm);
     }
 
     // Command to set the goal of the arm (in radians)

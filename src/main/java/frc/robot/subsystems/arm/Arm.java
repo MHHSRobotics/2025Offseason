@@ -3,6 +3,8 @@ package frc.robot.subsystems.arm;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.Alert;
+import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -16,10 +18,8 @@ import org.littletonrobotics.junction.mechanism.LoggedMechanismLigament2d;
 import org.littletonrobotics.junction.mechanism.LoggedMechanismRoot2d;
 import org.littletonrobotics.junction.networktables.LoggedNetworkBoolean;
 
-import frc.robot.io.CANcoderIO;
-import frc.robot.io.LoggedCANcoder;
-import frc.robot.io.LoggedTalonFX;
-import frc.robot.io.TalonFXIO;
+import frc.robot.io.EncoderIO;
+import frc.robot.io.MotorIO;
 import frc.robot.util.LoggedTunableNumber;
 
 import static edu.wpi.first.units.Units.Rotations;
@@ -34,10 +34,10 @@ public class Arm extends SubsystemBase {
         // All radians are mechanism radians
 
         public static final int motorId = 22;
+        public static final double offset = 0;
         public static final boolean motorInverted = false;
 
-        public static final int encoderId = 1;
-        public static final double encoderOffset = -1.052; // radians
+        public static final int encoderId = 26;
         public static final boolean encoderInverted = false;
 
         public static final double gearRatio = 700 / 9.; // ratio of motor rotations to mechanism rotations
@@ -92,11 +92,11 @@ public class Arm extends SubsystemBase {
                 "ArmSettings/Manual Arm", false); // toggles whether the arm is in manual control
     }
 
-    // Motor, uses LoggedTalonFX to automatically handle simulation
-    private LoggedTalonFX motor;
+    // Motor, uses MotorIO to automatically handle simulation
+    private MotorIO motor;
 
-    // LoggedCANcoder automatically handles simulation
-    private LoggedCANcoder encoder;
+    // EncoderIO automatically handles simulation
+    private EncoderIO encoder;
 
     // Mechanism visualization
     private final LoggedMechanism2d mech = new LoggedMechanism2d(3, 3);
@@ -144,21 +144,35 @@ public class Arm extends SubsystemBase {
                     (voltage) -> motor.setVoltage(voltage.in(Volts)),
                     // SysId logging function
                     (log) -> log.motor("arm")
-                            .angularPosition(Rotations.of(motor.getPosition()))
-                            .angularVelocity(RotationsPerSecond.of(motor.getVelocity()))
+                            .angularPosition(Rotations.of(motor.getInputs().position))
+                            .angularVelocity(RotationsPerSecond.of(motor.getInputs().velocity))
                             .voltage(Volts.of(motor.getInputs().appliedVoltage)),
                     this));
 
-    public Arm(TalonFXIO motorIO, CANcoderIO encoderIO) {
-        motor = new LoggedTalonFX(motorIO, "Arm/Motor");
+    private Alert motorDisconnect = new Alert("The arm motor is disconnected", AlertType.kError);
+    private Alert motorHardwareFault =
+            new Alert("The arm motor encountered an internal hardware fault", AlertType.kError);
+    private Alert motorOverheat = new Alert("The arm motor is overheating!", AlertType.kWarning);
+    private Alert motorForwardLimit = new Alert("The arm motor hit its forward limit", AlertType.kWarning);
+    private Alert motorReverseLimit = new Alert("The arm motor hit its reverse limit", AlertType.kWarning);
+
+    private Alert encoderDisconnect = new Alert("The arm encoder is disconnected", AlertType.kError);
+    private Alert encoderHardwareFault =
+            new Alert("The arm encoder encountered an internal hardware fault", AlertType.kError);
+    private Alert encoderMagnetFault = new Alert("The arm encoder magnet is not functioning", AlertType.kError);
+
+    public Arm(MotorIO motorIO, EncoderIO encoderIO) {
+        motor = motorIO;
+
         motor.setInverted(Constants.motorInverted);
         motor.connectCANcoder(Constants.encoderId, Constants.rotorToSensorRatio, Constants.encoderRatio);
+        motor.setOffset(Constants.offset);
 
         motor.setFeedforwardType(GravityTypeValue.Arm_Cosine);
 
-        encoder = new LoggedCANcoder(encoderIO, "Arm/Encoder");
+        encoder = encoderIO;
         encoder.setInverted(Constants.encoderInverted);
-        encoder.setRatioAndOffset(Constants.encoderRatio, Constants.encoderOffset);
+        encoder.setRatio(Constants.encoderRatio);
     }
 
     // Sets the speed of the arm. Speed is from -1 (full backward) to 1 (full forward)
@@ -168,12 +182,12 @@ public class Arm extends SubsystemBase {
 
     // Sets the goal of the arm in radians
     public void setGoal(double pos) {
-        motor.setGoalWithVoltage(MathUtil.clamp(pos, Constants.minAngle, Constants.maxAngle));
+        motor.setGoalWithVoltageMagic(MathUtil.clamp(pos, Constants.minAngle, Constants.maxAngle));
     }
 
     // Returns the goal of the arm
     public double getGoal() {
-        return motor.getGoal();
+        return motor.getInputs().setpoint;
     }
 
     // Gets the SysId routine
@@ -183,17 +197,21 @@ public class Arm extends SubsystemBase {
 
     // Checks if the arm is in safe SysId range
     public boolean withinSysIdLimits() {
-        return motor.getPosition() < Constants.maxSysIdAngle && motor.getPosition() > Constants.minSysIdAngle;
+        return motor.getInputs().position < Constants.maxSysIdAngle
+                && motor.getInputs().position > Constants.minSysIdAngle;
     }
 
     @Override
     public void periodic() {
         // Call periodic methods
-        motor.periodic();
-        encoder.periodic();
+        motor.updateInputs();
+        encoder.updateInputs();
+
+        Logger.processInputs("Arm/Motor", motor.getInputs());
+        Logger.processInputs("Arm/Encoder", encoder.getInputs());
 
         // Set angles of the visualization arm and goal arm
-        arm.setAngle(Rotation2d.fromRadians(motor.getPosition()));
+        arm.setAngle(Rotation2d.fromRadians(motor.getInputs().position));
 
         if (motor.getInputs().controlMode.startsWith("MotionMagic")) {
             // If motor is currently in PID mode, show all the lines
@@ -203,7 +221,7 @@ public class Arm extends SubsystemBase {
             fAmount.setLineWeight(6);
 
             // Set the angles/lengths of the lines
-            goalArm.setAngle(Rotation2d.fromRadians(motor.getGoal()));
+            goalArm.setAngle(Rotation2d.fromRadians(motor.getInputs().setpoint));
             pAmount.setLength(motor.getInputs().propOutput / 100);
             dAmount.setLength(motor.getInputs().derivOutput / 100);
             fAmount.setLength(motor.getInputs().feedforward / 100);
@@ -218,30 +236,25 @@ public class Arm extends SubsystemBase {
         // Log the mechanism
         Logger.recordOutput("Arm/Mech", mech);
 
-        // Update the tuning constants if applicable
-        if (Constants.kP.hasChanged(hashCode())) {
-            motor.setkP(Constants.kP.get());
-        }
-        if (Constants.kD.hasChanged(hashCode())) {
-            motor.setkD(Constants.kD.get());
-        }
-        if (Constants.kG.hasChanged(hashCode())) {
-            motor.setkG(Constants.kG.get());
-        }
-        if (Constants.kS.hasChanged(hashCode())) {
-            motor.setkS(Constants.kS.get());
-        }
-        if (Constants.kV.hasChanged(hashCode())) {
-            motor.setkV(Constants.kV.get());
-        }
-        if (Constants.kA.hasChanged(hashCode())) {
-            motor.setkA(Constants.kA.get());
-        }
-        if (Constants.maxVelocity.hasChanged(hashCode())) {
-            motor.setMaxVelocity(Constants.maxVelocity.get());
-        }
-        if (Constants.maxAccel.hasChanged(hashCode())) {
-            motor.setMaxAccel(Constants.maxAccel.get());
-        }
+        // Update the tuning constants
+        motor.setkP(Constants.kP.get());
+        motor.setkD(Constants.kD.get());
+        motor.setkG(Constants.kG.get());
+        motor.setkS(Constants.kS.get());
+        motor.setkV(Constants.kV.get());
+        motor.setkA(Constants.kA.get());
+        motor.setMaxVelocity(Constants.maxVelocity.get());
+        motor.setMaxAccel(Constants.maxAccel.get());
+
+        // Update the alerts
+        motorDisconnect.set(!motor.getInputs().connected);
+        motorOverheat.set(motor.getInputs().tempFault);
+        motorHardwareFault.set(motor.getInputs().hardwareFault);
+        motorForwardLimit.set(motor.getInputs().forwardLimitFault);
+        motorReverseLimit.set(motor.getInputs().reverseLimitFault);
+
+        encoderDisconnect.set(!encoder.getInputs().connected);
+        encoderHardwareFault.set(encoder.getInputs().hardwareFault);
+        encoderMagnetFault.set(encoder.getInputs().badMagnetFault);
     }
 }
