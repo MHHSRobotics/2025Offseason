@@ -14,7 +14,6 @@ public class EncoderIOCANcoder extends EncoderIO {
     private boolean configChanged = true;
 
     private double encoderRatio = 1;
-    private double encoderOffset = 0;
 
     private CANcoderSimState sim;
 
@@ -43,8 +42,7 @@ public class EncoderIOCANcoder extends EncoderIO {
         // CANcoder signals give data in encoder rotations. First convert to radians, then use encoderRatio to convert
         // to mechanism units.
         inputs.positionRad =
-                Units.rotationsToRadians(encoder.getAbsolutePosition().getValueAsDouble()) / encoderRatio
-                        - encoderOffset;
+                Units.rotationsToRadians(encoder.getAbsolutePosition().getValueAsDouble()) / encoderRatio;
         inputs.velocityRadPerSec =
                 Units.rotationsToRadians(encoder.getVelocity().getValueAsDouble()) / encoderRatio;
 
@@ -54,11 +52,10 @@ public class EncoderIOCANcoder extends EncoderIO {
     }
 
     // Sets the ratio and offset of this encoder. The ratio is (encoder radians)/(mechanism unit), and the offset is
-    // measured in mechanism units.
+    // measured in mechanism units. Note: this is purely aesthetic (it modifies the displayed encoder reading in AdvntageScope) so changing it won't affect actual robot behavior.
     @Override
-    public void setRatioAndOffset(double ratio, double offset) {
+    public void setRatio(double ratio) {
         encoderRatio = ratio;
-        encoderOffset = offset;
     }
 
     // Sets whether the encoder is inverted

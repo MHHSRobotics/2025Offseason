@@ -44,7 +44,7 @@ public class ArmSim extends SubsystemBase {
         // because the TalonFX doesn't like radians
         motor.setMechPosition(armMech.getAngleRads());
         motor.setMechVelocity(armMech.getVelocityRadPerSec());
-        encoder.setMechPosition(armMech.getAngleRads() - Arm.Constants.encoderOffset);
+        encoder.setMechPosition(armMech.getAngleRads());
         encoder.setMechVelocity(armMech.getVelocityRadPerSec());
     }
 }

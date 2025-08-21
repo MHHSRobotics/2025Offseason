@@ -34,11 +34,10 @@ public class Arm extends SubsystemBase {
         // All radians are mechanism radians
 
         public static final int motorId = 22;
-        public static final double motorOffset = 0;
+        public static final double offset = 0;
         public static final boolean motorInverted = false;
 
         public static final int encoderId = 26;
-        public static final double encoderOffset = 0; // radians
         public static final boolean encoderInverted = false;
 
         public static final double gearRatio = 700 / 9.; // ratio of motor rotations to mechanism rotations
@@ -167,13 +166,13 @@ public class Arm extends SubsystemBase {
 
         motor.setInverted(Constants.motorInverted);
         motor.connectCANcoder(Constants.encoderId, Constants.rotorToSensorRatio, Constants.encoderRatio);
-        motor.setOffset(Constants.motorOffset);
+        motor.setOffset(Constants.offset);
 
         motor.setFeedforwardType(GravityTypeValue.Arm_Cosine);
 
         encoder = encoderIO;
         encoder.setInverted(Constants.encoderInverted);
-        encoder.setRatioAndOffset(Constants.encoderRatio, Constants.encoderOffset);
+        encoder.setRatio(Constants.encoderRatio);
     }
 
     // Sets the speed of the arm. Speed is from -1 (full backward) to 1 (full forward)

@@ -54,6 +54,7 @@ public class SwerveModule {
         driveMotor.setGearRatio(constants.DriveMotorGearRatio);
         driveMotor.setStatorCurrentLimit(constants.SlipCurrent);
         driveMotor.setInverted(constants.DriveMotorInverted);
+        driveMotor.setOffset(constants.EncoderOffset);
 
         angleMotor.setBraking(true);
         angleMotor.setGains(constants.SteerMotorGains);
@@ -61,7 +62,6 @@ public class SwerveModule {
         angleMotor.setContinuousWrap(true);
         angleMotor.setInverted(constants.SteerMotorInverted);
 
-        angleEncoder.setRatioAndOffset(1, constants.EncoderOffset);
         angleEncoder.setInverted(constants.EncoderInverted);
 
         String modulePos = "[UNKNOWN]";
