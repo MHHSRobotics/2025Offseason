@@ -11,7 +11,11 @@ import com.ctre.phoenix6.controls.MotionMagicTorqueCurrentFOC;
 import com.ctre.phoenix6.controls.MotionMagicVelocityTorqueCurrentFOC;
 import com.ctre.phoenix6.controls.MotionMagicVelocityVoltage;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
+import com.ctre.phoenix6.controls.PositionTorqueCurrentFOC;
+import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.controls.TorqueCurrentFOC;
+import com.ctre.phoenix6.controls.VelocityTorqueCurrentFOC;
+import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
@@ -33,20 +37,25 @@ public class MotorIOTalonFX extends MotorIO {
     // Control objects
     private DutyCycleOut dutyCycle = new DutyCycleOut(0);
     private VoltageOut voltage = new VoltageOut(0);
+
+    private TorqueCurrentFOC torqueCurrent = new TorqueCurrentFOC(0);
     private MotionMagicTorqueCurrentFOC motionMagicTorqueCurrent = new MotionMagicTorqueCurrentFOC(0);
     private MotionMagicVoltage motionMagicVoltage = new MotionMagicVoltage(0);
-    private TorqueCurrentFOC torqueCurrent = new TorqueCurrentFOC(0);
-    private MotionMagicVelocityVoltage velocityVoltage = new MotionMagicVelocityVoltage(0);
-    private MotionMagicVelocityTorqueCurrentFOC velocityTorqueCurrent = new MotionMagicVelocityTorqueCurrentFOC(0);
+    private MotionMagicVelocityVoltage magicVelocityVoltage = new MotionMagicVelocityVoltage(0);
+    private MotionMagicVelocityTorqueCurrentFOC magicVelocityTorqueCurrent = new MotionMagicVelocityTorqueCurrentFOC(0);
+    private PositionVoltage positionVoltage = new PositionVoltage(0);
+    private PositionTorqueCurrentFOC positionCurrent = new PositionTorqueCurrentFOC(0);
+    private VelocityVoltage velocityVoltage = new VelocityVoltage(0);
+    private VelocityTorqueCurrentFOC velocityCurrent = new VelocityTorqueCurrentFOC(0);
     private Follower follow = new Follower(0, false);
 
-    public MotorIOTalonFX(int id,CANBus canBus){
+    public MotorIOTalonFX(int id, CANBus canBus) {
         motor = new TalonFX(id, canBus);
         sim = motor.getSimState();
     }
 
     public MotorIOTalonFX(int id, String canBus) {
-        this(id,new CANBus(canBus));
+        this(id, new CANBus(canBus));
     }
 
     public MotorIOTalonFX(int id) {
@@ -114,30 +123,49 @@ public class MotorIOTalonFX extends MotorIO {
         motor.setControl(torqueCurrent.withOutput(current));
     }
 
-    // Sets the goal of the motor using MotionMagic TorqueCurrentFOC output. Don't use this, use setGoalWithVoltage.
-    // TorqueCurrentFOC can't be characterized with SysId.
+    // Sets the goal of the motor using MotionMagic TorqueCurrentFOC output.
     @Override
-    public void setGoalWithCurrent(double position) {
+    public void setGoalWithCurrentMagic(double position) {
         motor.setControl(motionMagicTorqueCurrent.withPosition(Radians.of(position)));
     }
 
     // Sets the goal of the motor using MotionMagic Voltage output
     @Override
-    public void setGoalWithVoltage(double position) {
+    public void setGoalWithVoltageMagic(double position) {
         motor.setControl(motionMagicVoltage.withPosition(Radians.of(position)));
     }
 
-    // Sets the goal velocity of the motor using MotionMagic TorqueCurrentFOC output. Don't use this, use
-    // setVelocityWithVoltage.
-    // TorqueCurrentFOC can't be characterized with SysId.
+    // Sets the goal velocity of the motor using MotionMagic TorqueCurrentFOC output.
     @Override
-    public void setVelocityWithCurrent(double velocity) {
-        motor.setControl(velocityTorqueCurrent.withVelocity(RadiansPerSecond.of(velocity)));
+    public void setVelocityWithCurrentMagic(double velocity) {
+        motor.setControl(magicVelocityTorqueCurrent.withVelocity(RadiansPerSecond.of(velocity)));
     }
 
-    // Sets the goal velocity of the motor using MotionMagic TorqueCurrentFOC output. Don't use this, use
-    // setVelocityWithVoltage.
-    // TorqueCurrentFOC can't be characterized with SysId.
+    // Sets the goal velocity of the motor using MotionMagic Voltage output.
+    @Override
+    public void setVelocityWithVoltageMagic(double velocity) {
+        motor.setControl(magicVelocityVoltage.withVelocity(RadiansPerSecond.of(velocity)));
+    }
+
+    // Sets the goal of the motor using TorqueCurrentFOC output.
+    @Override
+    public void setGoalWithCurrent(double position) {
+        motor.setControl(positionCurrent.withPosition(Radians.of(position)));
+    }
+
+    // Sets the goal of the motor using Voltage output
+    @Override
+    public void setGoalWithVoltage(double position) {
+        motor.setControl(positionVoltage.withPosition(Radians.of(position)));
+    }
+
+    // Sets the goal velocity of the motor using TorqueCurrentFOC output.
+    @Override
+    public void setVelocityWithCurrent(double velocity) {
+        motor.setControl(velocityCurrent.withVelocity(RadiansPerSecond.of(velocity)));
+    }
+
+    // Sets the goal velocity of the motor using Voltage output.
     @Override
     public void setVelocityWithVoltage(double velocity) {
         motor.setControl(velocityVoltage.withVelocity(RadiansPerSecond.of(velocity)));
@@ -286,6 +314,12 @@ public class MotorIOTalonFX extends MotorIO {
         config.Feedback.RotorToSensorRatio = 1;
         config.Feedback.SensorToMechanismRatio = gearRatio;
         config.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.RotorSensor;
+        configChanged = true;
+    }
+
+    @Override
+    public void setOffset(double offset) {
+        config.Feedback.FeedbackRotorOffset = offset;
         configChanged = true;
     }
 

@@ -53,6 +53,14 @@ public class MotorIO {
 
     public void setTorqueCurrent(double current) {}
 
+    public void setGoalWithCurrentMagic(double goal) {}
+
+    public void setGoalWithVoltageMagic(double goal) {}
+
+    public void setVelocityWithCurrentMagic(double velocity) {}
+
+    public void setVelocityWithVoltageMagic(double velocity) {}
+
     public void setGoalWithCurrent(double goal) {}
 
     public void setGoalWithVoltage(double goal) {}
@@ -94,6 +102,8 @@ public class MotorIO {
     public void connectCANcoder(int id, double motorToSensorRatio, double sensorToMechanismRatio) {}
 
     public void setGearRatio(double gearRatio) {}
+
+    public void setOffset(double offset) {}
 
     public void setStatorCurrentLimit(double statorCurrentLimit) {}
 

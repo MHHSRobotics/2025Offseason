@@ -146,9 +146,10 @@ public class SwerveModule {
         // Scales the drive velocity goal according to how far away the steer motor is from its goal. This makes driving
         // smoother.
         state.cosineScale(Rotation2d.fromRadians(getAngle()));
-
+        // System.out.println(state.angle.getRadians());
         setDriveVelocity(state.speedMetersPerSecond / constants.WheelRadius);
         setAnglePosition(state.angle.getRadians());
+        // System.out.println(angleMotor.getInputs().setpoint);
     }
 
     // Runs a characterization for SysId

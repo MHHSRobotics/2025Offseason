@@ -19,10 +19,10 @@ public class GyroIOPigeon extends GyroIO {
         sim = gyro.getSimState();
     }
 
-    public GyroIOPigeon(int id,String canBus){
-        this(id,new CANBus(canBus));
+    public GyroIOPigeon(int id, String canBus) {
+        this(id, new CANBus(canBus));
     }
-    
+
     public GyroIOPigeon(int id) {
         this(id, new CANBus());
     }

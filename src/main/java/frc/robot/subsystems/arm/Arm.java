@@ -34,10 +34,11 @@ public class Arm extends SubsystemBase {
         // All radians are mechanism radians
 
         public static final int motorId = 22;
+        public static final double motorOffset = 0;
         public static final boolean motorInverted = false;
 
-        public static final int encoderId = 1;
-        public static final double encoderOffset = -1.052; // radians
+        public static final int encoderId = 26;
+        public static final double encoderOffset = 0; // radians
         public static final boolean encoderInverted = false;
 
         public static final double gearRatio = 700 / 9.; // ratio of motor rotations to mechanism rotations
@@ -166,6 +167,7 @@ public class Arm extends SubsystemBase {
 
         motor.setInverted(Constants.motorInverted);
         motor.connectCANcoder(Constants.encoderId, Constants.rotorToSensorRatio, Constants.encoderRatio);
+        motor.setOffset(Constants.motorOffset);
 
         motor.setFeedforwardType(GravityTypeValue.Arm_Cosine);
 
@@ -181,7 +183,7 @@ public class Arm extends SubsystemBase {
 
     // Sets the goal of the arm in radians
     public void setGoal(double pos) {
-        motor.setGoalWithVoltage(MathUtil.clamp(pos, Constants.minAngle, Constants.maxAngle));
+        motor.setGoalWithVoltageMagic(MathUtil.clamp(pos, Constants.minAngle, Constants.maxAngle));
     }
 
     // Returns the goal of the arm

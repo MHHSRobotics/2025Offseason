@@ -8,24 +8,23 @@ import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.signals.SensorDirectionValue;
 import com.ctre.phoenix6.sim.CANcoderSimState;
 
-import static edu.wpi.first.units.Units.Radians;
-
 public class EncoderIOCANcoder extends EncoderIO {
     private CANcoder encoder;
     private CANcoderConfiguration config = new CANcoderConfiguration();
     private boolean configChanged = true;
 
     private double encoderRatio = 1;
+    private double encoderOffset = 0;
 
     private CANcoderSimState sim;
 
-    public EncoderIOCANcoder(int id,CANBus canBus){
+    public EncoderIOCANcoder(int id, CANBus canBus) {
         encoder = new CANcoder(id, canBus);
         sim = encoder.getSimState();
     }
 
     public EncoderIOCANcoder(int id, String canBus) {
-        this(id,new CANBus(canBus));
+        this(id, new CANBus(canBus));
     }
 
     public EncoderIOCANcoder(int id) {
@@ -44,7 +43,8 @@ public class EncoderIOCANcoder extends EncoderIO {
         // CANcoder signals give data in encoder rotations. First convert to radians, then use encoderRatio to convert
         // to mechanism units.
         inputs.positionRad =
-                Units.rotationsToRadians(encoder.getAbsolutePosition().getValueAsDouble()) / encoderRatio;
+                Units.rotationsToRadians(encoder.getAbsolutePosition().getValueAsDouble()) / encoderRatio
+                        - encoderOffset;
         inputs.velocityRadPerSec =
                 Units.rotationsToRadians(encoder.getVelocity().getValueAsDouble()) / encoderRatio;
 
@@ -58,8 +58,7 @@ public class EncoderIOCANcoder extends EncoderIO {
     @Override
     public void setRatioAndOffset(double ratio, double offset) {
         encoderRatio = ratio;
-        config.MagnetSensor.withMagnetOffset(Radians.of(offset * ratio));
-        configChanged = true;
+        encoderOffset = offset;
     }
 
     // Sets whether the encoder is inverted
