@@ -2,6 +2,8 @@ package frc.robot;
 
 import edu.wpi.first.wpilibj.RobotBase;
 
+import com.ctre.phoenix6.CANBus;
+
 public final class Constants {
     // Should be Mode.REPLAY when replaying, else Mode.SIM
     public static final Mode simMode = Mode.SIM;
@@ -22,4 +24,10 @@ public final class Constants {
 
     public static final double debounceTime =
             0.5; // time in seconds to wait before reporting a motor or encoder disconnected
+
+    // Whether LoggedTunableNumbers should be published to NT
+    public static final boolean tuningMode = true;
+
+    public static final CANBus defaultBus = new CANBus("rio");
+    public static final CANBus swerveBus = new CANBus("rhino");
 }
