@@ -48,7 +48,6 @@ public class RobotContainer {
 
         TalonFXIO intakeMotor;
 
-
         switch (Constants.currentMode) {
             case REAL:
                 // On a real bot, the arm should be using IO that interfaces with real motors (TalonFXIOBase,

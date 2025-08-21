@@ -31,7 +31,8 @@ public class TalonFXIOBase extends TalonFXIO {
     // The actual TalonFX
     private TalonFX motor;
 
-    // All data here is measured in mech units, which are radians for arms and meters for elevators. TalonFX's native signals are scaled by 2pi, so they have to be fixed when the inputs are recorded.
+    // All data here is measured in mech units, which are radians for arms and meters for elevators. TalonFX's native
+    // signals are scaled by 2pi, so they have to be fixed when the inputs are recorded.
 
     // StatusSignals that get data from the motor, see TalonFXIO for an explanation of each
     private StatusSignal<Angle> position;

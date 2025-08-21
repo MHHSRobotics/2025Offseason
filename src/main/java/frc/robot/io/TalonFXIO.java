@@ -10,7 +10,9 @@ import com.ctre.phoenix6.controls.VoltageOut;
 
 import org.littletonrobotics.junction.AutoLog;
 
-// This is a generic class for all IO objects that access a TalonFX. The abstraction allows us to use this class without worrying if we're in a real bot, simulation, or replay. The TalonFXIOBase subclass is used for the real bot and simulation, and an empty instance of this class is used for replay.
+// This is a generic class for all IO objects that access a TalonFX. The abstraction allows us to use this class without
+// worrying if we're in a real bot, simulation, or replay. The TalonFXIOBase subclass is used for the real bot and
+// simulation, and an empty instance of this class is used for replay.
 public class TalonFXIO {
 
     // Creates a TalonFXIOInputsAutoLogged class that logs all inputs every periodic(). That constructor should be used
