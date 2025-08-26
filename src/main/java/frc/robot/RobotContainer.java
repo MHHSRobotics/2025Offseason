@@ -138,7 +138,7 @@ public class RobotContainer {
 
     private void configureBindings() {
         // PID-based forward movement (CCW)
-        // controller.cross().and(() -> !Arm.Constants.manualArm.get()).onTrue(armCommands.setGoal(() -> 0));
+        controller.cross().and(() -> !Arm.Constants.manualArm.get()).onTrue(armCommands.setGoal(() -> 0));
 
         // Manual forward movement (CCW)
         controller
@@ -148,7 +148,7 @@ public class RobotContainer {
                 .onFalse(armCommands.stop());
 
         // PID-based backward movement (CW)
-        // controller.circle().and(() -> !Arm.Constants.manualArm.get()).onTrue(armCommands.setGoal(() -> 1.5));
+        controller.circle().and(() -> !Arm.Constants.manualArm.get()).onTrue(armCommands.setGoal(() -> 1.5));
 
         // Manual backward movement (CW)
         controller

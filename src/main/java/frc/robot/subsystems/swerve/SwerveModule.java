@@ -3,6 +3,7 @@ package frc.robot.subsystems.swerve;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 
@@ -54,7 +55,7 @@ public class SwerveModule {
         driveMotor.setGearRatio(constants.DriveMotorGearRatio);
         driveMotor.setStatorCurrentLimit(constants.SlipCurrent);
         driveMotor.setInverted(constants.DriveMotorInverted);
-        driveMotor.setOffset(constants.EncoderOffset);
+        driveMotor.setOffset(Units.rotationsToRadians(constants.EncoderOffset));
 
         angleMotor.setBraking(true);
         angleMotor.setGains(constants.SteerMotorGains);
