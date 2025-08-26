@@ -34,7 +34,7 @@ public class Arm extends SubsystemBase {
         // All radians are mechanism radians
 
         public static final int motorId = 22;
-        public static final double offset = 0;
+        public static final double offset = -2.6;
         public static final boolean motorInverted = false;
 
         public static final int encoderId = 26;
