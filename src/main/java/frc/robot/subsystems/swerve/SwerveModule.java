@@ -55,13 +55,14 @@ public class SwerveModule {
         driveMotor.setGearRatio(constants.DriveMotorGearRatio);
         driveMotor.setStatorCurrentLimit(constants.SlipCurrent);
         driveMotor.setInverted(constants.DriveMotorInverted);
-        driveMotor.setOffset(Units.rotationsToRadians(constants.EncoderOffset));
 
         angleMotor.setBraking(true);
         angleMotor.setGains(constants.SteerMotorGains);
         angleMotor.connectCANcoder(constants.EncoderId, constants.SteerMotorGearRatio, 1);
         angleMotor.setContinuousWrap(true);
         angleMotor.setInverted(constants.SteerMotorInverted);
+        angleMotor.setOffset(Units.rotationsToRadians(
+                constants.EncoderOffset)); // Fix encoder zero position (convert from rotations to radians)
 
         angleEncoder.setInverted(constants.EncoderInverted);
 
@@ -95,86 +96,89 @@ public class SwerveModule {
         angleMotorOverheat =
                 new Alert("The angle motor on module " + modulePos + " is overheating", AlertType.kWarning);
 
-        encoderDisconnect = new Alert("The encoder on module " + modulePos + " is disconnect", AlertType.kError);
+        encoderDisconnect = new Alert("The encoder on module " + modulePos + " is disconnected", AlertType.kError);
         encoderHardwareFault =
                 new Alert("The encoder on module " + modulePos + " has encountered a hardware fault", AlertType.kError);
         encoderMagnetFault =
                 new Alert("The encoder on module " + modulePos + " has a non-functioning magnet", AlertType.kError);
     }
 
+    // Tell the drive motor how much power to use (voltage in volts, like 12V battery)
     public void setDriveVoltage(double voltage) {
         driveMotor.setVoltage(voltage);
     }
 
+    // Tell the steering motor how much power to use (voltage in volts)
     public void setAngleVoltage(double voltage) {
         angleMotor.setVoltage(voltage);
     }
 
-    // Sets the target velocity of this module to the given radians per second value
+    // Tell the wheel how fast to spin (speed in radians per second)
     public void setDriveVelocity(double radPerSec) {
         driveMotor.setVelocityWithVoltage(radPerSec);
     }
 
-    // Sets the target angle of this module (in radians)
+    // Tell the wheel which direction to point (angle in radians, like 0 = forward)
     public void setAnglePosition(double position) {
         angleMotor.setGoalWithVoltage(position);
     }
 
-    // Returns angle in radians
+    // Find out which direction the wheel is currently pointing (angle in radians)
     public double getAngle() {
         return angleMotor.getInputs().position;
     }
 
+    // Find out how far the robot has driven (distance in meters)
     public double getPositionMeters() {
         return getWheelPosition() * constants.WheelRadius;
     }
 
+    // Find out how fast the robot is moving (speed in meters per second)
     public double getVelocityMetersPerSec() {
         return driveMotor.getInputs().velocity * constants.WheelRadius;
     }
 
+    // Find out how much the wheel has rotated (angle in radians)
     public double getWheelPosition() {
         return driveMotor.getInputs().position;
     }
 
-    // A SwerveModuleState represents a velocity and angle for the swerve module. This method sets the goal of the
-    // swerve module to the given state.
+    // Make the swerve module go a certain speed and direction (state has speed in m/s and angle in radians)
     public void runSetpoint(SwerveModuleState state) {
-        // Optimizes the state so that the wheel doesn't have to turn so much. I.e. instead of turning 180 degrees and
-        // moving forward, the wheel can simply move backward
+        // Smart optimization: instead of turning 180° and going forward, just go backward instead
         state.optimize(Rotation2d.fromRadians(getAngle()));
 
-        // Scales the drive velocity goal according to how far away the steer motor is from its goal. This makes driving
-        // smoother.
+        // Slow down the wheel when it's still turning to the right angle (makes driving smoother)
         state.cosineScale(Rotation2d.fromRadians(getAngle()));
-        // System.out.println(state.angle.getRadians());
+
+        // Convert robot speed (m/s) to wheel spin speed (rad/s) using wheel size
         setDriveVelocity(state.speedMetersPerSecond / constants.WheelRadius);
         setAnglePosition(state.angle.getRadians());
-        // System.out.println(angleMotor.getInputs().setpoint);
     }
 
-    // Runs a characterization for SysId
+    // Special test mode for measuring how the robot moves (used by SysId tool)
     public void runCharacterization(double volts) {
-        setDriveVoltage(volts);
-        setAnglePosition(0);
+        setDriveVoltage(volts); // Apply test voltage
+        setAnglePosition(0); // Keep wheel pointing straight forward
     }
 
-    // Disables all motors in this module
+    // Turn off all motors in this swerve module
     public void stop() {
         setDriveVoltage(0);
         setAngleVoltage(0);
     }
 
-    // Returns the swerve module position, has drive and angle positions
+    // Get the module's current position: how far it's driven and which way it's pointing
     public SwerveModulePosition getPosition() {
         return new SwerveModulePosition(getPositionMeters(), Rotation2d.fromRadians(getAngle()));
     }
 
-    // Gets the current modules state, includes drive velocity and angle
+    // Get the module's current state: how fast it's going and which way it's pointing
     public SwerveModuleState getState() {
         return new SwerveModuleState(getVelocityMetersPerSec(), Rotation2d.fromRadians(getAngle()));
     }
 
+    // This runs every robot loop (about 50 times per second) to update sensors and check for problems
     public void periodic() {
         driveMotor.updateInputs();
         angleMotor.updateInputs();

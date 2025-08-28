@@ -138,24 +138,24 @@ public class RobotContainer {
 
     private void configureBindings() {
         // PID-based forward movement (CCW)
-        controller.cross().and(() -> !Arm.Constants.manualArm.get()).onTrue(armCommands.setGoal(() -> 0));
+        // controller.cross().and(() -> !Arm.Constants.manualArm.get()).onTrue(armCommands.setGoal(() -> 0));
 
-        // Manual forward movement (CCW)
-        controller
-                .povLeft()
-                .and(() -> Arm.Constants.manualArm.get())
-                .onTrue(armCommands.setSpeed(() -> 0.2))
-                .onFalse(armCommands.stop());
+        // // Manual forward movement (CCW)
+        // controller
+        //         .povLeft()
+        //         .and(() -> Arm.Constants.manualArm.get())
+        //         .onTrue(armCommands.setSpeed(() -> 0.2))
+        //         .onFalse(armCommands.stop());
 
-        // PID-based backward movement (CW)
-        controller.circle().and(() -> !Arm.Constants.manualArm.get()).onTrue(armCommands.setGoal(() -> 1.5));
+        // // PID-based backward movement (CW)
+        // controller.circle().and(() -> !Arm.Constants.manualArm.get()).onTrue(armCommands.setGoal(() -> 1.5));
 
-        // Manual backward movement (CW)
-        controller
-                .povRight()
-                .and(() -> Arm.Constants.manualArm.get())
-                .onTrue(armCommands.setSpeed(() -> -0.2))
-                .onFalse(armCommands.stop());
+        // // Manual backward movement (CW)
+        // controller
+        //         .povRight()
+        //         .and(() -> Arm.Constants.manualArm.get())
+        //         .onTrue(armCommands.setSpeed(() -> -0.2))
+        //         .onFalse(armCommands.stop());
 
         swerve.setDefaultCommand(swerveCommands.drive(
                 () -> -controller.getLeftY(), () -> -controller.getLeftX(), () -> -controller.getRightX(), () -> true));

@@ -28,117 +28,120 @@ import static edu.wpi.first.units.Units.Second;
 import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.units.Units.Volts;
 
+// Make the arm subsystem move a single-jointed arm to targets and show helpful
+// visuals for students tuning it. All angles are arm mechanism angles (radians).
 public class Arm extends SubsystemBase {
 
     public static class Constants {
-        // All radians are mechanism radians
+        // All angles in this class are arm mechanism angles (radians)
 
+        // CAN device ID for the arm motor controller
         public static final int motorId = 22;
+        // Angle offset (radians) to line up the absolute encoder zero with the real arm zero
         public static final double offset = -2.6;
+        // Whether to flip motor direction (true means reverse forward/backward)
         public static final boolean motorInverted = false;
 
+        // CAN device ID for the absolute encoder
         public static final int encoderId = 26;
+        // Whether to flip encoder direction to match the arm positive direction
         public static final boolean encoderInverted = false;
 
-        public static final double gearRatio = 700 / 9.; // ratio of motor rotations to mechanism rotations
-        public static final double encoderRatio = 28 / 9.; // ratio of encoder rotations to mechanism rotations
+        public static final double gearRatio = 700 / 9.; // Ratio of motor rotations to arm rotations (unitless)
+        public static final double encoderRatio = 28 / 9.; // Ratio of encoder rotations to arm rotations (unitless)
 
         public static final LoggedTunableNumber kP =
-                new LoggedTunableNumber("Arm/kP", 29.84); // volts per radian, current scales with distance to setpoint
+                new LoggedTunableNumber("Arm/kP", 29.84); // (volts per radian) more voltage when farther from target
         public static final LoggedTunableNumber kD =
-                new LoggedTunableNumber("Arm/kD", 3.9867); // volts per radian per sec
+                new LoggedTunableNumber("Arm/kD", 3.9867); // (volts per rad/s) reacts to how fast error is changing
 
-        public static final LoggedTunableNumber kS =
-                new LoggedTunableNumber("Arm/kS", 0.0138); // volts, the current needed to overcome static friction
+        public static final LoggedTunableNumber kS = new LoggedTunableNumber(
+                "Arm/kS", 0.0138); // (volts) voltage to get arm moving (overcome static friction)
         public static final LoggedTunableNumber kG = new LoggedTunableNumber(
-                "Arm/kG", 1.308); // volts, the current needed to overcome gravity when the arm is horizontal
+                "Arm/kG", 1.308); // (volts) voltage to hold the arm level (compensate gravity at 0 rad)
         public static final LoggedTunableNumber kV = new LoggedTunableNumber(
-                "Arm/kV",
-                9.2006); // volts per radian per sec, current needed to overcome linear friction (scales with velocity)
+                "Arm/kV", 9.2006); // (volts per rad/s) voltage that scales with speed to overcome friction
         public static final LoggedTunableNumber kA = new LoggedTunableNumber(
-                "Arm/kA",
-                0.76272); // volts per radian per sec^2, current needed to overcome quadratic friction (scales with
-        // acceleration)
+                "Arm/kA", 0.76272); // (volts per rad/s^2) extra voltage to help with acceleration
 
         public static final LoggedTunableNumber maxVelocity = new LoggedTunableNumber(
-                "Arm/maxVelocity", 100); // radians per sec, sets the max velocity MotionMagic will use
+                "Arm/maxVelocity", 100); // (rad/s) Motion Magic max speed for moving to a target
         public static final LoggedTunableNumber maxAccel = new LoggedTunableNumber(
-                "Arm/maxAccel", 200); // radians per sec^2, sets the max acceleration MotionMagic will use
+                "Arm/maxAccel", 200); // (rad/s^2) Motion Magic max acceleration for moving to a target
 
-        public static final double statorCurrentLimit = 70; // Limit on total torque output from the motor
-        public static final double supplyCurrentLimit = 60; // Limit on current pull from the motor
-        public static final double supplyCurrentLowerLimit =
-                40; // If the motor pulls >40 amps for >0.3 seconds, then the current limit will be set to 40 amps
-        public static final double supplyCurrentLowerTime = 0.3;
+        public static final double statorCurrentLimit = 70; // (amps) limit on motor torque output
+        public static final double supplyCurrentLimit = 60; // (amps) normal current limit pulled from battery
+        public static final double supplyCurrentLowerLimit = 40; // (amps) reduce to this if over limit for some time
+        public static final double supplyCurrentLowerTime = 0.3; // (seconds) time before lowering current limit
 
-        public static final double moi = 4.8944; // kg m^2, how hard it is to rotate the arm
-        public static final double mass = 10; // kg
+        public static final double moi = 4.8944; // (kg·m^2) how hard it is to rotate the arm
+        public static final double mass = 10; // (kg) estimated arm mass for simulation
 
-        public static final double minAngle = Units.degreesToRadians(-45);
-        public static final double maxAngle = Units.degreesToRadians(140);
-        public static final double startAngle = Units.degreesToRadians(90); // start angle for the simulated arm
+        public static final double minAngle = Units.degreesToRadians(-45); // (radians) soft lower limit (~-45°)
+        public static final double maxAngle = Units.degreesToRadians(140); // (radians) soft upper limit (~140°)
+        public static final double startAngle = Units.degreesToRadians(90); // (radians) start angle in sim (~90°)
 
-        // Angle bounds for SysId tests. If the arm hits its physical limit during SysId then the identification will
-        // fail. These bounds should be close to the mechanical bounds but with a few degrees of clearance.
+        // Angle bounds for SysId tests (radians). If the arm hits a hard stop during SysId, the test fails.
+        // Keep these slightly inside the real mechanical limits to leave a few degrees of safety.
         public static final double minSysIdAngle = Units.degreesToRadians(-30);
         public static final double maxSysIdAngle = Units.degreesToRadians(125);
 
         public static final double rotorToSensorRatio =
-                gearRatio / encoderRatio; // ratio of motor rotations to encoder rotations
+                gearRatio / encoderRatio; // Ratio of motor rotations to encoder rotations (unitless)
         public static final double armLength =
-                Math.sqrt(3 * moi / mass); // math to make WPILib simulate the arm correctly
+                Math.sqrt(3 * moi / mass); // Virtual arm length (meters) so WPILib sim behaves like our real arm
 
-        public static final LoggedNetworkBoolean manualArm = new LoggedNetworkBoolean(
-                "ArmSettings/Manual Arm", false); // toggles whether the arm is in manual control
+        public static final LoggedNetworkBoolean manualArm =
+                new LoggedNetworkBoolean("ArmSettings/Manual Arm", false); // Toggle to enable manual control mode
     }
 
-    // Motor, uses MotorIO to automatically handle simulation
+    // Arm motor interface; handles real robot and simulation for us
     private MotorIO motor;
 
-    // EncoderIO automatically handles simulation
+    // Absolute encoder interface; also supports simulation automatically
     private EncoderIO encoder;
 
-    // Mechanism visualization
+    // On-screen drawing of the arm for dashboards (length is visual only)
     private final LoggedMechanism2d mech = new LoggedMechanism2d(3, 3);
 
-    // The fixed end of the arm visualization
+    // The fixed base point for the arm drawing
     private final LoggedMechanismRoot2d root = mech.getRoot("ArmRoot", 1, 1.5);
 
-    // The arm visualization
+    // The live arm drawing that rotates to match the arm angle (radians)
     private final LoggedMechanismLigament2d arm =
             root.append(new LoggedMechanismLigament2d("Arm", 1.0, 0, 6, new Color8Bit(Color.kRed)));
 
-    // Visualization of the target position of the arm
+    // Drawing that shows the arm's target angle (radians)
     private final LoggedMechanismLigament2d goalArm =
             root.append(new LoggedMechanismLigament2d("GoalArm", 1.0, 0, 6, new Color8Bit(Color.kYellow)));
 
-    // Fixed end of the proportional visualization
+    // Base point for the proportional (P) bar visualization
     private final LoggedMechanismRoot2d pRoot = mech.getRoot("PRoot", 2.5, 2);
 
-    // Fixed end of the derivative visualization
+    // Base point for the derivative (D) bar visualization
     private final LoggedMechanismRoot2d dRoot = mech.getRoot("DRoot", 2.6, 2);
 
-    // Fixed end of the feedforward visualization
+    // Base point for the feedforward (FF) bar visualization
     private final LoggedMechanismRoot2d fRoot = mech.getRoot("FRoot", 2.7, 2);
 
-    // Proportional visualization
+    // Proportional (P) amount bar
     private final LoggedMechanismLigament2d pAmount =
             pRoot.append(new LoggedMechanismLigament2d("PAmount", 1.0, 90, 6, new Color8Bit(Color.kBlue)));
 
-    // Derivative visualization
+    // Derivative (D) amount bar
     private final LoggedMechanismLigament2d dAmount =
             dRoot.append(new LoggedMechanismLigament2d("DAmount", 1.0, 90, 6, new Color8Bit(Color.kGreen)));
 
-    // Feedforward visualization
+    // Feedforward (FF) amount bar
     private final LoggedMechanismLigament2d fAmount =
             fRoot.append(new LoggedMechanismLigament2d("FAmount", 1.0, 90, 6, new Color8Bit(Color.kWhite)));
 
-    // SysId routine
+    // SysId routine (test mode for measuring how the arm moves)
     private final SysIdRoutine sysId = new SysIdRoutine(
             new SysIdRoutine.Config(
-                    Volts.of(1).per(Second), // Ramp rate for quasistatic, volts/sec
-                    Volts.of(4), // Step voltage for dynamic
-                    Seconds.of(10)), // Timeout
+                    Volts.of(1).per(Second), // Ramp rate for quasistatic (volts per second)
+                    Volts.of(4), // Step voltage for dynamic test (volts)
+                    Seconds.of(10)), // Timeout (seconds)
             new SysIdRoutine.Mechanism(
                     // Voltage setting function
                     (voltage) -> motor.setVoltage(voltage.in(Volts)),
@@ -164,38 +167,44 @@ public class Arm extends SubsystemBase {
     public Arm(MotorIO motorIO, EncoderIO encoderIO) {
         motor = motorIO;
 
+        // Tell the motor which direction is forward (true = invert)
         motor.setInverted(Constants.motorInverted);
+        // Tell the motor which encoder to use and how motor/encoder/arm relate (ratios are unitless)
         motor.connectCANcoder(Constants.encoderId, Constants.rotorToSensorRatio, Constants.encoderRatio);
+        // Tell the motor the encoder zero offset (radians) so arm angles match real life
         motor.setOffset(Constants.offset);
 
+        // Make the motor use cosine gravity compensation (more help when the arm is level)
         motor.setFeedforwardType(GravityTypeValue.Arm_Cosine);
 
         encoder = encoderIO;
+        // Tell the encoder which direction is positive and the gear ratio to the arm
         encoder.setInverted(Constants.encoderInverted);
         encoder.setRatio(Constants.encoderRatio);
     }
 
-    // Sets the speed of the arm. Speed is from -1 (full backward) to 1 (full forward)
+    // Tell the arm motor how fast to spin (percent [-1 to 1], -1 = full backward, 1 = full forward)
     public void setSpeed(double value) {
         motor.setSpeed(value);
     }
 
-    // Sets the goal of the arm in radians
+    // Tell the arm to go to a target angle (radians). Example: 0 rad ≈ arm straight forward.
+    // We clamp to safe limits so the arm won't try to drive past its allowed range.
     public void setGoal(double pos) {
         motor.setGoalWithVoltageMagic(MathUtil.clamp(pos, Constants.minAngle, Constants.maxAngle));
     }
 
-    // Returns the goal of the arm
+    // Find out the current target angle (radians)
     public double getGoal() {
         return motor.getInputs().setpoint;
     }
 
-    // Gets the SysId routine
+    // Find out the SysId routine used for measuring how the arm moves (test mode)
     public SysIdRoutine getSysId() {
         return sysId;
     }
 
-    // Checks if the arm is in safe SysId range
+    // Find out if the arm is inside the safe angle range for SysId (radians)
     public boolean withinSysIdLimits() {
         return motor.getInputs().position < Constants.maxSysIdAngle
                 && motor.getInputs().position > Constants.minSysIdAngle;
@@ -203,40 +212,42 @@ public class Arm extends SubsystemBase {
 
     @Override
     public void periodic() {
-        // Call periodic methods
+        // This runs every robot loop (about 50 times per second) to update sensors,
+        // show visuals, apply tuning numbers, and check for problems
+        // 1) Update sensor/motor inputs so the latest values are available
         motor.updateInputs();
         encoder.updateInputs();
 
         Logger.processInputs("Arm/Motor", motor.getInputs());
         Logger.processInputs("Arm/Encoder", encoder.getInputs());
 
-        // Set angles of the visualization arm and goal arm
+        // 2) Update the on-screen arm drawing to match the current arm angle (radians)
         arm.setAngle(Rotation2d.fromRadians(motor.getInputs().position));
 
         if (motor.getInputs().controlMode.startsWith("MotionMagic")) {
-            // If motor is currently in PID mode, show all the lines
+            // If the motor is using Motion Magic (PID to a target), show the target and P/D/FF bars
             goalArm.setLineWeight(6);
             pAmount.setLineWeight(6);
             dAmount.setLineWeight(6);
             fAmount.setLineWeight(6);
 
-            // Set the angles/lengths of the lines
+            // Set the target angle and how big each control term is (scaled down for drawing)
             goalArm.setAngle(Rotation2d.fromRadians(motor.getInputs().setpoint));
             pAmount.setLength(motor.getInputs().propOutput / 100);
             dAmount.setLength(motor.getInputs().derivOutput / 100);
             fAmount.setLength(motor.getInputs().feedforward / 100);
         } else {
-            // Make all the lines invisible by setting their width to 0
+            // Hide the target and P/D/FF bars when not using Motion Magic
             goalArm.setLineWeight(0);
             pAmount.setLineWeight(0);
             dAmount.setLineWeight(0);
             fAmount.setLineWeight(0);
         }
 
-        // Log the mechanism
+        // 3) Send the mechanism drawing to the logs/dashboard
         Logger.recordOutput("Arm/Mech", mech);
 
-        // Update the tuning constants
+        // 4) Read tuning numbers and apply them to the motor controller (units noted above)
         motor.setkP(Constants.kP.get());
         motor.setkD(Constants.kD.get());
         motor.setkG(Constants.kG.get());
@@ -246,7 +257,7 @@ public class Arm extends SubsystemBase {
         motor.setMaxVelocity(Constants.maxVelocity.get());
         motor.setMaxAccel(Constants.maxAccel.get());
 
-        // Update the alerts
+        // 5) Update alerts so they appear on the dashboard
         motorDisconnect.set(!motor.getInputs().connected);
         motorOverheat.set(motor.getInputs().tempFault);
         motorHardwareFault.set(motor.getInputs().hardwareFault);
