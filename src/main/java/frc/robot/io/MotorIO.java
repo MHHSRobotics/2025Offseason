@@ -1,9 +1,13 @@
 package frc.robot.io;
 
+import edu.wpi.first.wpilibj.Alert;
+import edu.wpi.first.wpilibj.Alert.AlertType;
+
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.signals.GravityTypeValue;
 
 import org.littletonrobotics.junction.AutoLog;
+import org.littletonrobotics.junction.Logger;
 
 // Make a simple motor interface used by subsystems (arms, elevators, flywheels).
 // Mechanism units:
@@ -43,10 +47,54 @@ public class MotorIO {
         public boolean reverseLimitFault;
     }
 
+    private String logPath = "";
+
+    // Alert objects to show motor problems on the dashboard
+    private Alert disconnectAlert;
+    private Alert hardwareFaultAlert;
+    private Alert tempFaultAlert;
+    private Alert forwardLimitAlert;
+    private Alert reverseLimitAlert;
+
+    public MotorIO() {
+        // Alerts will be created when setName() is called
+    }
+
+    // Tell the MotorIO what to call this motor for alerts (like "arm" or "FL drive")
+    public void setName(String name) {
+        // Create alerts with descriptive names for this motor
+        disconnectAlert = new Alert("The " + name + " motor is disconnected", AlertType.kError);
+        hardwareFaultAlert =
+                new Alert("The " + name + " motor encountered an internal hardware fault", AlertType.kError);
+        tempFaultAlert = new Alert("The " + name + " motor is overheating!", AlertType.kWarning);
+        forwardLimitAlert = new Alert("The " + name + " motor hit its forward limit", AlertType.kWarning);
+        reverseLimitAlert = new Alert("The " + name + " motor hit its reverse limit", AlertType.kWarning);
+    }
+
+    // Tell the MotorIO where to log its data (like "Arm/Motor" or "Drive/Module0/DriveMotor")
+    public void setPath(String path) {
+        this.logPath = path;
+    }
+
     protected MotorIOInputsAutoLogged inputs = new MotorIOInputsAutoLogged();
 
     // Find out the latest values from the motor and store them in inputs
-    public void updateInputs() {}
+    public void update() {
+        // Log the inputs to AdvantageKit if a path has been set
+        if (!logPath.isEmpty()) {
+            Logger.processInputs(logPath, inputs);
+        }
+
+        // Update alerts based on the current motor status (this runs after subclass updates inputs)
+        // Only update alerts if they've been created (setName() was called)
+        if (disconnectAlert != null) {
+            disconnectAlert.set(!inputs.connected);
+            hardwareFaultAlert.set(inputs.hardwareFault);
+            tempFaultAlert.set(inputs.tempFault);
+            forwardLimitAlert.set(inputs.forwardLimitFault);
+            reverseLimitAlert.set(inputs.reverseLimitFault);
+        }
+    }
 
     // Find out the current inputs snapshot (read-only)
     public MotorIOInputsAutoLogged getInputs() {
@@ -125,6 +173,9 @@ public class MotorIO {
     // Tell Motion Magic the max acceleration to use (mechanism units per second^2)
     public void setMaxAccel(double maxAccel) {}
 
+    // Tell Motion Magic the max jerk to use (mechanism units per second^3)s
+    public void setMaxJerk(double maxJerk) {}
+
     // Make angle wrap-around enabled (useful for swerve angles that can spin past 360°)
     public void setContinuousWrap(boolean wrap) {}
 
@@ -152,15 +203,15 @@ public class MotorIO {
     // Time (seconds) above the limit before lowering the current
     public void setSupplyCurrentLowerTime(double supplyCurrentLowerTime) {}
 
-    // Set the forward soft limit (radians)
-    public void setForwardLimit(double forwardLimit) {}
-
-    // Set the reverse soft limit (radians)
-    public void setReverseLimit(double reverseLimit) {}
+    // Set soft limits (radians)
+    public void setLimits(double min, double max) {}
 
     // Make the simulated mechanism position update (radians)
     public void setMechPosition(double position) {}
 
     // Make the simulated mechanism velocity update (rad/s)
     public void setMechVelocity(double velocity) {}
+
+    // Clear all sticky faults on this motor
+    public void clearStickyFaults() {}
 }

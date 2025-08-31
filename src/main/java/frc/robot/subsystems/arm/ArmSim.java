@@ -30,10 +30,10 @@ public class ArmSim extends SubsystemBase {
                 Arm.Constants.gearRatio,
                 Arm.Constants.moi,
                 Arm.Constants.armLength,
-                Arm.Constants.minAngle,
-                Arm.Constants.maxAngle,
+                Arm.Constants.minAngle + Arm.Constants.offset,
+                Arm.Constants.maxAngle + Arm.Constants.offset,
                 true,
-                Arm.Constants.startAngle);
+                Arm.Constants.startAngle + Arm.Constants.offset);
     }
 
     @Override

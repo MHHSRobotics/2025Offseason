@@ -4,14 +4,10 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.wpilibj.Alert;
-import edu.wpi.first.wpilibj.Alert.AlertType;
 
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.swerve.SwerveModuleConstants;
-
-import org.littletonrobotics.junction.Logger;
 
 import frc.robot.io.EncoderIO;
 import frc.robot.io.MotorIO;
@@ -22,18 +18,6 @@ public class SwerveModule {
     private EncoderIO angleEncoder;
 
     private SwerveModuleConstants<TalonFXConfiguration, TalonFXConfiguration, CANcoderConfiguration> constants;
-
-    private Alert driveMotorDisconnect;
-    private Alert driveMotorHardwareFault;
-    private Alert driveMotorOverheat;
-
-    private Alert angleMotorDisconnect;
-    private Alert angleMotorHardwareFault;
-    private Alert angleMotorOverheat;
-
-    private Alert encoderDisconnect;
-    private Alert encoderHardwareFault;
-    private Alert encoderMagnetFault;
 
     private int index;
 
@@ -49,22 +33,6 @@ public class SwerveModule {
         driveMotor = driveMotorIO;
         angleMotor = angleMotorIO;
         angleEncoder = angleEncoderIO;
-
-        driveMotor.setBraking(true);
-        driveMotor.setGains(constants.DriveMotorGains);
-        driveMotor.setGearRatio(constants.DriveMotorGearRatio);
-        driveMotor.setStatorCurrentLimit(constants.SlipCurrent);
-        driveMotor.setInverted(constants.DriveMotorInverted);
-
-        angleMotor.setBraking(true);
-        angleMotor.setGains(constants.SteerMotorGains);
-        angleMotor.connectCANcoder(constants.EncoderId, constants.SteerMotorGearRatio, 1);
-        angleMotor.setContinuousWrap(true);
-        angleMotor.setInverted(constants.SteerMotorInverted);
-        angleMotor.setOffset(Units.rotationsToRadians(
-                constants.EncoderOffset)); // Fix encoder zero position (convert from rotations to radians)
-
-        angleEncoder.setInverted(constants.EncoderInverted);
 
         String modulePos = "[UNKNOWN]";
         switch (index) {
@@ -82,25 +50,30 @@ public class SwerveModule {
                 break;
         }
 
-        driveMotorDisconnect =
-                new Alert("The drive motor on module " + modulePos + " is disconnected", AlertType.kError);
-        driveMotorHardwareFault = new Alert(
-                "The drive motor on module " + modulePos + " has encountered a hardware error", AlertType.kError);
-        driveMotorOverheat =
-                new Alert("The drive motor on module " + modulePos + " is overheating", AlertType.kWarning);
+        // Tell the motors what to call themselves for alerts and where to log data
+        driveMotor.setName(modulePos + " drive");
+        driveMotor.setPath("Drive/Module" + index + "/DriveMotor");
+        angleMotor.setName(modulePos + " angle");
+        angleMotor.setPath("Drive/Module" + index + "/AngleMotor");
 
-        angleMotorDisconnect =
-                new Alert("The angle motor on module " + modulePos + " is disconnected", AlertType.kError);
-        angleMotorHardwareFault = new Alert(
-                "The angle motor on module " + modulePos + " has encountered a hardware error", AlertType.kError);
-        angleMotorOverheat =
-                new Alert("The angle motor on module " + modulePos + " is overheating", AlertType.kWarning);
+        driveMotor.setBraking(true);
+        driveMotor.setGains(constants.DriveMotorGains);
+        driveMotor.setGearRatio(constants.DriveMotorGearRatio);
+        driveMotor.setStatorCurrentLimit(constants.SlipCurrent);
+        driveMotor.setInverted(constants.DriveMotorInverted);
 
-        encoderDisconnect = new Alert("The encoder on module " + modulePos + " is disconnected", AlertType.kError);
-        encoderHardwareFault =
-                new Alert("The encoder on module " + modulePos + " has encountered a hardware fault", AlertType.kError);
-        encoderMagnetFault =
-                new Alert("The encoder on module " + modulePos + " has a non-functioning magnet", AlertType.kError);
+        angleMotor.setBraking(true);
+        angleMotor.setGains(constants.SteerMotorGains);
+        angleMotor.connectCANcoder(constants.EncoderId, constants.SteerMotorGearRatio, 1);
+        angleMotor.setContinuousWrap(true);
+        angleMotor.setInverted(constants.SteerMotorInverted);
+        angleMotor.setOffset(Units.rotationsToRadians(
+                constants.EncoderOffset)); // Fix encoder zero position (convert from rotations to radians)
+
+        // Tell the encoder what to call itself for alerts and where to log data
+        angleEncoder.setName(modulePos + " encoder");
+        angleEncoder.setPath("Drive/Module" + index + "/AngleEncoder");
+        angleEncoder.setInverted(constants.EncoderInverted);
     }
 
     // Tell the drive motor how much power to use (voltage in volts, like 12V battery)
@@ -180,24 +153,9 @@ public class SwerveModule {
 
     // This runs every robot loop (about 50 times per second) to update sensors and check for problems
     public void periodic() {
-        driveMotor.updateInputs();
-        angleMotor.updateInputs();
-        angleEncoder.updateInputs();
-
-        Logger.processInputs("Drive/Module" + index + "/DriveMotor", driveMotor.getInputs());
-        Logger.processInputs("Drive/Module" + index + "/AngleMotor", angleMotor.getInputs());
-        Logger.processInputs("Drive/Module" + index + "/AngleEncoder", angleEncoder.getInputs());
-
-        driveMotorDisconnect.set(!driveMotor.getInputs().connected);
-        driveMotorHardwareFault.set(driveMotor.getInputs().hardwareFault);
-        driveMotorOverheat.set(driveMotor.getInputs().tempFault);
-
-        angleMotorDisconnect.set(!angleMotor.getInputs().connected);
-        angleMotorHardwareFault.set(angleMotor.getInputs().hardwareFault);
-        angleMotorOverheat.set(angleMotor.getInputs().tempFault);
-
-        encoderDisconnect.set(!angleEncoder.getInputs().connected);
-        encoderHardwareFault.set(angleEncoder.getInputs().hardwareFault);
-        encoderMagnetFault.set(angleEncoder.getInputs().badMagnetFault);
+        // All updates handle logging and alerts automatically
+        driveMotor.update();
+        angleMotor.update();
+        angleEncoder.update();
     }
 }

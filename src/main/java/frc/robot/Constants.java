@@ -30,4 +30,8 @@ public final class Constants {
 
     public static final CANBus defaultBus = new CANBus("rio");
     public static final CANBus swerveBus = new CANBus("rhino");
+
+    public static final double loopOverrunWarningTimeout = 0.2;
+
+    public static final double brownoutVoltage = 6.0;
 }

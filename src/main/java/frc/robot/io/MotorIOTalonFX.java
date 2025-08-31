@@ -5,6 +5,7 @@ import edu.wpi.first.math.util.Units;
 import com.ctre.phoenix6.CANBus;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.controls.ControlRequest;
 import com.ctre.phoenix6.controls.DutyCycleOut;
 import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.MotionMagicTorqueCurrentFOC;
@@ -54,6 +55,7 @@ public class MotorIOTalonFX extends MotorIO {
     private VelocityTorqueCurrentFOC velocityCurrent = new VelocityTorqueCurrentFOC(0);
     private Follower follow = new Follower(0, false);
 
+    // Current offset of the motor
     private double offset = 0;
 
     // Make a TalonFX on the given CAN bus
@@ -73,10 +75,12 @@ public class MotorIOTalonFX extends MotorIO {
     }
 
     @Override
-    public void updateInputs() {
+    public void update() {
         if (configChanged) {
             configChanged = false;
+            ControlRequest control = motor.getAppliedControl();
             motor.getConfigurator().apply(config);
+            motor.setControl(control);
         }
 
         // Update all input values from the motor signals
@@ -111,6 +115,9 @@ public class MotorIOTalonFX extends MotorIO {
                 || motor.getFault_ForwardSoftLimit().getValue();
         inputs.reverseLimitFault = motor.getFault_ReverseHardLimit().getValue()
                 || motor.getFault_ReverseSoftLimit().getValue();
+
+        // Update alerts using the base class method (this checks all fault conditions and updates dashboard alerts)
+        super.update();
     }
 
     // Tell the motor how fast to spin (percent, -1 = full reverse, 1 = full forward)
@@ -287,6 +294,15 @@ public class MotorIOTalonFX extends MotorIO {
         }
     }
 
+    @Override
+    public void setMaxJerk(double maxJerk) {
+        double newMaxJerk = Units.radiansToRotations(maxJerk);
+        if (newMaxJerk != config.MotionMagic.MotionMagicJerk) {
+            config.MotionMagic.MotionMagicJerk = newMaxJerk;
+            configChanged = true;
+        }
+    }
+
     // Make continuous wrap enabled for mechanisms that can spin > 360° (like swerve azimuth)
     @Override
     public void setContinuousWrap(boolean continuousWrap) {
@@ -316,13 +332,15 @@ public class MotorIOTalonFX extends MotorIO {
 
     // Tell the motor to use its internal sensor with a gear ratio to the mechanism (unitless)
     @Override
-    public void setGearRatio(double gearRatio) {
+    public void setGearRatio(double motorToMechanismRatio) {
         config.Feedback.RotorToSensorRatio = 1;
-        config.Feedback.SensorToMechanismRatio = gearRatio;
+        config.Feedback.SensorToMechanismRatio = motorToMechanismRatio;
         config.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.RotorSensor;
         configChanged = true;
     }
 
+    // Set the offset of this motor, or what it reports at the 0 position. This will be subtracted from the reported
+    // position. Make sure to call this before setting limits!
     @Override
     public void setOffset(double offset) {
         this.offset = offset;
@@ -357,19 +375,15 @@ public class MotorIOTalonFX extends MotorIO {
     }
 
     @Override
-    public void setForwardLimit(double forwardLimit) {
+    public void setLimits(double min, double max) {
         config.SoftwareLimitSwitch.ForwardSoftLimitEnable = true;
-        config.SoftwareLimitSwitch.ForwardSoftLimitThreshold = Units.radiansToRotations(forwardLimit);
-        configChanged = true;
-    }
-
-    @Override
-    public void setReverseLimit(double reverseLimit) {
+        config.SoftwareLimitSwitch.ForwardSoftLimitThreshold = Units.radiansToRotations(max + offset);
         config.SoftwareLimitSwitch.ReverseSoftLimitEnable = true;
-        config.SoftwareLimitSwitch.ReverseSoftLimitThreshold = Units.radiansToRotations(reverseLimit);
+        config.SoftwareLimitSwitch.ReverseSoftLimitThreshold = Units.radiansToRotations(min + offset);
         configChanged = true;
     }
 
+    // We apply invert after adding offset because invert is applied before offset in the position reading code
     @Override
     public void setMechPosition(double position) {
         double rotorPos = Units.radiansToRotations(
@@ -384,5 +398,10 @@ public class MotorIOTalonFX extends MotorIO {
                 velocity * config.Feedback.RotorToSensorRatio * config.Feedback.SensorToMechanismRatio);
         rotorVel = config.MotorOutput.Inverted.equals(InvertedValue.Clockwise_Positive) ? -rotorVel : rotorVel;
         sim.setRotorVelocity(rotorVel);
+    }
+
+    @Override
+    public void clearStickyFaults() {
+        motor.clearStickyFaults();
     }
 }

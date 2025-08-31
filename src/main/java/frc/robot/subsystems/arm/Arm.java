@@ -3,8 +3,6 @@ package frc.robot.subsystems.arm;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.wpilibj.Alert;
-import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -17,10 +15,10 @@ import org.littletonrobotics.junction.mechanism.LoggedMechanism2d;
 import org.littletonrobotics.junction.mechanism.LoggedMechanismLigament2d;
 import org.littletonrobotics.junction.mechanism.LoggedMechanismRoot2d;
 import org.littletonrobotics.junction.networktables.LoggedNetworkBoolean;
+import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
 
 import frc.robot.io.EncoderIO;
 import frc.robot.io.MotorIO;
-import frc.robot.util.LoggedTunableNumber;
 
 import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
@@ -38,7 +36,7 @@ public class Arm extends SubsystemBase {
         // CAN device ID for the arm motor controller
         public static final int motorId = 22;
         // Angle offset (radians) to line up the absolute encoder zero with the real arm zero
-        public static final double offset = -2.6;
+        public static final double offset = -2.85;
         // Whether to flip motor direction (true means reverse forward/backward)
         public static final boolean motorInverted = false;
 
@@ -50,24 +48,24 @@ public class Arm extends SubsystemBase {
         public static final double gearRatio = 700 / 9.; // Ratio of motor rotations to arm rotations (unitless)
         public static final double encoderRatio = 28 / 9.; // Ratio of encoder rotations to arm rotations (unitless)
 
-        public static final LoggedTunableNumber kP =
-                new LoggedTunableNumber("Arm/kP", 29.84); // (volts per radian) more voltage when farther from target
-        public static final LoggedTunableNumber kD =
-                new LoggedTunableNumber("Arm/kD", 3.9867); // (volts per rad/s) reacts to how fast error is changing
+        public static final LoggedNetworkNumber kP =
+                new LoggedNetworkNumber("Arm/kP", 75); // (volts per radian) more voltage when farther from target
+        public static final LoggedNetworkNumber kD =
+                new LoggedNetworkNumber("Arm/kD", 7); // (volts per rad/s) reacts to how fast error is changing
 
-        public static final LoggedTunableNumber kS = new LoggedTunableNumber(
-                "Arm/kS", 0.0138); // (volts) voltage to get arm moving (overcome static friction)
-        public static final LoggedTunableNumber kG = new LoggedTunableNumber(
-                "Arm/kG", 1.308); // (volts) voltage to hold the arm level (compensate gravity at 0 rad)
-        public static final LoggedTunableNumber kV = new LoggedTunableNumber(
-                "Arm/kV", 9.2006); // (volts per rad/s) voltage that scales with speed to overcome friction
-        public static final LoggedTunableNumber kA = new LoggedTunableNumber(
-                "Arm/kA", 0.76272); // (volts per rad/s^2) extra voltage to help with acceleration
+        public static final LoggedNetworkNumber kS =
+                new LoggedNetworkNumber("Arm/kS", 0); // (volts) voltage to get arm moving (overcome static friction)
+        public static final LoggedNetworkNumber kG = new LoggedNetworkNumber(
+                "Arm/kG", 0); // (volts) voltage to hold the arm level (compensate gravity at 0 rad)
+        public static final LoggedNetworkNumber kV = new LoggedNetworkNumber(
+                "Arm/kV", 0); // (volts per rad/s) voltage that scales with speed to overcome friction
+        public static final LoggedNetworkNumber kA =
+                new LoggedNetworkNumber("Arm/kA", 0); // (volts per rad/s^2) extra voltage to help with acceleration
 
-        public static final LoggedTunableNumber maxVelocity = new LoggedTunableNumber(
+        public static final LoggedNetworkNumber maxVelocity = new LoggedNetworkNumber(
                 "Arm/maxVelocity", 100); // (rad/s) Motion Magic max speed for moving to a target
-        public static final LoggedTunableNumber maxAccel = new LoggedTunableNumber(
-                "Arm/maxAccel", 200); // (rad/s^2) Motion Magic max acceleration for moving to a target
+        public static final LoggedNetworkNumber maxAccel = new LoggedNetworkNumber(
+                "Arm/maxAccel", 20); // (rad/s^2) Motion Magic max acceleration for moving to a target
 
         public static final double statorCurrentLimit = 70; // (amps) limit on motor torque output
         public static final double supplyCurrentLimit = 60; // (amps) normal current limit pulled from battery
@@ -92,7 +90,7 @@ public class Arm extends SubsystemBase {
                 Math.sqrt(3 * moi / mass); // Virtual arm length (meters) so WPILib sim behaves like our real arm
 
         public static final LoggedNetworkBoolean manualArm =
-                new LoggedNetworkBoolean("ArmSettings/Manual Arm", false); // Toggle to enable manual control mode
+                new LoggedNetworkBoolean("Arm/Manual Arm", false); // Toggle to enable manual control mode
     }
 
     // Arm motor interface; handles real robot and simulation for us
@@ -152,20 +150,12 @@ public class Arm extends SubsystemBase {
                             .voltage(Volts.of(motor.getInputs().appliedVoltage)),
                     this));
 
-    private Alert motorDisconnect = new Alert("The arm motor is disconnected", AlertType.kError);
-    private Alert motorHardwareFault =
-            new Alert("The arm motor encountered an internal hardware fault", AlertType.kError);
-    private Alert motorOverheat = new Alert("The arm motor is overheating!", AlertType.kWarning);
-    private Alert motorForwardLimit = new Alert("The arm motor hit its forward limit", AlertType.kWarning);
-    private Alert motorReverseLimit = new Alert("The arm motor hit its reverse limit", AlertType.kWarning);
-
-    private Alert encoderDisconnect = new Alert("The arm encoder is disconnected", AlertType.kError);
-    private Alert encoderHardwareFault =
-            new Alert("The arm encoder encountered an internal hardware fault", AlertType.kError);
-    private Alert encoderMagnetFault = new Alert("The arm encoder magnet is not functioning", AlertType.kError);
-
     public Arm(MotorIO motorIO, EncoderIO encoderIO) {
         motor = motorIO;
+
+        // Tell the motor what to call itself for alerts and where to log data
+        motor.setName("arm");
+        motor.setPath("Arm/Motor");
 
         // Tell the motor which direction is forward (true = invert)
         motor.setInverted(Constants.motorInverted);
@@ -177,7 +167,12 @@ public class Arm extends SubsystemBase {
         // Make the motor use cosine gravity compensation (more help when the arm is level)
         motor.setFeedforwardType(GravityTypeValue.Arm_Cosine);
 
+        motor.setBraking(true);
+
         encoder = encoderIO;
+        // Tell the encoder what to call itself for alerts and where to log data
+        encoder.setName("arm encoder");
+        encoder.setPath("Arm/Encoder");
         // Tell the encoder which direction is positive and the gear ratio to the arm
         encoder.setInverted(Constants.encoderInverted);
         encoder.setRatio(Constants.encoderRatio);
@@ -214,12 +209,9 @@ public class Arm extends SubsystemBase {
     public void periodic() {
         // This runs every robot loop (about 50 times per second) to update sensors,
         // show visuals, apply tuning numbers, and check for problems
-        // 1) Update sensor/motor inputs so the latest values are available
-        motor.updateInputs();
-        encoder.updateInputs();
-
-        Logger.processInputs("Arm/Motor", motor.getInputs());
-        Logger.processInputs("Arm/Encoder", encoder.getInputs());
+        // 1) Update sensor/motor inputs so the latest values are available (logging and alerts happen automatically)
+        motor.update();
+        encoder.update();
 
         // 2) Update the on-screen arm drawing to match the current arm angle (radians)
         arm.setAngle(Rotation2d.fromRadians(motor.getInputs().position));
@@ -256,16 +248,5 @@ public class Arm extends SubsystemBase {
         motor.setkA(Constants.kA.get());
         motor.setMaxVelocity(Constants.maxVelocity.get());
         motor.setMaxAccel(Constants.maxAccel.get());
-
-        // 5) Update alerts so they appear on the dashboard
-        motorDisconnect.set(!motor.getInputs().connected);
-        motorOverheat.set(motor.getInputs().tempFault);
-        motorHardwareFault.set(motor.getInputs().hardwareFault);
-        motorForwardLimit.set(motor.getInputs().forwardLimitFault);
-        motorReverseLimit.set(motor.getInputs().reverseLimitFault);
-
-        encoderDisconnect.set(!encoder.getInputs().connected);
-        encoderHardwareFault.set(encoder.getInputs().hardwareFault);
-        encoderMagnetFault.set(encoder.getInputs().badMagnetFault);
     }
 }

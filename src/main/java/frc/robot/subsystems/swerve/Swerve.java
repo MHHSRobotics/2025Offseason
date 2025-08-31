@@ -8,8 +8,6 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.wpilibj.Alert;
-import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj.util.Color8Bit;
@@ -64,10 +62,6 @@ public class Swerve extends SubsystemBase {
     // Make the best guess of the robot's field position using wheel odometry and gyro (and vision if added later)
     private SwerveDrivePoseEstimator estimator;
 
-    // Show problems with the gyro so students see them on the dashboard
-    private Alert gyroDisconnect = new Alert("The gyro is disconnected", AlertType.kError);
-    private Alert gyroHardwareFault = new Alert("The gyro has encountered a hardware fault", AlertType.kError);
-
     // On-screen drawing of the drive to show module directions and speeds
     private final LoggedMechanism2d mech = new LoggedMechanism2d(3, 3);
 
@@ -80,6 +74,10 @@ public class Swerve extends SubsystemBase {
     public Swerve(GyroIO gyro, SwerveModule fl, SwerveModule fr, SwerveModule bl, SwerveModule br) {
         this.gyro = gyro;
         this.modules = new SwerveModule[] {fl, fr, bl, br};
+
+        // Tell the gyro what to call itself for alerts and where to log data
+        gyro.setName("gyro");
+        gyro.setPath("Drive/Gyro");
 
         estimator = new SwerveDrivePoseEstimator(kinematics, gyroAngle, getModulePositions(), new Pose2d());
         // Set up the on-screen visualization for the four modules
@@ -240,18 +238,13 @@ public class Swerve extends SubsystemBase {
             module.periodic();
         }
 
-        // 2) Update and log the gyro inputs
-        gyro.updateInputs();
-        Logger.processInputs("Drive/Gyro", gyro.getInputs());
+        // 2) Update the gyro inputs (logging and alerts happen automatically)
+        gyro.update();
 
-        // 3) Show gyro problems on the dashboard
-        gyroDisconnect.set(!gyro.getInputs().connected);
-        gyroHardwareFault.set(gyro.getInputs().hardwareFault);
-
-        // 4) Feed odometry to the pose estimator (time, heading, and wheel distances)
+        // 3) Feed odometry to the pose estimator (time, heading, and wheel distances)
         estimator.updateWithTime(RobotController.getFPGATime(), gyroAngle, getModulePositions());
 
-        // 5) Update the module speed/direction drawing
+        // 4) Update the module speed/direction drawing
         refreshVisualization();
 
         Logger.recordOutput("Drive/Mech", mech);
