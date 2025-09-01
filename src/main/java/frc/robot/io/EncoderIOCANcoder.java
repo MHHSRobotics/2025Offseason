@@ -17,9 +17,14 @@ public class EncoderIOCANcoder extends EncoderIO {
 
     private CANcoderSimState sim;
 
+    private int id;
+    private CANBus canBus;
+
     public EncoderIOCANcoder(int id, CANBus canBus) {
         encoder = new CANcoder(id, canBus);
         sim = encoder.getSimState();
+        this.id=id;
+        this.canBus=canBus;
     }
 
     public EncoderIOCANcoder(int id, String canBus) {
@@ -28,6 +33,14 @@ public class EncoderIOCANcoder extends EncoderIO {
 
     public EncoderIOCANcoder(int id) {
         this(id, new CANBus());
+    }
+
+    public int getId(){
+        return id;
+    }
+
+    public CANBus getCANBus(){
+        return canBus;
     }
 
     @Override

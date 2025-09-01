@@ -64,7 +64,7 @@ public class SwerveModule {
 
         angleMotor.setBraking(true);
         angleMotor.setGains(constants.SteerMotorGains);
-        angleMotor.connectCANcoder(constants.EncoderId, constants.SteerMotorGearRatio, 1);
+        angleMotor.connectEncoder(angleEncoder, constants.SteerMotorGearRatio, 1);
         angleMotor.setContinuousWrap(true);
         angleMotor.setInverted(constants.SteerMotorInverted);
         angleMotor.setOffset(Units.rotationsToRadians(

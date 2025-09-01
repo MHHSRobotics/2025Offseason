@@ -182,8 +182,8 @@ public class MotorIO {
     // Tell the controller which gravity model to use (like Arm_Cosine or Elevator_Static)
     public void setFeedforwardType(GravityTypeValue type) {}
 
-    // Tell the motor to use a remote CANcoder (id) with given gear ratios (unitless)
-    public void connectCANcoder(int id, double motorToSensorRatio, double sensorToMechanismRatio) {}
+    // Tell the motor to use a remote encoder with given gear ratios (unitless)
+    public void connectEncoder(EncoderIO encoder, double motorToSensorRatio, double sensorToMechanismRatio) {}
 
     // Tell the motor to use its internal sensor with a gear ratio to the mechanism (unitless)
     public void setGearRatio(double gearRatio) {}
@@ -214,4 +214,7 @@ public class MotorIO {
 
     // Clear all sticky faults on this motor
     public void clearStickyFaults() {}
+
+    // Tell the motor to be disabled or enabled
+    public void setDisabled(boolean disabled) {}
 }

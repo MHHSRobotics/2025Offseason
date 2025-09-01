@@ -1,6 +1,7 @@
 package frc.robot.io;
 
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.DriverStation;
 
 import com.ctre.phoenix6.CANBus;
 import com.ctre.phoenix6.configs.Slot0Configs;
@@ -12,6 +13,7 @@ import com.ctre.phoenix6.controls.MotionMagicTorqueCurrentFOC;
 import com.ctre.phoenix6.controls.MotionMagicVelocityTorqueCurrentFOC;
 import com.ctre.phoenix6.controls.MotionMagicVelocityVoltage;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
+import com.ctre.phoenix6.controls.NeutralOut;
 import com.ctre.phoenix6.controls.PositionTorqueCurrentFOC;
 import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.controls.TorqueCurrentFOC;
@@ -41,6 +43,7 @@ public class MotorIOTalonFX extends MotorIO {
     private TalonFXSimState sim;
 
     // Control objects (one per control mode)
+    private NeutralOut neutral = new NeutralOut();
     private DutyCycleOut dutyCycle = new DutyCycleOut(0);
     private VoltageOut voltage = new VoltageOut(0);
 
@@ -57,6 +60,9 @@ public class MotorIOTalonFX extends MotorIO {
 
     // Current offset of the motor
     private double offset = 0;
+
+    // Whether the motor is disabled
+    private boolean disabled = false;
 
     // Make a TalonFX on the given CAN bus
     public MotorIOTalonFX(int id, CANBus canBus) {
@@ -123,66 +129,77 @@ public class MotorIOTalonFX extends MotorIO {
     // Tell the motor how fast to spin (percent, -1 = full reverse, 1 = full forward)
     @Override
     public void setSpeed(double value) {
+        if (disabled) return;
         motor.setControl(dutyCycle.withOutput(value));
     }
 
     // Tell the motor what voltage to apply (volts). Similar to setSpeed but in volts.
     @Override
     public void setVoltage(double volts) {
+        if (disabled) return;
         motor.setControl(voltage.withOutput(volts));
     }
 
     // Tell the motor the torque-producing current to use (amps). Helpful to ignore battery sag and back-EMF.
     @Override
     public void setTorqueCurrent(double current) {
+        if (disabled) return;
         motor.setControl(torqueCurrent.withOutput(current));
     }
 
     // Tell the motor to go to a target position using Motion Magic with current control (radians)
     @Override
     public void setGoalWithCurrentMagic(double position) {
+        if (disabled) return;
         motor.setControl(motionMagicTorqueCurrent.withPosition(Radians.of(position + offset)));
     }
 
     // Tell the motor to go to a target position using Motion Magic with voltage control (radians)
     @Override
     public void setGoalWithVoltageMagic(double position) {
+        if (disabled) return;
         motor.setControl(motionMagicVoltage.withPosition(Radians.of(position + offset)));
     }
 
     // Tell the motor to reach a target speed using Motion Magic with current control (rad/s)
     @Override
     public void setVelocityWithCurrentMagic(double velocity) {
+        if (disabled) return;
         motor.setControl(magicVelocityTorqueCurrent.withVelocity(RadiansPerSecond.of(velocity)));
     }
 
     // Tell the motor to reach a target speed using Motion Magic with voltage control (rad/s)
     @Override
     public void setVelocityWithVoltageMagic(double velocity) {
+        if (disabled) return;
         motor.setControl(magicVelocityVoltage.withVelocity(RadiansPerSecond.of(velocity)));
     }
 
     // Tell the motor to go to a target position using current control (radians)
     @Override
     public void setGoalWithCurrent(double position) {
+        if (disabled) return;
         motor.setControl(positionCurrent.withPosition(Radians.of(position + offset)));
     }
 
     // Tell the motor to go to a target position using voltage control (radians)
     @Override
     public void setGoalWithVoltage(double position) {
+        if (disabled) return;
         motor.setControl(positionVoltage.withPosition(Radians.of(position + offset)));
     }
 
     // Tell the motor to reach a target speed using current control (rad/s)
     @Override
     public void setVelocityWithCurrent(double velocity) {
+        if (disabled) return;
         motor.setControl(velocityCurrent.withVelocity(RadiansPerSecond.of(velocity)));
     }
 
     // Tell the motor to reach a target speed using voltage control (rad/s)
     @Override
     public void setVelocityWithVoltage(double velocity) {
+        if (disabled) return;
         motor.setControl(velocityVoltage.withVelocity(RadiansPerSecond.of(velocity)));
     }
 
@@ -190,6 +207,7 @@ public class MotorIOTalonFX extends MotorIO {
     // Note: Only CTRE motors on the same CAN bus can be followed.
     @Override
     public void follow(int motorId, boolean invert) {
+        if (disabled) return;
         motor.setControl(follow.withMasterID(motorId).withOpposeMasterDirection(invert));
     }
 
@@ -327,21 +345,21 @@ public class MotorIOTalonFX extends MotorIO {
         }
     }
 
-    // Tell the motor to use a remote CANcoder (id) with gear ratios:
+    // Tell the motor to use a remote encoder with gear ratios:
     // - motorToSensorRatio: motor rotations to sensor rotations (unitless)
     // - sensorToMechanismRatio: sensor rotations to mechanism rotations (unitless)
-    // Only use ONE of connectCANcoder OR setGearRatio for a motor, not both.
+    // Only use ONE of connectEncoder OR setGearRatio for a motor, not both.
+    // Currently only supports CANcoders.
     @Override
-    public void connectCANcoder(int id, double motorToSensorRatio, double sensorToMechanismRatio) {
-        if (id != config.Feedback.FeedbackRemoteSensorID
-                || motorToSensorRatio != config.Feedback.RotorToSensorRatio
-                || sensorToMechanismRatio != config.Feedback.SensorToMechanismRatio
-                || config.Feedback.FeedbackSensorSource != FeedbackSensorSourceValue.FusedCANcoder) {
-            config.Feedback.FeedbackRemoteSensorID = id;
+    public void connectEncoder(EncoderIO encoder, double motorToSensorRatio, double sensorToMechanismRatio) {
+        if(encoder instanceof EncoderIOCANcoder cancoder){
+            config.Feedback.FeedbackRemoteSensorID = cancoder.getId();
+            config.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.FusedCANcoder;
             config.Feedback.RotorToSensorRatio = motorToSensorRatio;
             config.Feedback.SensorToMechanismRatio = sensorToMechanismRatio;
-            config.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.FusedCANcoder;
             configChanged = true;
+        }else{
+            DriverStation.reportWarning("TalonFX doesn't support feedback sources other than CANcoders", false);
         }
     }
 
@@ -437,5 +455,13 @@ public class MotorIOTalonFX extends MotorIO {
     @Override
     public void clearStickyFaults() {
         motor.clearStickyFaults();
+    }
+
+    @Override
+    public void setDisabled(boolean disabled) {
+        this.disabled = disabled;
+        if (disabled) {
+            motor.setControl(neutral);
+        }
     }
 }

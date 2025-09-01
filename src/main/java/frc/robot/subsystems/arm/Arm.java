@@ -90,7 +90,13 @@ public class Arm extends SubsystemBase {
                 Math.sqrt(3 * moi / mass); // Virtual arm length (meters) so WPILib sim behaves like our real arm
 
         public static final LoggedNetworkBoolean manualArm =
-                new LoggedNetworkBoolean("Arm/Manual Arm", false); // Toggle to enable manual control mode
+                new LoggedNetworkBoolean("Arm/Manual", false); // Toggle to enable manual control mode
+
+        public static final LoggedNetworkBoolean armLocked =
+                new LoggedNetworkBoolean("Arm/Locked", true); // Toggle to enable braking when stopped
+
+        public static final LoggedNetworkBoolean armDisabled =
+                new LoggedNetworkBoolean("Arm/Disabled", false); // Toggle to completely disable the arm subsystem
     }
 
     // Arm motor interface; handles real robot and simulation for us
@@ -160,14 +166,12 @@ public class Arm extends SubsystemBase {
         // Tell the motor which direction is forward (true = invert)
         motor.setInverted(Constants.motorInverted);
         // Tell the motor which encoder to use and how motor/encoder/arm relate (ratios are unitless)
-        motor.connectCANcoder(Constants.encoderId, Constants.rotorToSensorRatio, Constants.encoderRatio);
+        motor.connectEncoder(encoderIO, Constants.rotorToSensorRatio, Constants.encoderRatio);
         // Tell the motor the encoder zero offset (radians) so arm angles match real life
         motor.setOffset(Constants.offset);
 
         // Make the motor use cosine gravity compensation (more help when the arm is level)
         motor.setFeedforwardType(GravityTypeValue.Arm_Cosine);
-
-        motor.setBraking(true);
 
         encoder = encoderIO;
         // Tell the encoder what to call itself for alerts and where to log data
@@ -209,6 +213,13 @@ public class Arm extends SubsystemBase {
     public void periodic() {
         // This runs every robot loop (about 50 times per second) to update sensors,
         // show visuals, apply tuning numbers, and check for problems
+
+        // Set braking based on user input
+        motor.setBraking(Constants.armLocked.get());
+
+        // Disable the motor based on user input
+        motor.setDisabled(Constants.armDisabled.get());
+        
         // 1) Update sensor/motor inputs so the latest values are available (logging and alerts happen automatically)
         motor.update();
         encoder.update();
