@@ -196,16 +196,22 @@ public class MotorIOTalonFX extends MotorIO {
     // Tell the motor which direction is forward (true = invert)
     @Override
     public void setInverted(boolean inverted) {
-        config.MotorOutput.Inverted =
+        InvertedValue newInverted =
                 inverted ? InvertedValue.Clockwise_Positive : InvertedValue.CounterClockwise_Positive;
-        configChanged = true;
+        if (newInverted != config.MotorOutput.Inverted) {
+            config.MotorOutput.Inverted = newInverted;
+            configChanged = true;
+        }
     }
 
     // Tell the motor what to do when stopped: brake (hold) or coast (freewheel)
     @Override
     public void setBraking(boolean brake) {
-        config.MotorOutput.NeutralMode = brake ? NeutralModeValue.Brake : NeutralModeValue.Coast;
-        configChanged = true;
+        NeutralModeValue newNeutralMode = brake ? NeutralModeValue.Brake : NeutralModeValue.Coast;
+        if (newNeutralMode != config.MotorOutput.NeutralMode) {
+            config.MotorOutput.NeutralMode = newNeutralMode;
+            configChanged = true;
+        }
     }
 
     // Make PID and feedforward values active (converting from rotations-based to radians-based where needed)
@@ -306,15 +312,19 @@ public class MotorIOTalonFX extends MotorIO {
     // Make continuous wrap enabled for mechanisms that can spin > 360° (like swerve azimuth)
     @Override
     public void setContinuousWrap(boolean continuousWrap) {
-        config.ClosedLoopGeneral.ContinuousWrap = continuousWrap;
-        configChanged = true;
+        if (continuousWrap != config.ClosedLoopGeneral.ContinuousWrap) {
+            config.ClosedLoopGeneral.ContinuousWrap = continuousWrap;
+            configChanged = true;
+        }
     }
 
     // Tell the controller which gravity model to use (Arm_Cosine or Elevator_Static)
     @Override
     public void setFeedforwardType(GravityTypeValue type) {
-        config.Slot0.GravityType = type;
-        configChanged = true;
+        if (type != config.Slot0.GravityType) {
+            config.Slot0.GravityType = type;
+            configChanged = true;
+        }
     }
 
     // Tell the motor to use a remote CANcoder (id) with gear ratios:
@@ -323,20 +333,29 @@ public class MotorIOTalonFX extends MotorIO {
     // Only use ONE of connectCANcoder OR setGearRatio for a motor, not both.
     @Override
     public void connectCANcoder(int id, double motorToSensorRatio, double sensorToMechanismRatio) {
-        config.Feedback.FeedbackRemoteSensorID = id;
-        config.Feedback.RotorToSensorRatio = motorToSensorRatio;
-        config.Feedback.SensorToMechanismRatio = sensorToMechanismRatio;
-        config.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.FusedCANcoder;
-        configChanged = true;
+        if (id != config.Feedback.FeedbackRemoteSensorID
+                || motorToSensorRatio != config.Feedback.RotorToSensorRatio
+                || sensorToMechanismRatio != config.Feedback.SensorToMechanismRatio
+                || config.Feedback.FeedbackSensorSource != FeedbackSensorSourceValue.FusedCANcoder) {
+            config.Feedback.FeedbackRemoteSensorID = id;
+            config.Feedback.RotorToSensorRatio = motorToSensorRatio;
+            config.Feedback.SensorToMechanismRatio = sensorToMechanismRatio;
+            config.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.FusedCANcoder;
+            configChanged = true;
+        }
     }
 
     // Tell the motor to use its internal sensor with a gear ratio to the mechanism (unitless)
     @Override
     public void setGearRatio(double motorToMechanismRatio) {
-        config.Feedback.RotorToSensorRatio = 1;
-        config.Feedback.SensorToMechanismRatio = motorToMechanismRatio;
-        config.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.RotorSensor;
-        configChanged = true;
+        if (1.0 != config.Feedback.RotorToSensorRatio
+                || motorToMechanismRatio != config.Feedback.SensorToMechanismRatio
+                || config.Feedback.FeedbackSensorSource != FeedbackSensorSourceValue.RotorSensor) {
+            config.Feedback.RotorToSensorRatio = 1;
+            config.Feedback.SensorToMechanismRatio = motorToMechanismRatio;
+            config.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.RotorSensor;
+            configChanged = true;
+        }
     }
 
     // Set the offset of this motor, or what it reports at the 0 position. This will be subtracted from the reported
@@ -352,35 +371,50 @@ public class MotorIOTalonFX extends MotorIO {
     // - If current > SupplyCurrentLowerLimit for SupplyCurrentLowerTime seconds, clamp to SupplyCurrentLowerLimit
     @Override
     public void setStatorCurrentLimit(double statorCurrentLimit) {
-        config.CurrentLimits.StatorCurrentLimit = statorCurrentLimit;
-        configChanged = true;
+        if (statorCurrentLimit != config.CurrentLimits.StatorCurrentLimit) {
+            config.CurrentLimits.StatorCurrentLimit = statorCurrentLimit;
+            configChanged = true;
+        }
     }
 
     @Override
     public void setSupplyCurrentLimit(double supplyCurrentLimit) {
-        config.CurrentLimits.SupplyCurrentLimit = supplyCurrentLimit;
-        configChanged = true;
+        if (supplyCurrentLimit != config.CurrentLimits.SupplyCurrentLimit) {
+            config.CurrentLimits.SupplyCurrentLimit = supplyCurrentLimit;
+            configChanged = true;
+        }
     }
 
     @Override
     public void setSupplyCurrentLowerLimit(double supplyCurrentLowerLimit) {
-        config.CurrentLimits.SupplyCurrentLowerLimit = supplyCurrentLowerLimit;
-        configChanged = true;
+        if (supplyCurrentLowerLimit != config.CurrentLimits.SupplyCurrentLowerLimit) {
+            config.CurrentLimits.SupplyCurrentLowerLimit = supplyCurrentLowerLimit;
+            configChanged = true;
+        }
     }
 
     @Override
     public void setSupplyCurrentLowerTime(double supplyCurrentLowerTime) {
-        config.CurrentLimits.SupplyCurrentLowerTime = supplyCurrentLowerTime;
-        configChanged = true;
+        if (supplyCurrentLowerTime != config.CurrentLimits.SupplyCurrentLowerTime) {
+            config.CurrentLimits.SupplyCurrentLowerTime = supplyCurrentLowerTime;
+            configChanged = true;
+        }
     }
 
     @Override
     public void setLimits(double min, double max) {
-        config.SoftwareLimitSwitch.ForwardSoftLimitEnable = true;
-        config.SoftwareLimitSwitch.ForwardSoftLimitThreshold = Units.radiansToRotations(max + offset);
-        config.SoftwareLimitSwitch.ReverseSoftLimitEnable = true;
-        config.SoftwareLimitSwitch.ReverseSoftLimitThreshold = Units.radiansToRotations(min + offset);
-        configChanged = true;
+        double newForwardThreshold = Units.radiansToRotations(max + offset);
+        double newReverseThreshold = Units.radiansToRotations(min + offset);
+        if (!config.SoftwareLimitSwitch.ForwardSoftLimitEnable
+                || newForwardThreshold != config.SoftwareLimitSwitch.ForwardSoftLimitThreshold
+                || !config.SoftwareLimitSwitch.ReverseSoftLimitEnable
+                || newReverseThreshold != config.SoftwareLimitSwitch.ReverseSoftLimitThreshold) {
+            config.SoftwareLimitSwitch.ForwardSoftLimitEnable = true;
+            config.SoftwareLimitSwitch.ForwardSoftLimitThreshold = newForwardThreshold;
+            config.SoftwareLimitSwitch.ReverseSoftLimitEnable = true;
+            config.SoftwareLimitSwitch.ReverseSoftLimitThreshold = newReverseThreshold;
+            configChanged = true;
+        }
     }
 
     // We apply invert after adding offset because invert is applied before offset in the position reading code
