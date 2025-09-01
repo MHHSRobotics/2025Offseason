@@ -248,7 +248,7 @@ public class Arm extends SubsystemBase {
         }
 
         // 3) Send the mechanism drawing to the logs/dashboard
-        Logger.recordOutput("Arm/Mech", mech);
+        Logger.recordOutput("Arm/Visualization", mech);
 
         // 4) Read tuning numbers and apply them to the motor controller (units noted above)
         motor.setkP(Constants.kP.get());

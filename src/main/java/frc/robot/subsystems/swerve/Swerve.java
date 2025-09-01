@@ -18,6 +18,7 @@ import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.mechanism.LoggedMechanism2d;
 import org.littletonrobotics.junction.mechanism.LoggedMechanismLigament2d;
 import org.littletonrobotics.junction.mechanism.LoggedMechanismRoot2d;
+import org.littletonrobotics.junction.networktables.LoggedNetworkBoolean;
 
 import frc.robot.io.GyroIO;
 import frc.robot.util.RobotUtils;
@@ -45,6 +46,12 @@ public class Swerve extends SubsystemBase {
 
         // Same idea as movePow but for turning
         public static final double turnPow = 2;
+
+        public static final LoggedNetworkBoolean swerveLocked =
+                new LoggedNetworkBoolean("Swerve/Locked", true); // Toggle to enable braking when stopped
+
+        public static final LoggedNetworkBoolean swerveDisabled =
+                new LoggedNetworkBoolean("Swerve/Disabled", false); // Toggle to completely disable all motors in the swerve subsystem
     }
 
     // Find out the robot heading from the gyro (real or simulated)
@@ -77,7 +84,7 @@ public class Swerve extends SubsystemBase {
 
         // Tell the gyro what to call itself for alerts and where to log data
         gyro.setName("gyro");
-        gyro.setPath("Drive/Gyro");
+        gyro.setPath("Swerve/Gyro");
 
         estimator = new SwerveDrivePoseEstimator(kinematics, gyroAngle, getModulePositions(), new Pose2d());
         // Set up the on-screen visualization for the four modules
@@ -233,8 +240,10 @@ public class Swerve extends SubsystemBase {
     @Override
     public void periodic() {
         // This runs every robot loop (~50 times per second)
-        // 1) Run each module's periodic to update sensors and control
+        // 1) Run each module's periodic to update sensors and control, and brake and disable if necessary
         for (SwerveModule module : modules) {
+            module.setLocked(Constants.swerveLocked.get());
+            module.setDisabled(Constants.swerveDisabled.get());
             module.periodic();
         }
 
@@ -247,6 +256,6 @@ public class Swerve extends SubsystemBase {
         // 4) Update the module speed/direction drawing
         refreshVisualization();
 
-        Logger.recordOutput("Drive/Mech", mech);
+        Logger.recordOutput("Swerve/Visualization", mech);
     }
 }
