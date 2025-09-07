@@ -50,8 +50,8 @@ public class Swerve extends SubsystemBase {
         public static final LoggedNetworkBoolean swerveLocked =
                 new LoggedNetworkBoolean("Swerve/Locked", true); // Toggle to enable braking when stopped
 
-        public static final LoggedNetworkBoolean swerveDisabled =
-                new LoggedNetworkBoolean("Swerve/Disabled", false); // Toggle to completely disable all motors in the swerve subsystem
+        public static final LoggedNetworkBoolean swerveDisabled = new LoggedNetworkBoolean(
+                "Swerve/Disabled", false); // Toggle to completely disable all motors in the swerve subsystem
     }
 
     // Find out the robot heading from the gyro (real or simulated)

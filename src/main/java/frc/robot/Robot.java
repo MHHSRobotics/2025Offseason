@@ -1,21 +1,18 @@
-// Copyright (c) FIRST and other WPILib contributors.
-// Open Source Software; you can modify and/or share it under the terms of
-// the WPILib BSD license file in the root directory of this project.
-
 package frc.robot;
 
-import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.BiConsumer;
 
+import edu.wpi.first.wpilibj.Alert;
+import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.IterativeRobotBase;
 import edu.wpi.first.wpilibj.RobotController;
-import edu.wpi.first.wpilibj.Watchdog;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 
+import com.ctre.phoenix6.CANBus.CANBusStatus;
 import com.ctre.phoenix6.SignalLogger;
 
 import org.littletonrobotics.junction.LogFileUtil;
@@ -30,10 +27,12 @@ public class Robot extends LoggedRobot {
 
     private final RobotContainer robotContainer;
 
-    public Robot() {
-        robotContainer = new RobotContainer();
+    private final Timer lowBatteryTimer = new Timer();
 
-        // Add the project metadata to the logs so we can identify which version of the code create a specific log file
+    private final Alert lowBatteryAlert = new Alert("Battery charge is low, replace it soon", AlertType.kWarning);
+
+    public Robot() {
+        // Add the project metadata to the logs so we can identify which version of the code created a specific log file
         Logger.recordMetadata("Name", BuildConstants.MAVEN_NAME);
         Logger.recordMetadata("ProjectName", BuildConstants.MAVEN_NAME);
         Logger.recordMetadata("BuildDate", BuildConstants.BUILD_DATE);
@@ -75,14 +74,6 @@ public class Robot extends LoggedRobot {
         SignalLogger.enableAutoLogging(false);
 
         // Adjust loop overrun warning timeout
-        try {
-            Field watchdogField = IterativeRobotBase.class.getDeclaredField("m_watchdog");
-            watchdogField.setAccessible(true);
-            Watchdog watchdog = (Watchdog) watchdogField.get(this);
-            watchdog.setTimeout(Constants.loopOverrunWarningTimeout);
-        } catch (Exception e) {
-            DriverStation.reportWarning("Failed to disable loop overrun warnings.", false);
-        }
         CommandScheduler.getInstance().setPeriod(Constants.loopOverrunWarningTimeout);
 
         // Remove controller connection warnings
@@ -105,11 +96,31 @@ public class Robot extends LoggedRobot {
 
         // Configure brownout voltage
         RobotController.setBrownoutVoltage(Constants.brownoutVoltage);
+
+        // Restart timers
+        lowBatteryTimer.restart();
+
+        // Init robot container
+        robotContainer = new RobotContainer();
     }
 
     @Override
     public void robotPeriodic() {
         CommandScheduler.getInstance().run();
+
+        if (RobotController.getBatteryVoltage() <= Constants.lowBatteryVoltage && DriverStation.isEnabled()) {
+            if (lowBatteryTimer.hasElapsed(Constants.lowBatteryTime)) {
+                lowBatteryAlert.set(true);
+            }
+        } else {
+            lowBatteryAlert.set(false);
+            lowBatteryTimer.reset();
+        }
+
+        // Log CANivore status
+        CANBusStatus status = Constants.swerveBus.getStatus();
+        Logger.recordOutput("CANivore/Utilization", status.BusUtilization);
+        Logger.recordOutput("CANivore/Status", status.Status.isOK());
     }
 
     @Override

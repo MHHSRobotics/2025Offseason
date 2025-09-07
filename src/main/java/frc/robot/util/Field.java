@@ -6,9 +6,10 @@ public class Field {
     public static final double fieldWidth = 8.05;
 
     // Whether the field this season has rotational (C2) or reflected (D2) symmetry
-    public enum FieldSymmetry{
-        C2,D2
+    public enum FieldSymmetry {
+        C2,
+        D2
     }
 
-    public static final FieldSymmetry symm=FieldSymmetry.C2;
+    public static final FieldSymmetry symm = FieldSymmetry.C2;
 }

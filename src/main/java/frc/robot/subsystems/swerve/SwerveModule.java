@@ -77,17 +77,17 @@ public class SwerveModule {
     }
 
     // Sets whether the drive and angle motors should brake
-    public void setLocked(boolean locked){
+    public void setLocked(boolean locked) {
         driveMotor.setBraking(locked);
         angleMotor.setBraking(locked);
     }
 
     // Sets whether the swerve module is disabled
-    public void setDisabled(boolean disabled){
+    public void setDisabled(boolean disabled) {
         driveMotor.setDisabled(disabled);
         angleMotor.setDisabled(disabled);
     }
-    
+
     // Tell the drive motor how much power to use (voltage in volts, like 12V battery)
     public void setDriveVoltage(double voltage) {
         driveMotor.setVoltage(voltage);

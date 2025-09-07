@@ -30,10 +30,10 @@ public class ArmSim extends SubsystemBase {
                 Arm.Constants.gearRatio,
                 Arm.Constants.moi,
                 Arm.Constants.armLength,
-                Arm.Constants.minAngle + Arm.Constants.offset,
-                Arm.Constants.maxAngle + Arm.Constants.offset,
+                Arm.Constants.minAngle,
+                Arm.Constants.maxAngle,
                 true,
-                Arm.Constants.startAngle + Arm.Constants.offset);
+                Arm.Constants.startAngle);
     }
 
     @Override
@@ -47,9 +47,9 @@ public class ArmSim extends SubsystemBase {
 
         // 3) Tell the motor and encoder I/O the new arm angle and speed
         // All values here are mechanism radians (rad) and radians per second (rad/s)
-        motor.setMechPosition(armMech.getAngleRads());
+        motor.setMechPosition(armMech.getAngleRads() + Arm.Constants.offset);
         motor.setMechVelocity(armMech.getVelocityRadPerSec());
-        encoder.setMechPosition(armMech.getAngleRads());
+        encoder.setMechPosition(armMech.getAngleRads() + Arm.Constants.offset);
         encoder.setMechVelocity(armMech.getVelocityRadPerSec());
     }
 }

@@ -20,8 +20,6 @@ import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
 import frc.robot.io.EncoderIO;
 import frc.robot.io.MotorIO;
 
-import static edu.wpi.first.units.Units.Rotations;
-import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static edu.wpi.first.units.Units.Second;
 import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.units.Units.Volts;
@@ -145,15 +143,13 @@ public class Arm extends SubsystemBase {
             new SysIdRoutine.Config(
                     Volts.of(1).per(Second), // Ramp rate for quasistatic (volts per second)
                     Volts.of(4), // Step voltage for dynamic test (volts)
-                    Seconds.of(10)), // Timeout (seconds)
+                    Seconds.of(10), // Timeout (seconds)
+                    (state) -> Logger.recordOutput("Arm/SysIdState", state.toString())),
             new SysIdRoutine.Mechanism(
                     // Voltage setting function
                     (voltage) -> motor.setVoltage(voltage.in(Volts)),
                     // SysId logging function
-                    (log) -> log.motor("arm")
-                            .angularPosition(Rotations.of(motor.getInputs().position))
-                            .angularVelocity(RotationsPerSecond.of(motor.getInputs().velocity))
-                            .voltage(Volts.of(motor.getInputs().appliedVoltage)),
+                    null,
                     this));
 
     public Arm(MotorIO motorIO, EncoderIO encoderIO) {
@@ -219,7 +215,7 @@ public class Arm extends SubsystemBase {
 
         // Disable the motor based on user input
         motor.setDisabled(Constants.armDisabled.get());
-        
+
         // 1) Update sensor/motor inputs so the latest values are available (logging and alerts happen automatically)
         motor.update();
         encoder.update();

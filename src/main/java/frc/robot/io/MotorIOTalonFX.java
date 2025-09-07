@@ -352,13 +352,13 @@ public class MotorIOTalonFX extends MotorIO {
     // Currently only supports CANcoders.
     @Override
     public void connectEncoder(EncoderIO encoder, double motorToSensorRatio, double sensorToMechanismRatio) {
-        if(encoder instanceof EncoderIOCANcoder cancoder){
+        if (encoder instanceof EncoderIOCANcoder cancoder) {
             config.Feedback.FeedbackRemoteSensorID = cancoder.getId();
             config.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.FusedCANcoder;
             config.Feedback.RotorToSensorRatio = motorToSensorRatio;
             config.Feedback.SensorToMechanismRatio = sensorToMechanismRatio;
             configChanged = true;
-        }else{
+        } else {
             DriverStation.reportWarning("TalonFX doesn't support feedback sources other than CANcoders", false);
         }
     }

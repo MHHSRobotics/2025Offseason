@@ -25,19 +25,19 @@ public class RobotUtils {
 
     // Mirror a Pose2d across the field depending on field symmetry (C2 = rotate 180°, D2 = reflect across center line)
     public static Pose2d invert(Pose2d pose) {
-        switch(Field.symm){
+        switch (Field.symm) {
             case C2:
                 // C2 symmetry: rotate 180° around field center (like spinning the field upside down)
                 return new Pose2d(
-                    Field.fieldLength - pose.getX(),
-                    Field.fieldWidth - pose.getY(),
-                    pose.getRotation().rotateBy(Rotation2d.k180deg));
+                        Field.fieldLength - pose.getX(),
+                        Field.fieldWidth - pose.getY(),
+                        pose.getRotation().rotateBy(Rotation2d.k180deg));
             default: // D2 symmetry
                 // D2 symmetry: reflect across the field centerline (like flipping the field left-to-right)
                 return new Pose2d(
-                    Field.fieldLength - pose.getX(),
-                    pose.getY(), // Y stays the same for reflection symmetry
-                    Rotation2d.fromRadians(Math.PI - pose.getRotation().getRadians())); // Reflect the angle
+                        Field.fieldLength - pose.getX(),
+                        pose.getY(), // Y stays the same for reflection symmetry
+                        Rotation2d.fromRadians(Math.PI - pose.getRotation().getRadians())); // Reflect the angle
         }
     }
 
@@ -52,25 +52,25 @@ public class RobotUtils {
 
     // Mirror a Pose3d across the field depending on field symmetry (C2 = rotate 180°, D2 = reflect across center line)
     public static Pose3d invert(Pose3d pose) {
-        switch(Field.symm){
+        switch (Field.symm) {
             case C2:
                 // C2 symmetry: rotate 180° around field center (like spinning the field upside down)
                 return new Pose3d(
-                    Field.fieldLength - pose.getX(),
-                    Field.fieldWidth - pose.getY(),
-                    pose.getZ(),
-                    pose.getRotation().rotateBy(new Rotation3d(0, 0, Math.PI))); // Rotate 180° around Z-axis only
+                        Field.fieldLength - pose.getX(),
+                        Field.fieldWidth - pose.getY(),
+                        pose.getZ(),
+                        pose.getRotation().rotateBy(new Rotation3d(0, 0, Math.PI))); // Rotate 180° around Z-axis only
             default: // D2 symmetry
                 // D2 symmetry: reflect across the field centerline (like flipping the field left-to-right)
                 // Keep pitch and roll the same, only reflect the yaw (Z rotation)
                 return new Pose3d(
-                    Field.fieldLength - pose.getX(),
-                    pose.getY(), // Y stays the same for reflection symmetry
-                    pose.getZ(),
-                    new Rotation3d(
-                        pose.getRotation().getX(), // Keep roll (X rotation) the same
-                        pose.getRotation().getY(), // Keep pitch (Y rotation) the same  
-                        Math.PI - pose.getRotation().getZ())); // Reflect only the yaw (Z rotation)
+                        Field.fieldLength - pose.getX(),
+                        pose.getY(), // Y stays the same for reflection symmetry
+                        pose.getZ(),
+                        new Rotation3d(
+                                pose.getRotation().getX(), // Keep roll (X rotation) the same
+                                pose.getRotation().getY(), // Keep pitch (Y rotation) the same
+                                Math.PI - pose.getRotation().getZ())); // Reflect only the yaw (Z rotation)
         }
     }
 
@@ -83,9 +83,10 @@ public class RobotUtils {
         }
     }
 
-    // Mirror a Translation2d across the field depending on field symmetry (C2 = rotate 180°, D2 = reflect across center line)
+    // Mirror a Translation2d across the field depending on field symmetry (C2 = rotate 180°, D2 = reflect across center
+    // line)
     public static Translation2d invert(Translation2d trans) {
-        switch(Field.symm){
+        switch (Field.symm) {
             case C2:
                 // C2 symmetry: rotate 180° around field center (both X and Y flip)
                 return new Translation2d(Field.fieldLength - trans.getX(), Field.fieldWidth - trans.getY());
@@ -104,12 +105,14 @@ public class RobotUtils {
         }
     }
 
-    // Mirror a Translation3d across the field depending on field symmetry (C2 = rotate 180°, D2 = reflect across center line)
+    // Mirror a Translation3d across the field depending on field symmetry (C2 = rotate 180°, D2 = reflect across center
+    // line)
     public static Translation3d invert(Translation3d trans) {
-        switch(Field.symm){
+        switch (Field.symm) {
             case C2:
                 // C2 symmetry: rotate 180° around field center (both X and Y flip, Z stays same)
-                return new Translation3d(Field.fieldLength - trans.getX(), Field.fieldWidth - trans.getY(), trans.getZ());
+                return new Translation3d(
+                        Field.fieldLength - trans.getX(), Field.fieldWidth - trans.getY(), trans.getZ());
             default: // D2 symmetry
                 // D2 symmetry: reflect across the field centerline (only X flips, Y and Z stay same)
                 return new Translation3d(Field.fieldLength - trans.getX(), trans.getY(), trans.getZ());
@@ -127,7 +130,7 @@ public class RobotUtils {
 
     // Mirror a Rotation2d across the field depending on field symmetry (C2 = rotate 180°, D2 = reflect)
     public static Rotation2d invert(Rotation2d rot) {
-        switch(Field.symm){
+        switch (Field.symm) {
             case C2:
                 // C2 symmetry: rotate 180° (like spinning the robot around)
                 return rot.rotateBy(Rotation2d.k180deg);
