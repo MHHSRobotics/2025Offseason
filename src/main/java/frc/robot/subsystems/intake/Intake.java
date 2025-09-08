@@ -22,8 +22,8 @@ public class Intake extends SubsystemBase {
         public static final double supplyCurrentLowerLimit = 35; // (amps) reduce to this if over limit for some time
         public static final double supplyCurrentLowerTime = 0.3; // (seconds) time before lowering current limit
 
-        public static final LoggedNetworkBoolean intakeLocked =
-                new LoggedNetworkBoolean("Intake/Locked", false); // Toggle to enable braking when stopped (usually false for intake)
+        public static final LoggedNetworkBoolean intakeLocked = new LoggedNetworkBoolean(
+                "Intake/Locked", false); // Toggle to enable braking when stopped (usually false for intake)
 
         public static final LoggedNetworkBoolean intakeDisabled =
                 new LoggedNetworkBoolean("Intake/Disabled", false); // Toggle to completely disable the intake subsystem
