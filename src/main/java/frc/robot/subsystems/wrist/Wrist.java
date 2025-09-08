@@ -35,7 +35,7 @@ public class Wrist extends SubsystemBase {
         public static final boolean motorInverted = false;
 
         // CAN device ID for the absolute encoder
-        public static final int encoderId = 0;
+        public static final int encoderId = 28;
         // Whether to flip encoder direction to match the wrist positive direction
         public static final boolean encoderInverted = false;
 

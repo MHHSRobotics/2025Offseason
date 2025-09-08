@@ -33,7 +33,7 @@ public class Elevator extends SubsystemBase {
         public static final boolean rightMotorInverted = true; // Right motor typically inverted to match left
 
         // CAN device ID for the absolute encoder
-        public static final int encoderId = 2;
+        public static final int encoderId = 27;
         // Whether to flip encoder direction to match the elevator positive direction
         public static final boolean encoderInverted = false;
         // Height offset (meters) to line up the absolute encoder zero with the real elevator zero
