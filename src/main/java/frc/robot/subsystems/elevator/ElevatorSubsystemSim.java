@@ -50,15 +50,15 @@ public class ElevatorSubsystemSim extends SubsystemBase {
 
         // 3) Tell the motor and encoder I/O the new elevator height and speed
         // All values here are mechanism meters (m) and meters per second (m/s)
-        leftMotor.setMechPosition(elevatorMech.getPositionMeters() + Elevator.Constants.encoderOffset);
+        leftMotor.setMechPosition(elevatorMech.getPositionMeters() + Elevator.Constants.offset);
         leftMotor.setMechVelocity(elevatorMech.getVelocityMetersPerSecond());
 
         // Right motor gets the same position and velocity since it follows the left motor
-        rightMotor.setMechPosition(elevatorMech.getPositionMeters() + Elevator.Constants.encoderOffset);
+        rightMotor.setMechPosition(elevatorMech.getPositionMeters() + Elevator.Constants.offset);
         rightMotor.setMechVelocity(elevatorMech.getVelocityMetersPerSecond());
 
         // Encoder also gets the same values
-        encoder.setMechPosition(elevatorMech.getPositionMeters() + Elevator.Constants.encoderOffset);
+        encoder.setMechPosition(elevatorMech.getPositionMeters() + Elevator.Constants.offset);
         encoder.setMechVelocity(elevatorMech.getVelocityMetersPerSecond());
     }
 }

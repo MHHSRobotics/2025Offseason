@@ -28,6 +28,10 @@ public class Elevator extends SubsystemBase {
         // CAN device IDs for the elevator motor controllers
         public static final int leftMotorId = 20;
         public static final int rightMotorId = 21;
+
+        // Height offset (meters) to line up the absolute encoder zero with the real elevator zero
+        public static final double offset=0;
+
         // Whether to flip motor directions (true means reverse forward/backward)
         public static final boolean leftMotorInverted = false;
         public static final boolean rightMotorInverted = true; // Right motor typically inverted to match left
@@ -36,12 +40,11 @@ public class Elevator extends SubsystemBase {
         public static final int encoderId = 27;
         // Whether to flip encoder direction to match the elevator positive direction
         public static final boolean encoderInverted = false;
-        // Height offset (meters) to line up the absolute encoder zero with the real elevator zero
-        public static final double encoderOffset = 0.2405;
+        
 
         public static final double gearRatio = 8.0; // Ratio of motor rotations to elevator rotations (unitless)
         public static final double encoderRatio =
-                -0.5; // Ratio of encoder rotations to elevator rotations (unitless, negative since encoder was inverted
+                0.5; // Ratio of encoder rotations to elevator rotations (unitless, negative since encoder was inverted
         // before)
 
         public static final LoggedNetworkNumber kP =
@@ -160,7 +163,7 @@ public class Elevator extends SubsystemBase {
         // Tell the left motor which encoder to use and how motor/encoder/elevator relate (ratios are unitless)
         leftMotor.connectEncoder(encoderIO, Constants.rotorToSensorRatio, Constants.encoderRatio);
         // Tell the left motor the encoder zero offset (meters) so elevator heights match real life
-        leftMotor.setOffset(Constants.encoderOffset);
+        leftMotor.setOffset(Constants.offset);
 
         // Make the motors use elevator gravity compensation (constant help against gravity)
         leftMotor.setFeedforwardType(GravityTypeValue.Elevator_Static);
