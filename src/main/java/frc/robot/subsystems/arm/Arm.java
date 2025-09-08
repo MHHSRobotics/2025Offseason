@@ -6,7 +6,6 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 
 import com.ctre.phoenix6.signals.GravityTypeValue;
 
@@ -19,10 +18,6 @@ import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
 
 import frc.robot.io.EncoderIO;
 import frc.robot.io.MotorIO;
-
-import static edu.wpi.first.units.Units.Second;
-import static edu.wpi.first.units.Units.Seconds;
-import static edu.wpi.first.units.Units.Volts;
 
 // Make the arm subsystem move a single-jointed arm to targets and show helpful
 // visuals for students tuning it. All angles are arm mechanism angles (radians).
@@ -70,8 +65,10 @@ public class Arm extends SubsystemBase {
         public static final double supplyCurrentLowerLimit = 40; // (amps) reduce to this if over limit for some time
         public static final double supplyCurrentLowerTime = 0.3; // (seconds) time before lowering current limit
 
-        public static final double moi = 4.8944; // (kg·m^2) how hard it is to rotate the arm
         public static final double mass = 10; // (kg) estimated arm mass for simulation
+        public static final double armLength = 0.6; // Arm length (meters)
+        public static final double moi =
+                (1. / 3.) * mass * armLength * armLength; // (kg·m^2) how hard it is to rotate the arm
 
         public static final double minAngle = Units.degreesToRadians(-45); // (radians) soft lower limit (~-45°)
         public static final double maxAngle = Units.degreesToRadians(140); // (radians) soft upper limit (~140°)
@@ -80,12 +77,10 @@ public class Arm extends SubsystemBase {
         // Angle bounds for SysId tests (radians). If the arm hits a hard stop during SysId, the test fails.
         // Keep these slightly inside the real mechanical limits to leave a few degrees of safety.
         public static final double minSysIdAngle = Units.degreesToRadians(-30);
-        public static final double maxSysIdAngle = Units.degreesToRadians(125);
+        public static final double maxSysIdAngle = Units.degreesToRadians(120);
 
         public static final double rotorToSensorRatio =
                 gearRatio / encoderRatio; // Ratio of motor rotations to encoder rotations (unitless)
-        public static final double armLength =
-                Math.sqrt(3 * moi / mass); // Virtual arm length (meters) so WPILib sim behaves like our real arm
 
         public static final LoggedNetworkBoolean manualArm =
                 new LoggedNetworkBoolean("Arm/Manual", false); // Toggle to enable manual control mode
@@ -138,20 +133,6 @@ public class Arm extends SubsystemBase {
     private final LoggedMechanismLigament2d fAmount =
             fRoot.append(new LoggedMechanismLigament2d("FAmount", 1.0, 90, 6, new Color8Bit(Color.kWhite)));
 
-    // SysId routine (test mode for measuring how the arm moves)
-    private final SysIdRoutine sysId = new SysIdRoutine(
-            new SysIdRoutine.Config(
-                    Volts.of(1).per(Second), // Ramp rate for quasistatic (volts per second)
-                    Volts.of(4), // Step voltage for dynamic test (volts)
-                    Seconds.of(10), // Timeout (seconds)
-                    (state) -> Logger.recordOutput("Arm/SysIdState", state.toString())),
-            new SysIdRoutine.Mechanism(
-                    // Voltage setting function
-                    (voltage) -> motor.setVoltage(voltage.in(Volts)),
-                    // SysId logging function
-                    null,
-                    this));
-
     public Arm(MotorIO motorIO, EncoderIO encoderIO) {
         motor = motorIO;
 
@@ -179,30 +160,27 @@ public class Arm extends SubsystemBase {
     }
 
     // Tell the arm motor how fast to spin (percent [-1 to 1], -1 = full backward, 1 = full forward)
-    public void setSpeed(double value) {
-        motor.setSpeed(value);
+    public void setDutyCycle(double value) {
+        motor.setDutyCycle(value);
+    }
+
+    public double getPosition() {
+        return motor.getInputs().position;
+    }
+
+    public double getVelocity() {
+        return motor.getInputs().velocity;
     }
 
     // Tell the arm to go to a target angle (radians). Example: 0 rad ≈ arm straight forward.
     // We clamp to safe limits so the arm won't try to drive past its allowed range.
     public void setGoal(double pos) {
-        motor.setGoalWithVoltageMagic(MathUtil.clamp(pos, Constants.minAngle, Constants.maxAngle));
+        motor.setGoalWithCurrentMagic(MathUtil.clamp(pos, Constants.minAngle, Constants.maxAngle));
     }
 
     // Find out the current target angle (radians)
     public double getGoal() {
         return motor.getInputs().setpoint;
-    }
-
-    // Find out the SysId routine used for measuring how the arm moves (test mode)
-    public SysIdRoutine getSysId() {
-        return sysId;
-    }
-
-    // Find out if the arm is inside the safe angle range for SysId (radians)
-    public boolean withinSysIdLimits() {
-        return motor.getInputs().position < Constants.maxSysIdAngle
-                && motor.getInputs().position > Constants.minSysIdAngle;
     }
 
     @Override

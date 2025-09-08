@@ -102,7 +102,7 @@ public class MotorIO {
     }
 
     // Tell the motor how fast to spin (percent, -1 = full reverse, 1 = full forward)
-    public void setSpeed(double value) {}
+    public void setDutyCycle(double value) {}
 
     // Tell the motor what voltage to apply (volts). Similar to setSpeed but in volts.
     public void setVoltage(double volts) {}

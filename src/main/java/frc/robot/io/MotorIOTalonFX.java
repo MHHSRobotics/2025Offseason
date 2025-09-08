@@ -128,7 +128,7 @@ public class MotorIOTalonFX extends MotorIO {
 
     // Tell the motor how fast to spin (percent, -1 = full reverse, 1 = full forward)
     @Override
-    public void setSpeed(double value) {
+    public void setDutyCycle(double value) {
         if (disabled) return;
         motor.setControl(dutyCycle.withOutput(value));
     }
