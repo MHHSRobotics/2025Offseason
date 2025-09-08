@@ -28,12 +28,15 @@ public class GyroIOPigeon extends GyroIO {
     }
 
     @Override
-    public void updateInputs() {
+    public void update() {
         inputs.connected = gyro.isConnected();
         inputs.yawPositionRad = Units.degreesToRadians(gyro.getYaw().getValueAsDouble());
         inputs.yawVelocityRadPerSec =
                 Units.degreesToRadians(gyro.getAngularVelocityZWorld().getValueAsDouble());
         inputs.hardwareFault = gyro.getFault_Hardware().getValue();
+
+        // Update alerts using the base class method (this checks all fault conditions and updates dashboard alerts)
+        super.update();
     }
 
     @Override

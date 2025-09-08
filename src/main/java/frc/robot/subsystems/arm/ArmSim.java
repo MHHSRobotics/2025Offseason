@@ -7,17 +7,21 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.io.EncoderIO;
 import frc.robot.io.MotorIO;
 
-// This class simulates the physical arm on the robot attached to a motor and an encoder.
+// Make the arm simulator act like the real robot arm so students can test code without hardware.
+// The simulator uses the same constants as the real arm and updates angle (radians) and speed (rad/s).
 public class ArmSim extends SubsystemBase {
-    // Sim states for the motor and encoder
+    // Interfaces for the motor and encoder (these talk to the sim instead of real hardware)
     private MotorIO motor;
     private EncoderIO encoder;
 
+    // Motor model: one Kraken X60 FOC motor on the arm gearbox
     private static final DCMotor armGearbox = DCMotor.getKrakenX60Foc(1);
-    // The simulation model for the arm. This has one input, the voltage applied by the motor, and two outputs, the
-    // position and velocity of the arm.
+    // Simulation model for a single-jointed arm:
+    // - Input: voltage applied by the motor (volts)
+    // - Outputs: arm angle (radians) and arm angular velocity (radians per second)
     private SingleJointedArmSim armMech;
 
+    // Make the arm simulator with the same ratios, limits, and starting angle (radians) as the real arm
     public ArmSim(MotorIO motor, EncoderIO encoder) {
         this.motor = motor;
         this.encoder = encoder;
@@ -28,23 +32,24 @@ public class ArmSim extends SubsystemBase {
                 Arm.Constants.armLength,
                 Arm.Constants.minAngle,
                 Arm.Constants.maxAngle,
-                true,
+                false,
                 Arm.Constants.startAngle);
     }
 
     @Override
     public void periodic() {
-        // Update the voltage input to the arm
+        // This runs every robot loop (about 50 times per second)
+        // 1) Tell the simulator what voltage (volts) the motor applied
         armMech.setInputVoltage(motor.getInputs().appliedVoltage);
 
-        // Step forward 20ms (default robot loop duration)
+        // 2) Step the simulator forward by 20 ms (0.02 seconds)
         armMech.update(0.02);
 
-        // Set position and velocity of the motor and encoder. These have to be converted from radians to rotations
-        // because the TalonFX doesn't like radians
-        motor.setMechPosition(armMech.getAngleRads());
+        // 3) Tell the motor and encoder I/O the new arm angle and speed
+        // All values here are mechanism radians (rad) and radians per second (rad/s)
+        motor.setMechPosition(armMech.getAngleRads() + Arm.Constants.offset);
         motor.setMechVelocity(armMech.getVelocityRadPerSec());
-        encoder.setMechPosition(armMech.getAngleRads());
+        encoder.setMechPosition(armMech.getAngleRads() + Arm.Constants.offset);
         encoder.setMechVelocity(armMech.getVelocityRadPerSec());
     }
 }

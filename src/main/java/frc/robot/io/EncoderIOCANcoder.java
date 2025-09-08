@@ -17,9 +17,14 @@ public class EncoderIOCANcoder extends EncoderIO {
 
     private CANcoderSimState sim;
 
+    private int id;
+    private CANBus canBus;
+
     public EncoderIOCANcoder(int id, CANBus canBus) {
         encoder = new CANcoder(id, canBus);
         sim = encoder.getSimState();
+        this.id = id;
+        this.canBus = canBus;
     }
 
     public EncoderIOCANcoder(int id, String canBus) {
@@ -30,8 +35,16 @@ public class EncoderIOCANcoder extends EncoderIO {
         this(id, new CANBus());
     }
 
+    public int getId() {
+        return id;
+    }
+
+    public CANBus getCANBus() {
+        return canBus;
+    }
+
     @Override
-    public void updateInputs() {
+    public void update() {
         if (configChanged) {
             configChanged = false;
             encoder.getConfigurator().apply(config);
@@ -49,10 +62,13 @@ public class EncoderIOCANcoder extends EncoderIO {
         // Update fault inputs
         inputs.badMagnetFault = encoder.getFault_BadMagnet().getValue();
         inputs.hardwareFault = encoder.getFault_Hardware().getValue();
+
+        // Update alerts using the base class method (this checks all fault conditions and updates dashboard alerts)
+        super.update();
     }
 
-    // Sets the ratio and offset of this encoder. The ratio is (encoder radians)/(mechanism unit), and the offset is
-    // measured in mechanism units. Note: this is purely aesthetic (it modifies the displayed encoder reading in
+    // Sets the ratio of this encoder. The ratio is (encoder radians)/(mechanism unit). Note: this is purely aesthetic
+    // (it modifies the displayed encoder reading in
     // AdvntageScope) so changing it won't affect actual robot behavior.
     @Override
     public void setRatio(double ratio) {

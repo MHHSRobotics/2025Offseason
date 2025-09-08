@@ -1,16 +1,19 @@
 package frc.robot.io;
 
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.DriverStation;
 
 import com.ctre.phoenix6.CANBus;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.controls.ControlRequest;
 import com.ctre.phoenix6.controls.DutyCycleOut;
 import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.MotionMagicTorqueCurrentFOC;
 import com.ctre.phoenix6.controls.MotionMagicVelocityTorqueCurrentFOC;
 import com.ctre.phoenix6.controls.MotionMagicVelocityVoltage;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
+import com.ctre.phoenix6.controls.NeutralOut;
 import com.ctre.phoenix6.controls.PositionTorqueCurrentFOC;
 import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.controls.TorqueCurrentFOC;
@@ -27,6 +30,11 @@ import com.ctre.phoenix6.sim.TalonFXSimState;
 import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 
+// Make a CTRE TalonFX-backed implementation of MotorIO.
+// Units used:
+// - Mechanism position in radians (rad) for arms/flywheels, meters (m) for elevators
+// - Speeds in rad/s or m/s
+// - Voltages in volts, currents in amps
 public class MotorIOTalonFX extends MotorIO {
     private TalonFX motor;
     private TalonFXConfiguration config = new TalonFXConfiguration();
@@ -34,7 +42,8 @@ public class MotorIOTalonFX extends MotorIO {
 
     private TalonFXSimState sim;
 
-    // Control objects
+    // Control objects (one per control mode)
+    private NeutralOut neutral = new NeutralOut();
     private DutyCycleOut dutyCycle = new DutyCycleOut(0);
     private VoltageOut voltage = new VoltageOut(0);
 
@@ -49,32 +58,41 @@ public class MotorIOTalonFX extends MotorIO {
     private VelocityTorqueCurrentFOC velocityCurrent = new VelocityTorqueCurrentFOC(0);
     private Follower follow = new Follower(0, false);
 
+    // Current offset of the motor
     private double offset = 0;
 
+    // Whether the motor is disabled
+    private boolean disabled = false;
+
+    // Make a TalonFX on the given CAN bus
     public MotorIOTalonFX(int id, CANBus canBus) {
         motor = new TalonFX(id, canBus);
         sim = motor.getSimState();
     }
 
+    // Make a TalonFX on a named CAN bus (e.g., "rio", "canivore")
     public MotorIOTalonFX(int id, String canBus) {
         this(id, new CANBus(canBus));
     }
 
+    // Make a TalonFX on the default CAN bus
     public MotorIOTalonFX(int id) {
         this(id, new CANBus());
     }
 
     @Override
-    public void updateInputs() {
+    public void update() {
         if (configChanged) {
             configChanged = false;
+            ControlRequest control = motor.getAppliedControl();
             motor.getConfigurator().apply(config);
+            motor.setControl(control);
         }
 
-        // Update all the inputs from the signal values
+        // Update all input values from the motor signals
         inputs.connected = motor.isConnected();
 
-        // Some signals give rotations, so they have to be converted to radians
+        // Convert rotations to radians for mechanism units
         inputs.position = Units.rotationsToRadians(motor.getPosition().getValueAsDouble()) - offset;
         inputs.velocity = Units.rotationsToRadians(motor.getVelocity().getValueAsDouble());
         inputs.accel = Units.rotationsToRadians(motor.getAcceleration().getValueAsDouble());
@@ -103,99 +121,118 @@ public class MotorIOTalonFX extends MotorIO {
                 || motor.getFault_ForwardSoftLimit().getValue();
         inputs.reverseLimitFault = motor.getFault_ReverseHardLimit().getValue()
                 || motor.getFault_ReverseSoftLimit().getValue();
+
+        // Update alerts using the base class method (this checks all fault conditions and updates dashboard alerts)
+        super.update();
     }
 
-    // Sets the speed of the motor. -1 is full reverse, 1 is full forward
+    // Tell the motor how fast to spin (percent, -1 = full reverse, 1 = full forward)
     @Override
-    public void setSpeed(double value) {
+    public void setDutyCycle(double value) {
+        if (disabled) return;
         motor.setControl(dutyCycle.withOutput(value));
     }
 
-    // Sets the output voltage of the motor. This is basically the same as setSpeed but scaled by 12, so -12 is full
-    // reverse and 12 is full forward.
+    // Tell the motor what voltage to apply (volts). Similar to setSpeed but in volts.
     @Override
     public void setVoltage(double volts) {
+        if (disabled) return;
         motor.setControl(voltage.withOutput(volts));
     }
 
-    // Sets the torque current of the motor in amps. This is sometimes more useful than setting voltage, since it
-    // automatically compensates for battery voltage and the motor's back EMF
+    // Tell the motor the torque-producing current to use (amps). Helpful to ignore battery sag and back-EMF.
     @Override
     public void setTorqueCurrent(double current) {
+        if (disabled) return;
         motor.setControl(torqueCurrent.withOutput(current));
     }
 
-    // Sets the goal of the motor using MotionMagic TorqueCurrentFOC output.
+    // Tell the motor to go to a target position using Motion Magic with current control (radians)
     @Override
     public void setGoalWithCurrentMagic(double position) {
+        if (disabled) return;
         motor.setControl(motionMagicTorqueCurrent.withPosition(Radians.of(position + offset)));
     }
 
-    // Sets the goal of the motor using MotionMagic Voltage output
+    // Tell the motor to go to a target position using Motion Magic with voltage control (radians)
     @Override
     public void setGoalWithVoltageMagic(double position) {
+        if (disabled) return;
         motor.setControl(motionMagicVoltage.withPosition(Radians.of(position + offset)));
     }
 
-    // Sets the goal velocity of the motor using MotionMagic TorqueCurrentFOC output.
+    // Tell the motor to reach a target speed using Motion Magic with current control (rad/s)
     @Override
     public void setVelocityWithCurrentMagic(double velocity) {
+        if (disabled) return;
         motor.setControl(magicVelocityTorqueCurrent.withVelocity(RadiansPerSecond.of(velocity)));
     }
 
-    // Sets the goal velocity of the motor using MotionMagic Voltage output.
+    // Tell the motor to reach a target speed using Motion Magic with voltage control (rad/s)
     @Override
     public void setVelocityWithVoltageMagic(double velocity) {
+        if (disabled) return;
         motor.setControl(magicVelocityVoltage.withVelocity(RadiansPerSecond.of(velocity)));
     }
 
-    // Sets the goal of the motor using TorqueCurrentFOC output.
+    // Tell the motor to go to a target position using current control (radians)
     @Override
     public void setGoalWithCurrent(double position) {
+        if (disabled) return;
         motor.setControl(positionCurrent.withPosition(Radians.of(position + offset)));
     }
 
-    // Sets the goal of the motor using Voltage output
+    // Tell the motor to go to a target position using voltage control (radians)
     @Override
     public void setGoalWithVoltage(double position) {
+        if (disabled) return;
         motor.setControl(positionVoltage.withPosition(Radians.of(position + offset)));
     }
 
-    // Sets the goal velocity of the motor using TorqueCurrentFOC output.
+    // Tell the motor to reach a target speed using current control (rad/s)
     @Override
     public void setVelocityWithCurrent(double velocity) {
+        if (disabled) return;
         motor.setControl(velocityCurrent.withVelocity(RadiansPerSecond.of(velocity)));
     }
 
-    // Sets the goal velocity of the motor using Voltage output.
+    // Tell the motor to reach a target speed using voltage control (rad/s)
     @Override
     public void setVelocityWithVoltage(double velocity) {
+        if (disabled) return;
         motor.setControl(velocityVoltage.withVelocity(RadiansPerSecond.of(velocity)));
     }
 
-    // Makes this motor follow another motor with the given ID. Set invert to true to follow the other motor inverted.
-    // Only CTRE motors on the same CAN bus can be followed.
+    // Make this motor follow another motor with the given CAN ID (invert if needed).
+    // Note: Only CTRE motors on the same CAN bus can be followed.
     @Override
     public void follow(int motorId, boolean invert) {
+        if (disabled) return;
         motor.setControl(follow.withMasterID(motorId).withOpposeMasterDirection(invert));
     }
 
-    // Sets whether the motor's output is inverted
+    // Tell the motor which direction is forward (true = invert)
     @Override
     public void setInverted(boolean inverted) {
-        config.MotorOutput.Inverted =
+        InvertedValue newInverted =
                 inverted ? InvertedValue.Clockwise_Positive : InvertedValue.CounterClockwise_Positive;
-        configChanged = true;
+        if (newInverted != config.MotorOutput.Inverted) {
+            config.MotorOutput.Inverted = newInverted;
+            configChanged = true;
+        }
     }
 
-    // Sets whether the motor brakes on stop
+    // Tell the motor what to do when stopped: brake (hold) or coast (freewheel)
     @Override
     public void setBraking(boolean brake) {
-        config.MotorOutput.NeutralMode = brake ? NeutralModeValue.Brake : NeutralModeValue.Coast;
-        configChanged = true;
+        NeutralModeValue newNeutralMode = brake ? NeutralModeValue.Brake : NeutralModeValue.Coast;
+        if (newNeutralMode != config.MotorOutput.NeutralMode) {
+            config.MotorOutput.NeutralMode = newNeutralMode;
+            configChanged = true;
+        }
     }
 
-    // Setters for PID and feedforward tuning
+    // Make PID and feedforward values active (converting from rotations-based to radians-based where needed)
     @Override
     public void setkP(double kP) {
         double newkP = Units.rotationsToRadians(kP);
@@ -281,91 +318,124 @@ public class MotorIOTalonFX extends MotorIO {
         }
     }
 
-    // Sets whether continuous wrap should be enabled for the motor. This basically tells the TalonFX that it's attached
-    // to a mechanism that can go the full 360 degrees, so it can move in either direction to reach its goal. The swerve
-    // angle motors use this.
+    @Override
+    public void setMaxJerk(double maxJerk) {
+        double newMaxJerk = Units.radiansToRotations(maxJerk);
+        if (newMaxJerk != config.MotionMagic.MotionMagicJerk) {
+            config.MotionMagic.MotionMagicJerk = newMaxJerk;
+            configChanged = true;
+        }
+    }
+
+    // Make continuous wrap enabled for mechanisms that can spin > 360° (like swerve azimuth)
     @Override
     public void setContinuousWrap(boolean continuousWrap) {
-        config.ClosedLoopGeneral.ContinuousWrap = continuousWrap;
-        configChanged = true;
+        if (continuousWrap != config.ClosedLoopGeneral.ContinuousWrap) {
+            config.ClosedLoopGeneral.ContinuousWrap = continuousWrap;
+            configChanged = true;
+        }
     }
 
-    // Sets the feedforward type for this motor. Can be either Arm_Cosine or Elevator_Static
+    // Tell the controller which gravity model to use (Arm_Cosine or Elevator_Static)
     @Override
     public void setFeedforwardType(GravityTypeValue type) {
-        config.Slot0.GravityType = type;
-        configChanged = true;
+        if (type != config.Slot0.GravityType) {
+            config.Slot0.GravityType = type;
+            configChanged = true;
+        }
     }
 
-    // Connects a CANcoder with the given ID to this motor. motorToSensorRatio is the gear ratio between the motor and
-    // encoder, sensorToMechanismRatio is the gear ratio between encoder and mechanism.
-    // ONLY one of connectCANcoder and setGearRatio should be run on a given LoggedTalonFX. Use connectCANcoder if
-    // you're using a CANcoder, and setGearRatio otherwise.
+    // Tell the motor to use a remote encoder with gear ratios:
+    // - motorToSensorRatio: motor rotations to sensor rotations (unitless)
+    // - sensorToMechanismRatio: sensor rotations to mechanism rotations (unitless)
+    // Only use ONE of connectEncoder OR setGearRatio for a motor, not both.
+    // Currently only supports CANcoders.
     @Override
-    public void connectCANcoder(int id, double motorToSensorRatio, double sensorToMechanismRatio) {
-        config.Feedback.FeedbackRemoteSensorID = id;
-        config.Feedback.RotorToSensorRatio = motorToSensorRatio;
-        config.Feedback.SensorToMechanismRatio = sensorToMechanismRatio;
-        config.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.FusedCANcoder;
-        configChanged = true;
+    public void connectEncoder(EncoderIO encoder, double motorToSensorRatio, double sensorToMechanismRatio) {
+        if (encoder instanceof EncoderIOCANcoder cancoder) {
+            config.Feedback.FeedbackRemoteSensorID = cancoder.getId();
+            config.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.FusedCANcoder;
+            config.Feedback.RotorToSensorRatio = motorToSensorRatio;
+            config.Feedback.SensorToMechanismRatio = sensorToMechanismRatio;
+            configChanged = true;
+        } else {
+            DriverStation.reportWarning("TalonFX doesn't support feedback sources other than CANcoders", false);
+        }
     }
 
-    // Sets the gear ratio of the motor
+    // Tell the motor to use its internal sensor with a gear ratio to the mechanism (unitless)
     @Override
-    public void setGearRatio(double gearRatio) {
-        config.Feedback.RotorToSensorRatio = 1;
-        config.Feedback.SensorToMechanismRatio = gearRatio;
-        config.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.RotorSensor;
-        configChanged = true;
+    public void setGearRatio(double motorToMechanismRatio) {
+        if (1.0 != config.Feedback.RotorToSensorRatio
+                || motorToMechanismRatio != config.Feedback.SensorToMechanismRatio
+                || config.Feedback.FeedbackSensorSource != FeedbackSensorSourceValue.RotorSensor) {
+            config.Feedback.RotorToSensorRatio = 1;
+            config.Feedback.SensorToMechanismRatio = motorToMechanismRatio;
+            config.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.RotorSensor;
+            configChanged = true;
+        }
     }
 
+    // Set the offset of this motor, or what it reports at the 0 position. This will be subtracted from the reported
+    // position. Make sure to call this before setting limits!
     @Override
     public void setOffset(double offset) {
         this.offset = offset;
     }
 
-    // How TalonFX current limits work: the stator current limit is the limit on how much force can be applied by the
-    // motor. The supply current limit is the limit on how many amps the motor can pull from the battery. To prevent
-    // brownouts, if the current pulled by the motor exceeds SupplyCurrentLowerLimit for SupplyCurrentLowerTime seconds
-    // then the motor output will be clamped to SupplyCurrentLowerLimit.
+    // Current limits:
+    // - StatorCurrentLimit: limit on torque-producing current (amps)
+    // - SupplyCurrentLimit: limit on battery current draw (amps)
+    // - If current > SupplyCurrentLowerLimit for SupplyCurrentLowerTime seconds, clamp to SupplyCurrentLowerLimit
     @Override
     public void setStatorCurrentLimit(double statorCurrentLimit) {
-        config.CurrentLimits.StatorCurrentLimit = statorCurrentLimit;
-        configChanged = true;
+        if (statorCurrentLimit != config.CurrentLimits.StatorCurrentLimit) {
+            config.CurrentLimits.StatorCurrentLimit = statorCurrentLimit;
+            configChanged = true;
+        }
     }
 
     @Override
     public void setSupplyCurrentLimit(double supplyCurrentLimit) {
-        config.CurrentLimits.SupplyCurrentLimit = supplyCurrentLimit;
-        configChanged = true;
+        if (supplyCurrentLimit != config.CurrentLimits.SupplyCurrentLimit) {
+            config.CurrentLimits.SupplyCurrentLimit = supplyCurrentLimit;
+            configChanged = true;
+        }
     }
 
     @Override
     public void setSupplyCurrentLowerLimit(double supplyCurrentLowerLimit) {
-        config.CurrentLimits.SupplyCurrentLowerLimit = supplyCurrentLowerLimit;
-        configChanged = true;
+        if (supplyCurrentLowerLimit != config.CurrentLimits.SupplyCurrentLowerLimit) {
+            config.CurrentLimits.SupplyCurrentLowerLimit = supplyCurrentLowerLimit;
+            configChanged = true;
+        }
     }
 
     @Override
     public void setSupplyCurrentLowerTime(double supplyCurrentLowerTime) {
-        config.CurrentLimits.SupplyCurrentLowerTime = supplyCurrentLowerTime;
-        configChanged = true;
+        if (supplyCurrentLowerTime != config.CurrentLimits.SupplyCurrentLowerTime) {
+            config.CurrentLimits.SupplyCurrentLowerTime = supplyCurrentLowerTime;
+            configChanged = true;
+        }
     }
 
     @Override
-    public void setForwardLimit(double forwardLimit) {
-        config.SoftwareLimitSwitch.ForwardSoftLimitEnable = true;
-        config.SoftwareLimitSwitch.ForwardSoftLimitThreshold = Units.radiansToRotations(forwardLimit);
-        configChanged = true;
+    public void setLimits(double min, double max) {
+        double newForwardThreshold = Units.radiansToRotations(max + offset);
+        double newReverseThreshold = Units.radiansToRotations(min + offset);
+        if (!config.SoftwareLimitSwitch.ForwardSoftLimitEnable
+                || newForwardThreshold != config.SoftwareLimitSwitch.ForwardSoftLimitThreshold
+                || !config.SoftwareLimitSwitch.ReverseSoftLimitEnable
+                || newReverseThreshold != config.SoftwareLimitSwitch.ReverseSoftLimitThreshold) {
+            config.SoftwareLimitSwitch.ForwardSoftLimitEnable = true;
+            config.SoftwareLimitSwitch.ForwardSoftLimitThreshold = newForwardThreshold;
+            config.SoftwareLimitSwitch.ReverseSoftLimitEnable = true;
+            config.SoftwareLimitSwitch.ReverseSoftLimitThreshold = newReverseThreshold;
+            configChanged = true;
+        }
     }
 
-    @Override
-    public void setReverseLimit(double reverseLimit) {
-        config.SoftwareLimitSwitch.ReverseSoftLimitEnable = true;
-        config.SoftwareLimitSwitch.ReverseSoftLimitThreshold = Units.radiansToRotations(reverseLimit);
-        configChanged = true;
-    }
-
+    // We apply invert after adding offset because invert is applied before offset in the position reading code
     @Override
     public void setMechPosition(double position) {
         double rotorPos = Units.radiansToRotations(
@@ -380,5 +450,18 @@ public class MotorIOTalonFX extends MotorIO {
                 velocity * config.Feedback.RotorToSensorRatio * config.Feedback.SensorToMechanismRatio);
         rotorVel = config.MotorOutput.Inverted.equals(InvertedValue.Clockwise_Positive) ? -rotorVel : rotorVel;
         sim.setRotorVelocity(rotorVel);
+    }
+
+    @Override
+    public void clearStickyFaults() {
+        motor.clearStickyFaults();
+    }
+
+    @Override
+    public void setDisabled(boolean disabled) {
+        this.disabled = disabled;
+        if (disabled) {
+            motor.setControl(neutral);
+        }
     }
 }

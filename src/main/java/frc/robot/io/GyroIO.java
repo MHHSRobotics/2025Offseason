@@ -1,6 +1,10 @@
 package frc.robot.io;
 
+import edu.wpi.first.wpilibj.Alert;
+import edu.wpi.first.wpilibj.Alert.AlertType;
+
 import org.littletonrobotics.junction.AutoLog;
+import org.littletonrobotics.junction.Logger;
 
 public class GyroIO {
     @AutoLog
@@ -11,9 +15,44 @@ public class GyroIO {
         public boolean hardwareFault;
     }
 
+    private String logPath = "";
+
+    // Alert objects to show gyro problems on the dashboard
+    private Alert disconnectAlert;
+    private Alert hardwareFaultAlert;
+
+    public GyroIO() {
+        // Alerts will be created when setName() is called
+    }
+
+    // Tell the GyroIO what to call this gyro for alerts (like "gyro" or "main gyro")
+    public void setName(String name) {
+        // Create alerts with descriptive names for this gyro
+        disconnectAlert = new Alert("The " + name + " is disconnected", AlertType.kError);
+        hardwareFaultAlert = new Alert("The " + name + " has encountered a hardware fault", AlertType.kError);
+    }
+
+    // Tell the GyroIO where to log its data (like "Drive/Gyro")
+    public void setPath(String path) {
+        this.logPath = path;
+    }
+
     protected GyroIOInputsAutoLogged inputs = new GyroIOInputsAutoLogged();
 
-    public void updateInputs() {}
+    // Find out the latest values from the gyro and store them in inputs
+    public void update() {
+        // Log the inputs to AdvantageKit if a path has been set
+        if (!logPath.isEmpty()) {
+            Logger.processInputs(logPath, inputs);
+        }
+
+        // Update alerts based on the current gyro status (this runs after subclass updates inputs)
+        // Only update alerts if they've been created (setName() was called)
+        if (disconnectAlert != null) {
+            disconnectAlert.set(!inputs.connected);
+            hardwareFaultAlert.set(inputs.hardwareFault);
+        }
+    }
 
     public GyroIOInputsAutoLogged getInputs() {
         return inputs;

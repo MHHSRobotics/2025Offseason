@@ -22,12 +22,17 @@ public final class Constants {
         REPLAY
     }
 
-    public static final double debounceTime =
-            0.5; // time in seconds to wait before reporting a motor or encoder disconnected
-
-    // Whether LoggedTunableNumbers should be published to NT
-    public static final boolean tuningMode = true;
-
     public static final CANBus defaultBus = new CANBus("rio");
     public static final CANBus swerveBus = new CANBus("rhino");
+
+    public static final double loopOverrunWarningTimeout = 0.2;
+
+    // Voltage at which brownout protection occurs
+    public static final double brownoutVoltage = 6.0;
+
+    // Voltage at which low battery warning appears
+    public static final double lowBatteryVoltage = 11.8;
+
+    // How long to wait before reporting low battery
+    public static final double lowBatteryTime = 0.5;
 }
