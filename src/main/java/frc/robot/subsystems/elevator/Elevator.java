@@ -30,7 +30,7 @@ public class Elevator extends SubsystemBase {
         public static final int rightMotorId = 21;
 
         // Height offset (meters) to line up the absolute encoder zero with the real elevator zero
-        public static final double offset=0;
+        public static final double offset = 0;
 
         // Whether to flip motor directions (true means reverse forward/backward)
         public static final boolean leftMotorInverted = false;
@@ -40,7 +40,6 @@ public class Elevator extends SubsystemBase {
         public static final int encoderId = 27;
         // Whether to flip encoder direction to match the elevator positive direction
         public static final boolean encoderInverted = false;
-        
 
         public static final double gearRatio = 8.0; // Ratio of motor rotations to elevator rotations (unitless)
         public static final double encoderRatio =

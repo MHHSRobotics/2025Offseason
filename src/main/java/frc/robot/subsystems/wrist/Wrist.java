@@ -30,7 +30,7 @@ public class Wrist extends SubsystemBase {
         // CAN device ID for the wrist motor controller
         public static final int motorId = 23;
         // Angle offset (radians) to line up the absolute encoder zero with the real wrist zero
-        public static final double encoderOffset = 7.05;
+        public static final double encoderOffset = 1.3;
         // Whether to flip motor direction (true means reverse forward/backward)
         public static final boolean motorInverted = false;
 
@@ -41,7 +41,7 @@ public class Wrist extends SubsystemBase {
 
         public static final double gearRatio = 16.0; // Ratio of motor rotations to wrist rotations (unitless)
         public static final double encoderRatio =
-                -1.0; // Ratio of encoder rotations to wrist rotations (unitless, negative since encoder was inverted
+                1.0; // Ratio of encoder rotations to wrist rotations (unitless, negative since encoder was inverted
         // before)
 
         public static final LoggedNetworkNumber kP =
@@ -127,6 +127,9 @@ public class Wrist extends SubsystemBase {
     private final LoggedMechanismLigament2d wrist =
             root.append(new LoggedMechanismLigament2d("Wrist", 0.5, 0, 6, new Color8Bit(Color.kOrange)));
 
+    private final LoggedMechanismLigament2d middle =
+            root.append(new LoggedMechanismLigament2d("Middle", 0.0, 0, 10, new Color8Bit(Color.kPurple)));
+
     // Drawing that shows the wrist's target angle (radians)
     private final LoggedMechanismLigament2d goalWrist =
             root.append(new LoggedMechanismLigament2d("GoalWrist", 0.5, 0, 6, new Color8Bit(Color.kYellow)));
@@ -203,6 +206,7 @@ public class Wrist extends SubsystemBase {
     // Tell the wrist to go to a target angle (radians). Example: 0 rad ≈ wrist straight forward.
     // We clamp to safe limits so the wrist won't try to drive past its allowed range.
     public void setGoal(double angle) {
+        System.out.println(angle);
         motor.setGoalWithCurrentMagic(MathUtil.clamp(angle, Constants.minAngle, Constants.maxAngle));
     }
 
