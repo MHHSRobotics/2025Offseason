@@ -2,7 +2,6 @@ package frc.robot.subsystems.hang;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.LoggedNetworkBoolean;
 
 import frc.robot.io.MotorIO;
@@ -86,10 +85,5 @@ public class Hang extends SubsystemBase {
 
         // Update motor inputs so the latest values are available (logging and alerts happen automatically)
         motor.update();
-
-        // Log useful climbing information
-        Logger.recordOutput("Hang/SupplyCurrent", getSupplyCurrent());
-        Logger.recordOutput("Hang/TorqueCurrent", getTorqueCurrent());
-        Logger.recordOutput("Hang/AppliedVoltage", getAppliedVoltage());
     }
 }

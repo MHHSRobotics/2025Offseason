@@ -2,7 +2,6 @@ package frc.robot.subsystems.intake;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.LoggedNetworkBoolean;
 
 import frc.robot.io.MotorIO;
@@ -23,7 +22,7 @@ public class Intake extends SubsystemBase {
         public static final double supplyCurrentLowerTime = 0.3; // (seconds) time before lowering current limit
 
         public static final LoggedNetworkBoolean intakeLocked = new LoggedNetworkBoolean(
-                "Intake/Locked", false); // Toggle to enable braking when stopped (usually false for intake)
+                "Intake/Locked", true); // Toggle to enable braking when stopped (usually false for intake)
 
         public static final LoggedNetworkBoolean intakeDisabled =
                 new LoggedNetworkBoolean("Intake/Disabled", false); // Toggle to completely disable the intake subsystem
@@ -91,11 +90,5 @@ public class Intake extends SubsystemBase {
 
         // Update motor inputs so the latest values are available (logging and alerts happen automatically)
         motor.update();
-
-        // Log useful intake information
-        Logger.recordOutput("Intake/SupplyCurrent", getSupplyCurrent());
-        Logger.recordOutput("Intake/TorqueCurrent", getTorqueCurrent());
-        Logger.recordOutput("Intake/AppliedVoltage", getAppliedVoltage());
-        Logger.recordOutput("Intake/HasGamePiece", hasGamePiece());
     }
 }

@@ -34,24 +34,4 @@ public class HangCommands {
     public Command retractDown() {
         return setSpeed(() -> -1.0);
     }
-
-    // Tell the hang to extend up at half speed (for careful positioning)
-    public Command extendSlow() {
-        return setSpeed(() -> 0.5);
-    }
-
-    // Tell the hang to retract down at half speed (for careful positioning)
-    public Command retractSlow() {
-        return setSpeed(() -> -0.5);
-    }
-
-    // Tell the hang to extend up at quarter speed (for very precise positioning)
-    public Command extendVeryslow() {
-        return setSpeed(() -> 0.25);
-    }
-
-    // Tell the hang to retract down at quarter speed (for very precise positioning)
-    public Command retractVerySlow() {
-        return setSpeed(() -> -0.25);
-    }
 }

@@ -17,7 +17,7 @@ public class WristCommands {
     }
 
     // Tell the wrist motor how fast to spin (percent [-1 to 1], -1 = full backward, 1 = full forward)
-    public Command setSpeed(DoubleSupplier speed) {
+    public Command setDutyCycle(DoubleSupplier speed) {
         return new InstantCommand(() -> wrist.setDutyCycle(speed.getAsDouble()), wrist);
     }
 
@@ -33,7 +33,7 @@ public class WristCommands {
 
     // Tell the wrist to stop all motor output
     public Command stop() {
-        return setSpeed(() -> 0);
+        return setDutyCycle(() -> 0);
     }
 
     // Tell the wrist to go to the straight forward position (0 radians = 0°)
@@ -49,20 +49,5 @@ public class WristCommands {
     // Tell the wrist to go to the down position (-90° = -π/2 radians)
     public Command goToDown() {
         return setGoal(() -> Units.degreesToRadians(-90));
-    }
-
-    // Tell the wrist to go to the stow position (-135° for safe storage)
-    public Command goToStow() {
-        return setGoal(() -> Units.degreesToRadians(-135));
-    }
-
-    // Tell the wrist to move up by a small amount (5°)
-    public Command nudgeUp() {
-        return changeGoal(() -> Units.degreesToRadians(5));
-    }
-
-    // Tell the wrist to move down by a small amount (-5°)
-    public Command nudgeDown() {
-        return changeGoal(() -> Units.degreesToRadians(-5));
     }
 }

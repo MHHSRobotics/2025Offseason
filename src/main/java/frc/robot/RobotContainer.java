@@ -208,7 +208,7 @@ public class RobotContainer {
                 .onFalse(armCommands.stop());
 
         // PID-based backward movement (CW)
-        controller.circle().and(() -> !Arm.Constants.manualArm.get()).onTrue(armCommands.setGoal(() -> 1.5));
+        controller.circle().and(() -> !Arm.Constants.manualArm.get()).onTrue(armCommands.setGoal(() -> 2));
 
         // Manual backward movement (CW)
         controller
@@ -218,7 +218,7 @@ public class RobotContainer {
                 .onFalse(armCommands.stop());
 
         // Elevator controls
-        // PID-based elevator up to middle position (L1 button)
+        // XPID-based elevator up to middle position (L1 button)
         controller.L1().and(() -> !Elevator.Constants.manualElevator.get()).onTrue(elevatorCommands.goToMiddle());
 
         // Manual elevator up (L1 button in manual mode)
@@ -256,51 +256,45 @@ public class RobotContainer {
         controller
                 .triangle()
                 .and(() -> Wrist.Constants.manualWrist.get())
-                .onTrue(wristCommands.setSpeed(() -> 0.2))
+                .onTrue(wristCommands.setDutyCycle(() -> 0.2))
                 .onFalse(wristCommands.stop());
 
         // PID-based wrist to down position (square button)
-        controller.square().and(() -> !Wrist.Constants.manualWrist.get()).onTrue(wristCommands.goToDown());
+        controller.povDown().and(() -> !Wrist.Constants.manualWrist.get()).onTrue(wristCommands.goToDown());
 
         // Manual wrist down (square button in manual mode)
         controller
                 .square()
                 .and(() -> Wrist.Constants.manualWrist.get())
-                .onTrue(wristCommands.setSpeed(() -> -0.2))
+                .onTrue(wristCommands.setDutyCycle(() -> -0.2))
                 .onFalse(wristCommands.stop());
 
         // PID-based wrist to stow position (R2 button)
-        controller.R2().and(() -> !Wrist.Constants.manualWrist.get()).onTrue(wristCommands.goToStow());
+        controller.povUp().and(() -> !Wrist.Constants.manualWrist.get()).onTrue(wristCommands.goToUp());
 
         // Manual wrist down faster (R2 button in manual mode)
         controller
                 .R2()
                 .and(() -> Wrist.Constants.manualWrist.get())
-                .onTrue(wristCommands.setSpeed(() -> -0.3))
+                .onTrue(wristCommands.setDutyCycle(() -> -0.3))
                 .onFalse(wristCommands.stop());
-
-        // Fine control: nudge wrist up (right bumper)
-        controller.povUp().onTrue(wristCommands.nudgeUp());
-
-        // Fine control: nudge wrist down (down bumper)
-        controller.povDown().onTrue(wristCommands.nudgeDown());
 
         // Hang controls (for climbing at end of match)
         // Hang extend up at full speed (left stick up)
-        controller.povLeft().whileTrue(hangCommands.extendUp());
+        controller.povLeft().onTrue(hangCommands.extendUp()).onFalse(hangCommands.stop());
 
         // Hang retract down at full speed (left stick down)
-        controller.povRight().whileTrue(hangCommands.retractDown());
+        controller.povRight().onTrue(hangCommands.retractDown()).onFalse(hangCommands.stop());
 
-        // Hang extend up slowly for precise positioning (share button)
-        controller.PS().whileTrue(hangCommands.extendSlow());
+        // Hang controls (for climbing at end of match)
+        // Hang extend up at full speed (left stick up)
+        controller.L1().onTrue(intakeCommands.intakeFull()).onFalse(intakeCommands.stop());
 
-        // Hang retract down slowly for precise positioning (options button)
-        controller.options().whileTrue(hangCommands.retractSlow());
+        // Hang retract down at full speed (left stick down)
+        controller.R1().onTrue(intakeCommands.outtakeFull()).onFalse(intakeCommands.stop());
 
-        // swerve.setDefaultCommand(swerveCommands.drive(
-        //         () -> -controller.getLeftY(), () -> -controller.getLeftX(), () -> -controller.getRightX(), () ->
-        // true));
+        swerve.setDefaultCommand(swerveCommands.drive(
+                () -> -controller.getLeftY(), () -> -controller.getLeftX(), () -> -controller.getRightX(), () -> true));
     }
 
     private void configureSysId() {}

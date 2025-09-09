@@ -36,15 +36,15 @@ public class Arm extends SubsystemBase {
         // CAN device ID for the absolute encoder
         public static final int encoderId = 26;
         // Whether to flip encoder direction to match the arm positive direction
-        public static final boolean encoderInverted = false;
+        public static final boolean encoderInverted = true;
 
         public static final double gearRatio = 700 / 9.; // Ratio of motor rotations to arm rotations (unitless)
         public static final double encoderRatio = 28 / 9.; // Ratio of encoder rotations to arm rotations (unitless)
 
         public static final LoggedNetworkNumber kP =
-                new LoggedNetworkNumber("Arm/kP", 75); // (volts per radian) more voltage when farther from target
+                new LoggedNetworkNumber("Arm/kP", 150); // (volts per radian) more voltage when farther from target
         public static final LoggedNetworkNumber kD =
-                new LoggedNetworkNumber("Arm/kD", 7); // (volts per rad/s) reacts to how fast error is changing
+                new LoggedNetworkNumber("Arm/kD", 50); // (volts per rad/s) reacts to how fast error is changing
 
         public static final LoggedNetworkNumber kS =
                 new LoggedNetworkNumber("Arm/kS", 0); // (volts) voltage to get arm moving (overcome static friction)
@@ -107,6 +107,10 @@ public class Arm extends SubsystemBase {
     // The live arm drawing that rotates to match the arm angle (radians)
     private final LoggedMechanismLigament2d arm =
             root.append(new LoggedMechanismLigament2d("Arm", 1.0, 0, 6, new Color8Bit(Color.kRed)));
+
+    // The live arm drawing that rotates to match the arm angle (radians)
+    private final LoggedMechanismLigament2d middle =
+            root.append(new LoggedMechanismLigament2d("Middle", 0.0, 0, 10, new Color8Bit(Color.kBlue)));
 
     // Drawing that shows the arm's target angle (radians)
     private final LoggedMechanismLigament2d goalArm =
