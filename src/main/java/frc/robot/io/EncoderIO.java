@@ -20,6 +20,8 @@ public class EncoderIO {
 
     private String logPath = "";
 
+    private String name;
+
     // Alert objects to show encoder problems on the dashboard
     private Alert disconnectAlert;
     private Alert hardwareFaultAlert;
@@ -31,11 +33,17 @@ public class EncoderIO {
 
     // Tell the EncoderIO what to call this encoder for alerts (like "arm encoder" or "FL encoder")
     public void setName(String name) {
+        this.name=name;
+
         // Create alerts with descriptive names for this encoder
         disconnectAlert = new Alert("The " + name + " encoder is disconnected", AlertType.kError);
         hardwareFaultAlert =
                 new Alert("The " + name + " encoder encountered an internal hardware fault", AlertType.kError);
         magnetFaultAlert = new Alert("The " + name + " encoder magnet is not functioning", AlertType.kError);
+    }
+
+    public String getName(){
+        return name;
     }
 
     // Tell the EncoderIO where to log its data (like "Arm/Encoder" or "Drive/Module0/AngleEncoder")
@@ -65,7 +73,7 @@ public class EncoderIO {
         return inputs;
     }
 
-    public void setRatio(double ratio) {}
+    public void setRatioAndOffset(double ratio,double offset) {}
 
     public void setInverted(boolean inverted) {}
 

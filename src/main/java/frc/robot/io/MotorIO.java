@@ -49,6 +49,8 @@ public class MotorIO {
 
     private String logPath = "";
 
+    private String name;
+
     // Alert objects to show motor problems on the dashboard
     private Alert disconnectAlert;
     private Alert hardwareFaultAlert;
@@ -62,6 +64,7 @@ public class MotorIO {
 
     // Tell the MotorIO what to call this motor for alerts (like "arm" or "FL drive")
     public void setName(String name) {
+        this.name = name;
         // Create alerts with descriptive names for this motor
         disconnectAlert = new Alert("The " + name + " motor is disconnected", AlertType.kError);
         hardwareFaultAlert =
@@ -69,6 +72,10 @@ public class MotorIO {
         tempFaultAlert = new Alert("The " + name + " motor is overheating!", AlertType.kWarning);
         forwardLimitAlert = new Alert("The " + name + " motor hit its forward limit", AlertType.kWarning);
         reverseLimitAlert = new Alert("The " + name + " motor hit its reverse limit", AlertType.kWarning);
+    }
+
+    public String getName() {
+        return name;
     }
 
     // Tell the MotorIO where to log its data (like "Arm/Motor" or "Drive/Module0/DriveMotor")
@@ -183,7 +190,7 @@ public class MotorIO {
     public void setFeedforwardType(GravityTypeValue type) {}
 
     // Tell the motor to use a remote encoder with given gear ratios (unitless)
-    public void connectEncoder(EncoderIO encoder, double motorToSensorRatio, double sensorToMechanismRatio) {}
+    public void connectEncoder(EncoderIO encoder, double motorToSensorRatio, double sensorToMechanismRatio, double offset) {}
 
     // Tell the motor to use its internal sensor with a gear ratio to the mechanism (unitless)
     public void setGearRatio(double gearRatio) {}

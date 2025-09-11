@@ -29,7 +29,7 @@ public class Arm extends SubsystemBase {
         // CAN device ID for the arm motor controller
         public static final int motorId = 22;
         // Angle offset (radians) to line up the absolute encoder zero with the real arm zero
-        public static final double offset = -2.85;
+        public static final double offset = 0; // -2.85;
         // Whether to flip motor direction (true means reverse forward/backward)
         public static final boolean motorInverted = false;
 
@@ -108,7 +108,6 @@ public class Arm extends SubsystemBase {
     private final LoggedMechanismLigament2d arm =
             root.append(new LoggedMechanismLigament2d("Arm", 1.0, 0, 6, new Color8Bit(Color.kRed)));
 
-    // The live arm drawing that rotates to match the arm angle (radians)
     private final LoggedMechanismLigament2d middle =
             root.append(new LoggedMechanismLigament2d("Middle", 0.0, 0, 10, new Color8Bit(Color.kBlue)));
 

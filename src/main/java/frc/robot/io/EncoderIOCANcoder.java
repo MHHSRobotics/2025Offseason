@@ -67,12 +67,12 @@ public class EncoderIOCANcoder extends EncoderIO {
         super.update();
     }
 
-    // Sets the ratio of this encoder. The ratio is (encoder radians)/(mechanism unit). Note: this is purely aesthetic
-    // (it modifies the displayed encoder reading in
-    // AdvntageScope) so changing it won't affect actual robot behavior.
+    // Sets the ratio and offset of this encoder. The ratio is (encoder radians)/(mechanism unit). Offset is in mechanism radians.
     @Override
-    public void setRatio(double ratio) {
+    public void setRatioAndOffset(double ratio,double offset) {
         encoderRatio = ratio;
+        config.MagnetSensor.MagnetOffset=Units.radiansToRotations(offset)*ratio;
+        configChanged=true;
     }
 
     // Sets whether the encoder is inverted
