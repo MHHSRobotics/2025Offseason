@@ -364,6 +364,7 @@ public class MotorIOTalonFX extends MotorIO {
     }
 
     // Tell the motor to use its internal sensor with a gear ratio to the mechanism (unitless)
+    // TODO: Add offset support
     @Override
     public void setGearRatio(double motorToMechanismRatio) {
         if (1.0 != config.Feedback.RotorToSensorRatio
@@ -372,6 +373,7 @@ public class MotorIOTalonFX extends MotorIO {
             config.Feedback.RotorToSensorRatio = 1;
             config.Feedback.SensorToMechanismRatio = motorToMechanismRatio;
             config.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.RotorSensor;
+
             configChanged = true;
         }
     }
@@ -380,7 +382,7 @@ public class MotorIOTalonFX extends MotorIO {
     // position. Make sure to call this before setting limits!
     @Override
     public void setOffset(double offset) {
-        this.offset = offset;
+        // this.offset = offset;
     }
 
     // Current limits:
