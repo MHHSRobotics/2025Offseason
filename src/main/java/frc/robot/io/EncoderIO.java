@@ -73,7 +73,7 @@ public class EncoderIO {
         return inputs;
     }
 
-    public void setRatioAndOffset(double ratio, double offset) {}
+    public void setRatio(double ratio) {}
 
     public void setInverted(boolean inverted) {}
 

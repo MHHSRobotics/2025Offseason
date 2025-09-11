@@ -72,7 +72,6 @@ public class EncoderIOCANcoder extends EncoderIO {
     @Override
     public void setRatioAndOffset(double ratio, double offset) {
         encoderRatio = ratio;
-        config.MagnetSensor.MagnetOffset = Units.radiansToRotations(offset) * ratio;
         configChanged = true;
     }
 

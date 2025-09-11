@@ -32,7 +32,7 @@ public class ArmSim extends SubsystemBase {
                 Arm.Constants.armLength,
                 Arm.Constants.minAngle,
                 Arm.Constants.maxAngle,
-                true,
+                false,
                 Arm.Constants.startAngle);
     }
 
