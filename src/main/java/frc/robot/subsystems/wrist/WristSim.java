@@ -47,9 +47,9 @@ public class WristSim extends SubsystemBase {
 
         // 3) Tell the motor and encoder I/O the new wrist angle and speed
         // All values here are mechanism radians (rad) and radians per second (rad/s)
-        motor.setMechPosition(wristMech.getAngleRads() + Wrist.Constants.encoderOffset);
+        motor.setMechPosition(wristMech.getAngleRads() + Wrist.Constants.offset);
         motor.setMechVelocity(wristMech.getVelocityRadPerSec());
-        encoder.setMechPosition(wristMech.getAngleRads() + Wrist.Constants.encoderOffset);
+        encoder.setMechPosition(wristMech.getAngleRads() + Wrist.Constants.offset);
         encoder.setMechVelocity(wristMech.getVelocityRadPerSec());
     }
 }

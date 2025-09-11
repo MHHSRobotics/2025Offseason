@@ -67,12 +67,13 @@ public class EncoderIOCANcoder extends EncoderIO {
         super.update();
     }
 
-    // Sets the ratio and offset of this encoder. The ratio is (encoder radians)/(mechanism unit). Offset is in mechanism radians.
+    // Sets the ratio and offset of this encoder. The ratio is (encoder radians)/(mechanism unit). Offset is in
+    // mechanism radians.
     @Override
-    public void setRatioAndOffset(double ratio,double offset) {
+    public void setRatioAndOffset(double ratio, double offset) {
         encoderRatio = ratio;
-        config.MagnetSensor.MagnetOffset=Units.radiansToRotations(offset)*ratio;
-        configChanged=true;
+        config.MagnetSensor.MagnetOffset = Units.radiansToRotations(offset) * ratio;
+        configChanged = true;
     }
 
     // Sets whether the encoder is inverted

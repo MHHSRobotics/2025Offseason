@@ -351,7 +351,7 @@ public class MotorIOTalonFX extends MotorIO {
     // Only use ONE of connectEncoder OR setGearRatio for a motor, not both.
     // Currently only supports CANcoders.
     @Override
-    public void connectEncoder(EncoderIO encoder, double motorToSensorRatio, double sensorToMechanismRatio, double offset) {
+    public void connectEncoder(EncoderIO encoder, double motorToSensorRatio, double sensorToMechanismRatio) {
         if (encoder instanceof EncoderIOCANcoder cancoder) {
             config.Feedback.FeedbackRemoteSensorID = cancoder.getId();
             config.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.FusedCANcoder;

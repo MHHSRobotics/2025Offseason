@@ -159,7 +159,7 @@ public class Arm extends SubsystemBase {
         encoder.setPath("Arm/Encoder");
         // Tell the encoder which direction is positive and the gear ratio to the arm
         encoder.setInverted(Constants.encoderInverted);
-        encoder.setRatio(Constants.encoderRatio);
+        encoder.setRatioAndOffset(Constants.encoderRatio, Constants.offset);
     }
 
     // Tell the arm motor how fast to spin (percent [-1 to 1], -1 = full backward, 1 = full forward)

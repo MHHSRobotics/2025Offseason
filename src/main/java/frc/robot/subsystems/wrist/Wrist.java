@@ -30,7 +30,7 @@ public class Wrist extends SubsystemBase {
         // CAN device ID for the wrist motor controller
         public static final int motorId = 23;
         // Angle offset (radians) to line up the absolute encoder zero with the real wrist zero
-        public static final double encoderOffset = 1.3;
+        public static final double offset = 1.3;
         // Whether to flip motor direction (true means reverse forward/backward)
         public static final boolean motorInverted = false;
 
@@ -173,8 +173,6 @@ public class Wrist extends SubsystemBase {
         motor.setInverted(Constants.motorInverted);
         // Tell the motor which encoder to use and how motor/encoder/wrist relate (ratios are unitless)
         motor.connectEncoder(encoderIO, Constants.rotorToSensorRatio, Constants.encoderRatio);
-        // Tell the motor the encoder zero offset (radians) so wrist angles match real life
-        motor.setOffset(Constants.encoderOffset);
 
         // Make the motor use cosine gravity compensation (more help when the wrist is level)
         motor.setFeedforwardType(GravityTypeValue.Arm_Cosine);
@@ -185,7 +183,7 @@ public class Wrist extends SubsystemBase {
         encoder.setPath("Wrist/Encoder");
         // Tell the encoder which direction is positive and the gear ratio to the wrist
         encoder.setInverted(Constants.encoderInverted);
-        encoder.setRatio(Constants.encoderRatio);
+        encoder.setRatioAndOffset(Constants.encoderRatio, Constants.offset);
     }
 
     // Tell the wrist motor how fast to spin (percent [-1 to 1], -1 = full backward, 1 = full forward)

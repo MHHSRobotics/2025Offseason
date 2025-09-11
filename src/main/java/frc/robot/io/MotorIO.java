@@ -190,7 +190,7 @@ public class MotorIO {
     public void setFeedforwardType(GravityTypeValue type) {}
 
     // Tell the motor to use a remote encoder with given gear ratios (unitless)
-    public void connectEncoder(EncoderIO encoder, double motorToSensorRatio, double sensorToMechanismRatio, double offset) {}
+    public void connectEncoder(EncoderIO encoder, double motorToSensorRatio, double sensorToMechanismRatio) {}
 
     // Tell the motor to use its internal sensor with a gear ratio to the mechanism (unitless)
     public void setGearRatio(double gearRatio) {}

@@ -33,7 +33,7 @@ public class EncoderIO {
 
     // Tell the EncoderIO what to call this encoder for alerts (like "arm encoder" or "FL encoder")
     public void setName(String name) {
-        this.name=name;
+        this.name = name;
 
         // Create alerts with descriptive names for this encoder
         disconnectAlert = new Alert("The " + name + " encoder is disconnected", AlertType.kError);
@@ -42,7 +42,7 @@ public class EncoderIO {
         magnetFaultAlert = new Alert("The " + name + " encoder magnet is not functioning", AlertType.kError);
     }
 
-    public String getName(){
+    public String getName() {
         return name;
     }
 
@@ -73,7 +73,7 @@ public class EncoderIO {
         return inputs;
     }
 
-    public void setRatioAndOffset(double ratio,double offset) {}
+    public void setRatioAndOffset(double ratio, double offset) {}
 
     public void setInverted(boolean inverted) {}
 
