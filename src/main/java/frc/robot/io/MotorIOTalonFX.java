@@ -57,12 +57,16 @@ public class MotorIOTalonFX extends MotorIO {
     private VelocityVoltage velocityVoltage = new VelocityVoltage(0);
     private VelocityTorqueCurrentFOC velocityCurrent = new VelocityTorqueCurrentFOC(0);
     private Follower follow = new Follower(0, false);
+    private ControlRequest currentControl;
 
     // Current offset of the motor
     private double offset = 0;
 
     // Whether the motor is disabled
     private boolean disabled = false;
+
+    private double kG = 0;
+    private double gravFeedforward = 0;
 
     // Make a TalonFX on the given CAN bus
     public MotorIOTalonFX(int id, CANBus canBus) {
@@ -107,7 +111,7 @@ public class MotorIOTalonFX extends MotorIO {
         inputs.setpoint =
                 Units.rotationsToRadians(motor.getClosedLoopReference().getValueAsDouble()) - offset;
         inputs.error = Units.rotationsToRadians(motor.getClosedLoopError().getValueAsDouble());
-        inputs.feedforward = motor.getClosedLoopFeedForward().getValueAsDouble();
+        inputs.feedforward = motor.getClosedLoopFeedForward().getValueAsDouble() + gravFeedforward;
         inputs.derivOutput = motor.getClosedLoopDerivativeOutput().getValueAsDouble();
         inputs.intOutput = motor.getClosedLoopIntegratedOutput().getValueAsDouble();
         inputs.propOutput = motor.getClosedLoopProportionalOutput().getValueAsDouble();
@@ -122,6 +126,33 @@ public class MotorIOTalonFX extends MotorIO {
         inputs.reverseLimitFault = motor.getFault_ReverseHardLimit().getValue()
                 || motor.getFault_ReverseSoftLimit().getValue();
 
+        gravFeedforward = config.Slot0.GravityType == GravityTypeValue.Arm_Cosine ? kG * Math.cos(inputs.position) : kG;
+        if (currentControl instanceof PositionVoltage x) {
+            x.withFeedForward(gravFeedforward);
+        }
+        if (currentControl instanceof PositionTorqueCurrentFOC x) {
+            x.withFeedForward(gravFeedforward);
+        }
+        if (currentControl instanceof VelocityVoltage x) {
+            x.withFeedForward(gravFeedforward);
+        }
+        if (currentControl instanceof VelocityTorqueCurrentFOC x) {
+            x.withFeedForward(gravFeedforward);
+        }
+        if (currentControl instanceof MotionMagicVoltage x) {
+            x.withFeedForward(gravFeedforward);
+        }
+        if (currentControl instanceof MotionMagicTorqueCurrentFOC x) {
+            x.withFeedForward(gravFeedforward);
+        }
+        if (currentControl instanceof MotionMagicVelocityVoltage x) {
+            x.withFeedForward(gravFeedforward);
+        }
+        if (currentControl instanceof MotionMagicVelocityTorqueCurrentFOC x) {
+            x.withFeedForward(gravFeedforward);
+        }
+        motor.setControl(currentControl);
+
         // Update alerts using the base class method (this checks all fault conditions and updates dashboard alerts)
         super.update();
     }
@@ -129,86 +160,74 @@ public class MotorIOTalonFX extends MotorIO {
     // Tell the motor how fast to spin (percent, -1 = full reverse, 1 = full forward)
     @Override
     public void setDutyCycle(double value) {
-        if (disabled) return;
-        motor.setControl(dutyCycle.withOutput(value));
+        currentControl = dutyCycle.withOutput(value);
     }
 
     // Tell the motor what voltage to apply (volts). Similar to setSpeed but in volts.
     @Override
     public void setVoltage(double volts) {
-        if (disabled) return;
-        motor.setControl(voltage.withOutput(volts));
+        currentControl = voltage.withOutput(volts);
     }
 
     // Tell the motor the torque-producing current to use (amps). Helpful to ignore battery sag and back-EMF.
     @Override
     public void setTorqueCurrent(double current) {
-        if (disabled) return;
-        motor.setControl(torqueCurrent.withOutput(current));
+        currentControl = torqueCurrent.withOutput(current);
     }
 
     // Tell the motor to go to a target position using Motion Magic with current control (radians)
     @Override
     public void setGoalWithCurrentMagic(double position) {
-        if (disabled) return;
-        motor.setControl(motionMagicTorqueCurrent.withPosition(Radians.of(position + offset)));
+        currentControl = motionMagicTorqueCurrent.withPosition(Radians.of(position + offset));
     }
 
     // Tell the motor to go to a target position using Motion Magic with voltage control (radians)
     @Override
     public void setGoalWithVoltageMagic(double position) {
-        if (disabled) return;
-        motor.setControl(motionMagicVoltage.withPosition(Radians.of(position + offset)));
+        currentControl = motionMagicVoltage.withPosition(Radians.of(position + offset));
     }
 
     // Tell the motor to reach a target speed using Motion Magic with current control (rad/s)
     @Override
     public void setVelocityWithCurrentMagic(double velocity) {
-        if (disabled) return;
-        motor.setControl(magicVelocityTorqueCurrent.withVelocity(RadiansPerSecond.of(velocity)));
+        currentControl = magicVelocityTorqueCurrent.withVelocity(RadiansPerSecond.of(velocity));
     }
 
     // Tell the motor to reach a target speed using Motion Magic with voltage control (rad/s)
     @Override
     public void setVelocityWithVoltageMagic(double velocity) {
-        if (disabled) return;
-        motor.setControl(magicVelocityVoltage.withVelocity(RadiansPerSecond.of(velocity)));
+        currentControl = magicVelocityVoltage.withVelocity(RadiansPerSecond.of(velocity));
     }
 
     // Tell the motor to go to a target position using current control (radians)
     @Override
     public void setGoalWithCurrent(double position) {
-        if (disabled) return;
-        motor.setControl(positionCurrent.withPosition(Radians.of(position + offset)));
+        currentControl = positionCurrent.withPosition(Radians.of(position + offset));
     }
 
     // Tell the motor to go to a target position using voltage control (radians)
     @Override
     public void setGoalWithVoltage(double position) {
-        if (disabled) return;
-        motor.setControl(positionVoltage.withPosition(Radians.of(position + offset)));
+        currentControl = positionVoltage.withPosition(Radians.of(position + offset));
     }
 
     // Tell the motor to reach a target speed using current control (rad/s)
     @Override
     public void setVelocityWithCurrent(double velocity) {
-        if (disabled) return;
-        motor.setControl(velocityCurrent.withVelocity(RadiansPerSecond.of(velocity)));
+        currentControl = velocityCurrent.withVelocity(RadiansPerSecond.of(velocity));
     }
 
     // Tell the motor to reach a target speed using voltage control (rad/s)
     @Override
     public void setVelocityWithVoltage(double velocity) {
-        if (disabled) return;
-        motor.setControl(velocityVoltage.withVelocity(RadiansPerSecond.of(velocity)));
+        currentControl = velocityVoltage.withVelocity(RadiansPerSecond.of(velocity));
     }
 
     // Make this motor follow another motor with the given CAN ID (invert if needed).
     // Note: Only CTRE motors on the same CAN bus can be followed.
     @Override
     public void follow(int motorId, boolean invert) {
-        if (disabled) return;
-        motor.setControl(follow.withMasterID(motorId).withOpposeMasterDirection(invert));
+        currentControl = follow.withMasterID(motorId).withOpposeMasterDirection(invert);
     }
 
     // Tell the motor which direction is forward (true = invert)
@@ -270,10 +289,7 @@ public class MotorIOTalonFX extends MotorIO {
 
     @Override
     public void setkG(double kG) {
-        if (kG != config.Slot0.kG) {
-            config.Slot0.kG = kG;
-            configChanged = true;
-        }
+        this.kG = kG;
     }
 
     @Override

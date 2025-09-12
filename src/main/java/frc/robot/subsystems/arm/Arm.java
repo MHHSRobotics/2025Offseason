@@ -49,7 +49,7 @@ public class Arm extends SubsystemBase {
         public static final LoggedNetworkNumber kS =
                 new LoggedNetworkNumber("Arm/kS", 0); // (volts) voltage to get arm moving (overcome static friction)
         public static final LoggedNetworkNumber kG = new LoggedNetworkNumber(
-                "Arm/kG", 0); // (volts) voltage to hold the arm level (compensate gravity at 0 rad)
+                "Arm/kG", 20); // (volts) voltage to hold the arm level (compensate gravity at 0 rad)
         public static final LoggedNetworkNumber kV = new LoggedNetworkNumber(
                 "Arm/kV", 0); // (volts per rad/s) voltage that scales with speed to overcome friction
         public static final LoggedNetworkNumber kA =
@@ -160,7 +160,7 @@ public class Arm extends SubsystemBase {
         encoder.setPath("Arm/Encoder");
         // Tell the encoder which direction is positive and the gear ratio to the arm
         encoder.setInverted(Constants.encoderInverted);
-        encoder.setRatioAndOffset(Constants.encoderRatio, Constants.offset);
+        encoder.setRatio(Constants.encoderRatio);
     }
 
     // Tell the arm motor how fast to spin (percent [-1 to 1], -1 = full backward, 1 = full forward)

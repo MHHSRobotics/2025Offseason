@@ -70,9 +70,8 @@ public class EncoderIOCANcoder extends EncoderIO {
     // Sets the ratio and offset of this encoder. The ratio is (encoder radians)/(mechanism unit). Offset is in
     // mechanism radians.
     @Override
-    public void setRatioAndOffset(double ratio, double offset) {
+    public void setRatio(double ratio) {
         encoderRatio = ratio;
-        configChanged = true;
     }
 
     // Sets whether the encoder is inverted

@@ -177,13 +177,15 @@ public class Wrist extends SubsystemBase {
         // Make the motor use cosine gravity compensation (more help when the wrist is level)
         motor.setFeedforwardType(GravityTypeValue.Arm_Cosine);
 
+        motor.setOffset(Constants.offset);
+
         encoder = encoderIO;
         // Tell the encoder what to call itself for alerts and where to log data
         encoder.setName("wrist encoder");
         encoder.setPath("Wrist/Encoder");
         // Tell the encoder which direction is positive and the gear ratio to the wrist
         encoder.setInverted(Constants.encoderInverted);
-        encoder.setRatioAndOffset(Constants.encoderRatio, Constants.offset);
+        encoder.setRatio(Constants.encoderRatio);
     }
 
     // Tell the wrist motor how fast to spin (percent [-1 to 1], -1 = full backward, 1 = full forward)

@@ -162,6 +162,8 @@ public class Elevator extends SubsystemBase {
         // Tell the left motor which encoder to use and how motor/encoder/elevator relate (ratios are unitless)
         leftMotor.connectEncoder(encoderIO, Constants.rotorToSensorRatio, Constants.encoderRatio);
 
+        leftMotor.setOffset(Constants.offset);
+
         // Make the motors use elevator gravity compensation (constant help against gravity)
         leftMotor.setFeedforwardType(GravityTypeValue.Elevator_Static);
         rightMotor.setFeedforwardType(GravityTypeValue.Elevator_Static);
@@ -175,7 +177,7 @@ public class Elevator extends SubsystemBase {
         encoder.setPath("Elevator/Encoder");
         // Tell the encoder which direction is positive and the gear ratio to the elevator
         encoder.setInverted(Constants.encoderInverted);
-        encoder.setRatioAndOffset(Constants.encoderRatio, Constants.offset);
+        encoder.setRatio(Constants.encoderRatio);
     }
 
     // Tell the elevator motors how fast to spin (percent [-1 to 1], -1 = full down, 1 = full up)
