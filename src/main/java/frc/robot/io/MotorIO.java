@@ -192,6 +192,11 @@ public class MotorIO {
     // Tell the motor to use a remote encoder with given gear ratios (unitless)
     public void connectEncoder(EncoderIO encoder, double motorToSensorRatio, double sensorToMechanismRatio) {}
 
+    // Tell the motor to use a remote encoder with given gear ratios (unitless). sensorToMechanism ratio defaults to 1.
+    public void connectEncoder(EncoderIO encoder, double motorToSensorRatio) {
+        connectEncoder(encoder, motorToSensorRatio,1);
+    }
+
     // Tell the motor to use its internal sensor with a gear ratio to the mechanism (unitless)
     public void setGearRatio(double gearRatio) {}
 

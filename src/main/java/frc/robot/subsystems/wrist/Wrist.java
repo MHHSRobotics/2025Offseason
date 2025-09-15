@@ -40,9 +40,6 @@ public class Wrist extends SubsystemBase {
         public static final boolean encoderInverted = false;
 
         public static final double gearRatio = 16.0; // Ratio of motor rotations to wrist rotations (unitless)
-        public static final double encoderRatio =
-                1.0; // Ratio of encoder rotations to wrist rotations (unitless, negative since encoder was inverted
-        // before)
 
         public static final LoggedNetworkNumber kP =
                 new LoggedNetworkNumber("Wrist/kP", 3); // (volts per radian) more voltage when farther from target
@@ -93,7 +90,7 @@ public class Wrist extends SubsystemBase {
         public static final double maxSysIdAngle = Units.degreesToRadians(75);
 
         public static final double rotorToSensorRatio =
-                gearRatio / encoderRatio; // Ratio of motor rotations to encoder rotations (unitless)
+                gearRatio; // Ratio of motor rotations to encoder rotations (unitless)
 
         public static final LoggedNetworkBoolean manualWrist =
                 new LoggedNetworkBoolean("Wrist/Manual", false); // Toggle to enable manual control mode
@@ -172,7 +169,7 @@ public class Wrist extends SubsystemBase {
         // Tell the motor which direction is forward (true = invert)
         motor.setInverted(Constants.motorInverted);
         // Tell the motor which encoder to use and how motor/encoder/wrist relate (ratios are unitless)
-        motor.connectEncoder(encoderIO, Constants.rotorToSensorRatio, Constants.encoderRatio);
+        motor.connectEncoder(encoderIO, Constants.rotorToSensorRatio);
 
         // Make the motor use cosine gravity compensation (more help when the wrist is level)
         motor.setFeedforwardType(GravityTypeValue.Arm_Cosine);
@@ -183,7 +180,7 @@ public class Wrist extends SubsystemBase {
         encoder.setPath("Wrist/Encoder");
         // Tell the encoder which direction is positive and the gear ratio to the wrist
         encoder.setInverted(Constants.encoderInverted);
-        encoder.setRatioAndOffset(Constants.encoderRatio, Constants.offset);
+        encoder.setOffset(Constants.offset);
     }
 
     // Tell the wrist motor how fast to spin (percent [-1 to 1], -1 = full backward, 1 = full forward)
