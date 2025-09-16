@@ -252,8 +252,8 @@ public class MotorIO {
         unsupportedFeature();
     }
 
-    // Tell the motor to use a remote encoder with given gear ratios (unitless)
-    public void connectEncoder(EncoderIO encoder, double motorToSensorRatio, double sensorToMechanismRatio) {
+    // Tell the motor to use a remote encoder with given gear ratio (unitless)
+    public void connectEncoder(EncoderIO encoder, double motorToSensorRatio) {
         unsupportedFeature();
     }
 

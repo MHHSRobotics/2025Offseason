@@ -58,9 +58,6 @@ public class MotorIOTalonFX extends MotorIO {
     private VelocityTorqueCurrentFOC velocityCurrent = new VelocityTorqueCurrentFOC(0);
     private Follower follow = new Follower(0, false);
 
-    // Current offset of the motor
-    private double offset = 0;
-
     // Whether the motor is disabled
     private boolean disabled = false;
 
@@ -93,7 +90,7 @@ public class MotorIOTalonFX extends MotorIO {
         inputs.connected = motor.isConnected();
 
         // Convert rotations to radians for mechanism units
-        inputs.position = Units.rotationsToRadians(motor.getPosition().getValueAsDouble()) - offset;
+        inputs.position = Units.rotationsToRadians(motor.getPosition().getValueAsDouble());
         inputs.velocity = Units.rotationsToRadians(motor.getVelocity().getValueAsDouble());
         inputs.accel = Units.rotationsToRadians(motor.getAcceleration().getValueAsDouble());
 
@@ -105,7 +102,7 @@ public class MotorIOTalonFX extends MotorIO {
         inputs.controlMode = motor.getControlMode().getValue().toString();
 
         inputs.setpoint =
-                Units.rotationsToRadians(motor.getClosedLoopReference().getValueAsDouble()) - offset;
+                Units.rotationsToRadians(motor.getClosedLoopReference().getValueAsDouble());
         inputs.error = Units.rotationsToRadians(motor.getClosedLoopError().getValueAsDouble());
         inputs.feedforward = motor.getClosedLoopFeedForward().getValueAsDouble();
         inputs.derivOutput = motor.getClosedLoopDerivativeOutput().getValueAsDouble();
@@ -347,42 +344,28 @@ public class MotorIOTalonFX extends MotorIO {
 
     // Tell the motor to use a remote encoder with gear ratios:
     // - motorToSensorRatio: motor rotations to sensor rotations (unitless)
-    // - sensorToMechanismRatio: sensor rotations to mechanism rotations (unitless)
     // Only use ONE of connectEncoder OR setGearRatio for a motor, not both.
     // Currently only supports CANcoders.
     @Override
-    public void connectEncoder(EncoderIO encoder, double motorToSensorRatio, double sensorToMechanismRatio) {
+    public void connectEncoder(EncoderIO encoder, double motorToSensorRatio) {
         if (encoder instanceof EncoderIOCANcoder cancoder) {
             config.Feedback.FeedbackRemoteSensorID = cancoder.getId();
             config.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.FusedCANcoder;
             config.Feedback.RotorToSensorRatio = motorToSensorRatio;
-            config.Feedback.SensorToMechanismRatio = sensorToMechanismRatio;
+            config.Feedback.SensorToMechanismRatio = cancoder.getRatio();
             configChanged = true;
         } else {
             DriverStation.reportWarning("TalonFX doesn't support feedback sources other than CANcoders", false);
         }
     }
 
-    // Tell the motor to use its internal sensor with a gear ratio to the mechanism (unitless)
-    // TODO: Add offset support
+    // Tell the motor to use its internal sensor with a gear ratio to the mechanism
     @Override
     public void setGearRatio(double motorToMechanismRatio) {
-        if (1.0 != config.Feedback.RotorToSensorRatio
-                || motorToMechanismRatio != config.Feedback.SensorToMechanismRatio
-                || config.Feedback.FeedbackSensorSource != FeedbackSensorSourceValue.RotorSensor) {
-            config.Feedback.RotorToSensorRatio = 1;
-            config.Feedback.SensorToMechanismRatio = motorToMechanismRatio;
-            config.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.RotorSensor;
-
-            configChanged = true;
-        }
-    }
-
-    // Set the offset of this motor, or what it reports at the 0 position. This will be subtracted from the reported
-    // position. Make sure to call this before setting limits!
-    @Override
-    public void setOffset(double offset) {
-        // this.offset = offset;
+        config.Feedback.RotorToSensorRatio = 1;
+        config.Feedback.SensorToMechanismRatio = motorToMechanismRatio;
+        config.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.RotorSensor;
+        configChanged = true;
     }
 
     // Current limits:

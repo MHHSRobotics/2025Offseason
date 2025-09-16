@@ -43,7 +43,7 @@ public class EncoderIO {
     }
 
     public String getName() {
-        return name;
+        return name==null?"encoder":name;
     }
 
     // Tell the EncoderIO where to log its data (like "Arm/Encoder" or "Drive/Module0/AngleEncoder")
@@ -73,7 +73,9 @@ public class EncoderIO {
         return inputs;
     }
 
-    public void setRatioAndOffset(double ratio, double offset) {}
+    public void setGearRatio(double ratio) {}
+
+    public void setOffset(double offset) {}
 
     public void setInverted(boolean inverted) {}
 
