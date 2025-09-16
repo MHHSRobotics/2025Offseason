@@ -13,6 +13,8 @@ public class EncoderIOCANcoder extends EncoderIO {
     private CANcoderConfiguration config = new CANcoderConfiguration();
     private boolean configChanged = true;
 
+    private double encoderRatio = 1;
+
     private CANcoderSimState sim;
 
     private int id;
@@ -53,9 +55,9 @@ public class EncoderIOCANcoder extends EncoderIO {
         // CANcoder signals give data in encoder rotations. First convert to radians, then use encoderRatio to convert
         // to mechanism units.
         inputs.positionRad =
-                Units.rotationsToRadians(encoder.getAbsolutePosition().getValueAsDouble());
+                Units.rotationsToRadians(encoder.getAbsolutePosition().getValueAsDouble()) / encoderRatio;
         inputs.velocityRadPerSec =
-                Units.rotationsToRadians(encoder.getVelocity().getValueAsDouble());
+                Units.rotationsToRadians(encoder.getVelocity().getValueAsDouble()) / encoderRatio;
 
         // Update fault inputs
         inputs.badMagnetFault = encoder.getFault_BadMagnet().getValue();
@@ -68,8 +70,9 @@ public class EncoderIOCANcoder extends EncoderIO {
     // Sets the ratio and offset of this encoder. The ratio is (encoder radians)/(mechanism unit). Offset is in
     // mechanism radians.
     @Override
-    public void setOffset(double offset) {
-        config.MagnetSensor.MagnetOffset = Units.radiansToRotations(offset);
+    public void setRatioAndOffset(double ratio, double offset) {
+        encoderRatio = ratio;
+        config.MagnetSensor.MagnetOffset = Units.radiansToRotations(offset) * ratio;
         configChanged = true;
     }
 
@@ -83,7 +86,7 @@ public class EncoderIOCANcoder extends EncoderIO {
 
     @Override
     public void setMechPosition(double position) {
-        double encoderPos = Units.radiansToRotations(position);
+        double encoderPos = Units.radiansToRotations(position * encoderRatio);
         encoderPos = config.MagnetSensor.SensorDirection.equals(SensorDirectionValue.Clockwise_Positive)
                 ? -encoderPos
                 : encoderPos;
@@ -92,7 +95,7 @@ public class EncoderIOCANcoder extends EncoderIO {
 
     @Override
     public void setMechVelocity(double velocity) {
-        double encoderVel = Units.radiansToRotations(velocity);
+        double encoderVel = Units.radiansToRotations(velocity * encoderRatio);
         encoderVel = config.MagnetSensor.SensorDirection.equals(SensorDirectionValue.Clockwise_Positive)
                 ? -encoderVel
                 : encoderVel;

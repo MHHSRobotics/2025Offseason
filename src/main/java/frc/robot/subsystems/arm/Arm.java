@@ -39,6 +39,7 @@ public class Arm extends SubsystemBase {
         public static final boolean encoderInverted = true;
 
         public static final double gearRatio = 700 / 9.; // Ratio of motor rotations to arm rotations (unitless)
+        public static final double encoderRatio = 28 / 9.; // Ratio of encoder rotations to arm rotations (unitless)
 
         public static final LoggedNetworkNumber kP =
                 new LoggedNetworkNumber("Arm/kP", 150); // (volts per radian) more voltage when farther from target
@@ -79,7 +80,7 @@ public class Arm extends SubsystemBase {
         public static final double maxSysIdAngle = Units.degreesToRadians(120);
 
         public static final double rotorToSensorRatio =
-                gearRatio; // Ratio of motor rotations to encoder rotations (unitless)
+                gearRatio / encoderRatio; // Ratio of motor rotations to encoder rotations (unitless)
 
         public static final LoggedNetworkBoolean manualArm =
                 new LoggedNetworkBoolean("Arm/Manual", false); // Toggle to enable manual control mode
@@ -145,7 +146,7 @@ public class Arm extends SubsystemBase {
         // Tell the motor which direction is forward (true = invert)
         motor.setInverted(Constants.motorInverted);
         // Tell the motor which encoder to use and how motor/encoder/arm relate (ratios are unitless)
-        motor.connectEncoder(encoderIO, Constants.rotorToSensorRatio);
+        motor.connectEncoder(encoderIO, Constants.rotorToSensorRatio, Constants.encoderRatio);
         // Tell the motor the encoder zero offset (radians) so arm angles match real life
         motor.setOffset(Constants.offset);
 
@@ -158,7 +159,7 @@ public class Arm extends SubsystemBase {
         encoder.setPath("Arm/Encoder");
         // Tell the encoder which direction is positive and the gear ratio to the arm
         encoder.setInverted(Constants.encoderInverted);
-        encoder.setOffset(Constants.offset);
+        encoder.setRatioAndOffset(Constants.encoderRatio, Constants.offset);
     }
 
     // Tell the arm motor how fast to spin (percent [-1 to 1], -1 = full backward, 1 = full forward)
