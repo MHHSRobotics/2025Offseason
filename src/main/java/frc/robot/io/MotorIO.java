@@ -3,14 +3,15 @@ package frc.robot.io;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj.DriverStation;
-import frc.robot.Constants;
-import frc.robot.Constants.Mode;
 
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.signals.GravityTypeValue;
 
 import org.littletonrobotics.junction.AutoLog;
 import org.littletonrobotics.junction.Logger;
+
+import frc.robot.Constants;
+import frc.robot.Constants.Mode;
 
 // Make a simple motor interface used by subsystems (arms, elevators, flywheels).
 // Mechanism units:
@@ -78,7 +79,7 @@ public class MotorIO {
     }
 
     public String getName() {
-        return name==null?"motor":name;
+        return name == null ? "motor" : name;
     }
 
     // Tell the MotorIO where to log its data (like "Arm/Motor" or "Drive/Module0/DriveMotor")
@@ -111,7 +112,7 @@ public class MotorIO {
     }
 
     private void unsupportedFeature() {
-        if(Constants.currentMode!=Mode.REPLAY){
+        if (Constants.currentMode != Mode.REPLAY) {
             DriverStation.reportWarning("An unsupported feature was used on " + getName(), false);
         }
     }

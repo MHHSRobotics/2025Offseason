@@ -2,12 +2,13 @@ package frc.robot.io;
 
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
-import frc.robot.Constants;
-import frc.robot.Constants.Mode;
 import edu.wpi.first.wpilibj.DriverStation;
 
 import org.littletonrobotics.junction.AutoLog;
 import org.littletonrobotics.junction.Logger;
+
+import frc.robot.Constants;
+import frc.robot.Constants.Mode;
 
 public class GyroIO {
     @AutoLog
@@ -32,15 +33,15 @@ public class GyroIO {
 
     // Tell the GyroIO what to call this gyro for alerts (like "gyro" or "main gyro")
     public void setName(String name) {
-        this.name=name;
+        this.name = name;
 
         // Create alerts with descriptive names for this gyro
         disconnectAlert = new Alert("The " + name + " is disconnected", AlertType.kError);
         hardwareFaultAlert = new Alert("The " + name + " has encountered a hardware fault", AlertType.kError);
     }
 
-    public String getName(){
-        return name==null?"gyro":name;
+    public String getName() {
+        return name == null ? "gyro" : name;
     }
 
     // Tell the GyroIO where to log its data (like "Drive/Gyro")
@@ -70,7 +71,7 @@ public class GyroIO {
     }
 
     private void unsupportedFeature() {
-        if(Constants.currentMode!=Mode.REPLAY){
+        if (Constants.currentMode != Mode.REPLAY) {
             DriverStation.reportWarning("An unsupported feature was used on " + getName(), false);
         }
     }

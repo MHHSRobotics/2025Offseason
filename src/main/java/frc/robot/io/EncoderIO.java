@@ -3,11 +3,12 @@ package frc.robot.io;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj.DriverStation;
-import frc.robot.Constants;
-import frc.robot.Constants.Mode;
 
 import org.littletonrobotics.junction.AutoLog;
 import org.littletonrobotics.junction.Logger;
+
+import frc.robot.Constants;
+import frc.robot.Constants.Mode;
 
 public class EncoderIO {
     @AutoLog
@@ -77,7 +78,7 @@ public class EncoderIO {
     }
 
     private void unsupportedFeature() {
-        if(Constants.currentMode!=Mode.REPLAY){
+        if (Constants.currentMode != Mode.REPLAY) {
             DriverStation.reportWarning("An unsupported feature was used on " + getName(), false);
         }
     }
