@@ -2,6 +2,9 @@ package frc.robot.io;
 
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
+import edu.wpi.first.wpilibj.DriverStation;
+import frc.robot.Constants;
+import frc.robot.Constants.Mode;
 
 import org.littletonrobotics.junction.AutoLog;
 import org.littletonrobotics.junction.Logger;
@@ -73,13 +76,29 @@ public class EncoderIO {
         return inputs;
     }
 
-    public void setGearRatio(double ratio) {}
+    private void unsupportedFeature() {
+        if(Constants.currentMode!=Mode.REPLAY){
+            DriverStation.reportWarning("An unsupported feature was used on " + getName(), false);
+        }
+    }
 
-    public void setOffset(double offset) {}
+    public void setGearRatio(double ratio) {
+        unsupportedFeature();
+    }
 
-    public void setInverted(boolean inverted) {}
+    public void setOffset(double offset) {
+        unsupportedFeature();
+    }
 
-    public void setMechPosition(double position) {}
+    public void setInverted(boolean inverted) {
+        unsupportedFeature();
+    }
 
-    public void setMechVelocity(double velocity) {}
+    public void setMechPosition(double position) {
+        unsupportedFeature();
+    }
+
+    public void setMechVelocity(double velocity) {
+        unsupportedFeature();
+    }
 }
