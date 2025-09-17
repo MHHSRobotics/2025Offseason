@@ -43,7 +43,7 @@ public class EncoderIO {
     }
 
     public String getName() {
-        return name==null?"encoder":name;
+        return name == null ? "encoder" : name;
     }
 
     // Tell the EncoderIO where to log its data (like "Arm/Encoder" or "Drive/Module0/AngleEncoder")

@@ -1,8 +1,8 @@
 package frc.robot.io;
 
 import edu.wpi.first.wpilibj.Alert;
-import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Alert.AlertType;
+import edu.wpi.first.wpilibj.DriverStation;
 
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.signals.GravityTypeValue;
@@ -89,7 +89,7 @@ public class MotorIO {
     // Find out the latest values from the motor and store them in inputs
     public void update() {
         // Report warning for unnamed motors
-        if(name==null){
+        if (name == null) {
             DriverStation.reportWarning("Motor is unnamed; errors will not be reported!", true);
         }
         // Log the inputs to AdvantageKit if a path has been set
@@ -108,8 +108,8 @@ public class MotorIO {
         }
     }
 
-    private void unsupportedFeature(){
-        DriverStation.reportWarning("An unsupported feature was used on "+(name==null?"a motor":name), false);
+    private void unsupportedFeature() {
+        DriverStation.reportWarning("An unsupported feature was used on " + (name == null ? "a motor" : name), false);
     }
 
     // Find out the current inputs snapshot (read-only)

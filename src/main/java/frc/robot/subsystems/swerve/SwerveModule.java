@@ -62,18 +62,18 @@ public class SwerveModule {
         driveMotor.setStatorCurrentLimit(constants.SlipCurrent);
         driveMotor.setInverted(constants.DriveMotorInverted);
 
-        angleMotor.setBraking(true);
-        angleMotor.setGains(constants.SteerMotorGains);
-        angleMotor.connectEncoder(angleEncoder, constants.SteerMotorGearRatio, 1);
-        angleMotor.setContinuousWrap(true);
-        angleMotor.setInverted(constants.SteerMotorInverted);
-        angleMotor.setOffset(Units.rotationsToRadians(
-                constants.EncoderOffset)); // Fix encoder zero position (convert from rotations to radians)
-
         // Tell the encoder what to call itself for alerts and where to log data
         angleEncoder.setName(modulePos + " encoder");
         angleEncoder.setPath("Drive/Module" + index + "/AngleEncoder");
         angleEncoder.setInverted(constants.EncoderInverted);
+
+        angleMotor.setBraking(true);
+        angleMotor.setGains(constants.SteerMotorGains);
+        angleMotor.connectEncoder(angleEncoder, constants.SteerMotorGearRatio);
+        angleMotor.setContinuousWrap(true);
+        angleMotor.setInverted(constants.SteerMotorInverted);
+        angleMotor.setOffset(Units.rotationsToRadians(
+                constants.EncoderOffset)); // Fix encoder zero position (convert from rotations to radians)
     }
 
     // Sets whether the drive and angle motors should brake

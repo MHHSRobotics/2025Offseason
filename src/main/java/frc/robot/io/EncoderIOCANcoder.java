@@ -11,20 +11,20 @@ import com.ctre.phoenix6.sim.CANcoderSimState;
 
 /**
  * CANcoder implementation of EncoderIO that handles absolute position sensing.
- * 
+ *
  * OFFSET HANDLING ARCHITECTURE:
  * This class uses a two-part offset system to handle arbitrary mechanism offsets:
- * 
+ *
  * 1. MagnetOffset (hardware offset): Applied by the CANcoder firmware directly to raw sensor readings.
  *    - MUST be in range [-1, 1] encoder rotations (API limitation - values outside this range are silently modulo'd)
  *    - Applied before any gear ratio conversion
  *    - Measured in encoder rotations
- * 
+ *
  * 2. extraOffset (software offset): Applied in software after unit conversion.
  *    - Handles the "overflow" when desired offset exceeds MagnetOffset range
  *    - Always a multiple of 2π (full rotations) when possible
  *    - Measured in mechanism units
- * 
+ *
  * MATHEMATICAL RELATIONSHIPS:
  * - Encoder rotations to mechanism units: mech_rad = (enc_rot * 2π) / encoderRatio
  * - Total offset = (MagnetOffset * 2π / encoderRatio) + extraOffset (both in mechanism unitns)
@@ -73,11 +73,11 @@ public class EncoderIOCANcoder extends EncoderIO {
         return id;
     }
 
-    public double getRatio(){
+    public double getRatio() {
         return encoderRatio;
     }
 
-    public double getExtraOffset(){
+    public double getExtraOffset() {
         return extraOffset;
     }
 
@@ -124,49 +124,45 @@ public class EncoderIOCANcoder extends EncoderIO {
 
     /**
      * Sets the offset of the encoder in mechanism radians.
-     * 
+     *
      * OFFSET SPLITTING ALGORITHM:
      * 1. Convert mechanism offset to encoder rotations: mechOffset * encoderRatio / 2π
      * 2. Split into integer and fractional parts
      * 3. Try to put fractional part into MagnetOffset (if it fits within ±1 rotation)
      * 4. Put the remainder (integer rotations) into extraOffset
-     * 
+     *
      * This ensures maximum use of hardware offset while keeping extraOffset as multiples of 2π when possible.
-     * 
+     *
      * @param mechOffset Desired offset in mechanism radians
      */
     @Override
-    public void setOffset(double mechOffset){
-        // Convert mechanism offset to encoder rotations
-        double rotOffset = Units.radiansToRotations(mechOffset * encoderRatio);
-        
+    public void setOffset(double mechOffset) {
+        // Convert mechanism offset to mech rotations
+        double rotOffset = Units.radiansToRotations(mechOffset);
+
         // Wrap to [-0.5, 0.5] range to find the fractional rotation part
-        // This is what we'll try to put in MagnetOffset
         double remOffset = rotOffset - Math.round(rotOffset);
-        
-        // Check if this fractional part fits within the ±1 rotation MagnetOffset limit
-        double magnetOffset = remOffset;
-        
-        if(Math.abs(magnetOffset) <= 1){
+
+        double magnetOffset = remOffset * encoderRatio;
+
+        if (Math.abs(magnetOffset) <= 1) {
             // IDEAL CASE: We can use MagnetOffset for the fractional part
             // MagnetOffset handles the fractional rotation (in encoder rotations)
             config.MagnetSensor.MagnetOffset = magnetOffset;
-            
+
             // extraOffset handles the integer rotations (converted back to mechanism radians)
             // This will be a multiple of 2π, preserving periodicity
-            extraOffset = Units.rotationsToRadians((rotOffset - remOffset) / encoderRatio);
+            extraOffset = Units.rotationsToRadians(rotOffset - remOffset);
         } else {
-            // FALLBACK CASE: If we somehow can't fit in MagnetOffset, put entire offset in software
+            // FALLBACK CASE: If we can't fit in MagnetOffset, put entire offset in software
             config.MagnetSensor.MagnetOffset = 0;
             extraOffset = mechOffset;
-            
+
             // Warn because non-2π multiples in extraOffset break gravity compensation assumptions
-            // (Gravity compensation often assumes position wraps every 2π)
             DriverStation.reportWarning(
-                "extraOffset is not a multiple of 2pi--if " + getName() + 
-                " is used in an arm mechanism, kG will not account for gravity correctly", 
-                false
-            );
+                    "extraOffset is not a multiple of 2pi--if " + getName()
+                            + " is used in an arm mechanism, kG will not account for gravity correctly",
+                    false);
         }
         configChanged = true;
     }
@@ -185,7 +181,7 @@ public class EncoderIOCANcoder extends EncoderIO {
     /**
      * Sets the simulated mechanism position.
      * Reverses the calculation from update() to determine what encoder position produces the desired mechanism position.
-     * 
+     *
      * @param position Desired mechanism position in mech units
      */
     @Override
@@ -195,8 +191,9 @@ public class EncoderIOCANcoder extends EncoderIO {
         // 2. Apply gear ratio: (position + extraOffset) * encoderRatio
         // 3. Convert to rotations: ((position + extraOffset) * encoderRatio) / 2π
         // 4. Add hardware offset: final + MagnetOffset
-        double encoderPos = Units.radiansToRotations((position + extraOffset) * encoderRatio) + config.MagnetSensor.MagnetOffset;
-        
+        double encoderPos =
+                Units.radiansToRotations((position + extraOffset) * encoderRatio) + config.MagnetSensor.MagnetOffset;
+
         // Apply inversion if configured
         encoderPos = config.MagnetSensor.SensorDirection.equals(SensorDirectionValue.Clockwise_Positive)
                 ? -encoderPos
@@ -212,7 +209,7 @@ public class EncoderIOCANcoder extends EncoderIO {
     public void setMechVelocity(double velocity) {
         // Convert mechanism velocity to encoder velocity
         double encoderVel = Units.radiansToRotations(velocity * encoderRatio);
-        
+
         // Apply inversion if configured
         encoderVel = config.MagnetSensor.SensorDirection.equals(SensorDirectionValue.Clockwise_Positive)
                 ? -encoderVel

@@ -127,9 +127,6 @@ public class Wrist extends SubsystemBase {
     private final LoggedMechanismLigament2d wrist =
             root.append(new LoggedMechanismLigament2d("Wrist", 0.5, 0, 6, new Color8Bit(Color.kOrange)));
 
-    private final LoggedMechanismLigament2d middle =
-            root.append(new LoggedMechanismLigament2d("Middle", 0.0, 0, 10, new Color8Bit(Color.kPurple)));
-
     // Drawing that shows the wrist's target angle (radians)
     private final LoggedMechanismLigament2d goalWrist =
             root.append(new LoggedMechanismLigament2d("GoalWrist", 0.5, 0, 6, new Color8Bit(Color.kYellow)));
@@ -163,6 +160,14 @@ public class Wrist extends SubsystemBase {
             fRoot.append(new LoggedMechanismLigament2d("FAmount", 1.0, 90, 6, new Color8Bit(Color.kWhite)));
 
     public Wrist(MotorIO motorIO, EncoderIO encoderIO) {
+        encoder = encoderIO;
+        // Tell the encoder what to call itself for alerts and where to log data
+        encoder.setName("wrist encoder");
+        encoder.setPath("Wrist/Encoder");
+        // Tell the encoder which direction is positive and the gear ratio to the wrist
+        encoder.setInverted(Constants.encoderInverted);
+        encoder.setGearRatio(Constants.encoderRatio);
+
         motor = motorIO;
 
         // Tell the motor what to call itself for alerts and where to log data
@@ -172,18 +177,15 @@ public class Wrist extends SubsystemBase {
         // Tell the motor which direction is forward (true = invert)
         motor.setInverted(Constants.motorInverted);
         // Tell the motor which encoder to use and how motor/encoder/wrist relate (ratios are unitless)
-        motor.connectEncoder(encoderIO, Constants.rotorToSensorRatio, Constants.encoderRatio);
+        motor.connectEncoder(encoderIO, Constants.rotorToSensorRatio);
 
         // Make the motor use cosine gravity compensation (more help when the wrist is level)
         motor.setFeedforwardType(GravityTypeValue.Arm_Cosine);
 
-        encoder = encoderIO;
-        // Tell the encoder what to call itself for alerts and where to log data
-        encoder.setName("wrist encoder");
-        encoder.setPath("Wrist/Encoder");
-        // Tell the encoder which direction is positive and the gear ratio to the wrist
-        encoder.setInverted(Constants.encoderInverted);
-        encoder.setRatioAndOffset(Constants.encoderRatio, Constants.offset);
+        motor.setOffset(Constants.offset);
+
+        // Add the middle dot to the visualization
+        root.append(new LoggedMechanismLigament2d("Middle", 0.0, 0, 10, new Color8Bit(Color.kPurple)));
     }
 
     // Tell the wrist motor how fast to spin (percent [-1 to 1], -1 = full backward, 1 = full forward)
