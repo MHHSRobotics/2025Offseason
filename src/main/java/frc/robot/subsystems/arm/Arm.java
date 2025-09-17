@@ -29,7 +29,7 @@ public class Arm extends SubsystemBase {
         // CAN device ID for the arm motor controller
         public static final int motorId = 22;
         // Angle offset (radians) to line up the absolute encoder zero with the real arm zero
-        public static final double offset = 0; // -2.85;
+        public static final double offset = -12; // -2.85;
         // Whether to flip motor direction (true means reverse forward/backward)
         public static final boolean motorInverted = false;
 
@@ -152,8 +152,6 @@ public class Arm extends SubsystemBase {
         motor.setInverted(Constants.motorInverted);
         // Tell the motor which encoder to use and how motor/encoder/arm relate (ratios are unitless)
         motor.connectEncoder(encoderIO, Constants.rotorToSensorRatio);
-        // Tell the motor the encoder zero offset (radians) so arm angles match real life
-        motor.setOffset(Constants.offset);
 
         // Make the motor use cosine gravity compensation (more help when the arm is level)
         motor.setFeedforwardType(GravityTypeValue.Arm_Cosine);

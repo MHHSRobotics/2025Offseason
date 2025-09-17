@@ -148,7 +148,7 @@ public class EncoderIOCANcoder extends EncoderIO {
         if (Math.abs(magnetOffset) <= 1) {
             // IDEAL CASE: We can use MagnetOffset for the fractional part
             // MagnetOffset handles the fractional rotation (in encoder rotations)
-            config.MagnetSensor.MagnetOffset = magnetOffset;
+            config.MagnetSensor.MagnetOffset = -magnetOffset;
 
             // extraOffset handles the integer rotations (converted back to mechanism radians)
             // This will be a multiple of 2π, preserving periodicity
@@ -192,7 +192,7 @@ public class EncoderIOCANcoder extends EncoderIO {
         // 3. Convert to rotations: ((position + extraOffset) * encoderRatio) / 2π
         // 4. Add hardware offset: final + MagnetOffset
         double encoderPos =
-                Units.radiansToRotations((position + extraOffset) * encoderRatio) + config.MagnetSensor.MagnetOffset;
+                Units.radiansToRotations((position + extraOffset) * encoderRatio) - config.MagnetSensor.MagnetOffset;
 
         // Apply inversion if configured
         encoderPos = config.MagnetSensor.SensorDirection.equals(SensorDirectionValue.Clockwise_Positive)

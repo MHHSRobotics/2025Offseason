@@ -68,7 +68,7 @@ public class RobotContainer {
     private void initSubsystems() {
         // Initialize subsystems in order: arm, elevator, wrist, intake, hang, swerve
         // Each subsystem is created immediately after its motor/encoder initialization
-        
+
         // Initialize arm motor and encoder
         MotorIO armMotor;
         EncoderIO armEncoder;
@@ -225,7 +225,7 @@ public class RobotContainer {
         }
     }
 
-    private void initCommands(){
+    private void initCommands() {
         armCommands = new ArmCommands(arm);
         elevatorCommands = new ElevatorCommands(elevator);
         wristCommands = new WristCommands(wrist);

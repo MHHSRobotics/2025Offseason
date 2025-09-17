@@ -493,8 +493,12 @@ public class MotorIOTalonFX extends MotorIO {
     // We apply invert after adding offset because invert is applied before offset in the position reading code
     @Override
     public void setMechPosition(double position) {
+
         double rotorPos = Units.radiansToRotations(
                 (position + extraOffset) * config.Feedback.RotorToSensorRatio * config.Feedback.SensorToMechanismRatio);
+        if (config.Feedback.FeedbackSensorSource == FeedbackSensorSourceValue.RotorSensor) {
+            rotorPos += config.Feedback.FeedbackRotorOffset;
+        }
         rotorPos = config.MotorOutput.Inverted.equals(InvertedValue.Clockwise_Positive) ? -rotorPos : rotorPos;
         sim.setRawRotorPosition(rotorPos);
     }
