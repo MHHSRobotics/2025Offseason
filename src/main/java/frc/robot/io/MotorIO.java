@@ -2,7 +2,6 @@ package frc.robot.io;
 
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
-import edu.wpi.first.wpilibj.DriverStation;
 
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.signals.GravityTypeValue;
@@ -12,6 +11,7 @@ import org.littletonrobotics.junction.Logger;
 
 import frc.robot.Constants;
 import frc.robot.Constants.Mode;
+import frc.robot.util.Alerts;
 
 // Make a simple motor interface used by subsystems (arms, elevators, flywheels).
 // Mechanism units:
@@ -93,7 +93,7 @@ public class MotorIO {
     public void update() {
         // Report warning for unnamed motors
         if (name == null) {
-            DriverStation.reportWarning("Motor is unnamed; errors will not be reported!", true);
+            Alerts.create("Motor is unnamed; errors will not be reported!", AlertType.kWarning);
         }
         // Log the inputs to AdvantageKit if a path has been set
         if (!logPath.isEmpty()) {
@@ -113,7 +113,7 @@ public class MotorIO {
 
     private void unsupportedFeature() {
         if (Constants.currentMode != Mode.REPLAY) {
-            DriverStation.reportWarning("An unsupported feature was used on " + getName(), false);
+            Alerts.create("An unsupported feature was used on " + getName(), AlertType.kWarning);
         }
     }
 

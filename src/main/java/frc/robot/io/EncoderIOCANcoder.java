@@ -1,13 +1,15 @@
 package frc.robot.io;
 
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.Alert.AlertType;
 
 import com.ctre.phoenix6.CANBus;
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.signals.SensorDirectionValue;
 import com.ctre.phoenix6.sim.CANcoderSimState;
+
+import frc.robot.util.Alerts;
 
 /**
  * CANcoder implementation of EncoderIO that handles absolute position sensing.
@@ -159,10 +161,10 @@ public class EncoderIOCANcoder extends EncoderIO {
             extraOffset = mechOffset;
 
             // Warn because non-2π multiples in extraOffset break gravity compensation assumptions
-            DriverStation.reportWarning(
+            Alerts.create(
                     "extraOffset is not a multiple of 2pi--if " + getName()
                             + " is used in an arm mechanism, kG will not account for gravity correctly",
-                    false);
+                    AlertType.kWarning);
         }
         configChanged = true;
     }

@@ -1,7 +1,7 @@
 package frc.robot.io;
 
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.Alert.AlertType;
 
 import com.ctre.phoenix6.CANBus;
 import com.ctre.phoenix6.configs.Slot0Configs;
@@ -27,6 +27,8 @@ import com.ctre.phoenix6.signals.GravityTypeValue;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.sim.TalonFXSimState;
+
+import frc.robot.util.Alerts;
 
 import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
@@ -387,7 +389,9 @@ public class MotorIOTalonFX extends MotorIO {
             connectedEncoder = cancoder;
             configChanged = true;
         } else {
-            DriverStation.reportWarning("TalonFX doesn't support feedback sources other than CANcoders", false);
+            Alerts.create(
+                    "TalonFX " + getName() + " doesn't support feedback sources other than CANcoders",
+                    AlertType.kError);
         }
     }
 
@@ -428,13 +432,13 @@ public class MotorIOTalonFX extends MotorIO {
                 extraOffset = offset;
 
                 // Warn because non-2π multiples in extraOffset break gravity compensation assumptions
-                DriverStation.reportWarning(
+                Alerts.create(
                         "extraOffset is not a multiple of 2pi--if " + getName()
                                 + " is used in an arm mechanism, kG will not account for gravity correctly",
-                        false);
+                        AlertType.kWarning);
             }
         } else {
-            DriverStation.reportWarning("Invalid sensor source for TalonFX " + getName(), true);
+            Alerts.create("Invalid sensor source for TalonFX " + getName(), AlertType.kError);
         }
     }
 

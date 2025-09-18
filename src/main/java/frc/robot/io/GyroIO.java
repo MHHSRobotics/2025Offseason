@@ -2,13 +2,13 @@ package frc.robot.io;
 
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
-import edu.wpi.first.wpilibj.DriverStation;
 
 import org.littletonrobotics.junction.AutoLog;
 import org.littletonrobotics.junction.Logger;
 
 import frc.robot.Constants;
 import frc.robot.Constants.Mode;
+import frc.robot.util.Alerts;
 
 public class GyroIO {
     @AutoLog
@@ -72,7 +72,7 @@ public class GyroIO {
 
     private void unsupportedFeature() {
         if (Constants.currentMode != Mode.REPLAY) {
-            DriverStation.reportWarning("An unsupported feature was used on " + getName(), false);
+            Alerts.create("An unsupported feature was used on " + getName(), AlertType.kWarning);
         }
     }
 
