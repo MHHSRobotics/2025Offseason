@@ -1,10 +1,10 @@
 package frc.robot;
 
-import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandPS5Controller;
 
+import frc.robot.Constants.Mode;
 import frc.robot.commands.ArmCommands;
 import frc.robot.commands.ElevatorCommands;
 import frc.robot.commands.HangCommands;
@@ -205,23 +205,16 @@ public class RobotContainer {
 
         swerve = new Swerve(gyro, fl, fr, bl, br);
 
-        // Initialize simulation objects (only runs in simulation mode)
-        switch (Constants.currentMode) {
-            case SIM:
-                if (!RobotBase.isReal()) {
-                    // Create simulation objects in order: arm, elevator, wrist, intake, hang, swerve
-                    new ArmSim(armMotor, armEncoder);
-                    new ElevatorSubsystemSim(elevatorLeftMotor, elevatorRightMotor, elevatorEncoder);
-                    new WristSim(wristMotor, wristEncoder);
+        if (Constants.currentMode == Mode.SIM) {
+            // Initialize simulations for each component in sim mode
+            new ArmSim(armMotor, armEncoder);
+            new ElevatorSubsystemSim(elevatorLeftMotor, elevatorRightMotor, elevatorEncoder);
+            new WristSim(wristMotor, wristEncoder);
 
-                    new SwerveModuleSim(flDriveMotor, flAngleMotor, flEncoder, TunerConstants.FrontLeft);
-                    new SwerveModuleSim(frDriveMotor, frAngleMotor, frEncoder, TunerConstants.FrontRight);
-                    new SwerveModuleSim(blDriveMotor, blAngleMotor, blEncoder, TunerConstants.BackLeft);
-                    new SwerveModuleSim(brDriveMotor, brAngleMotor, brEncoder, TunerConstants.BackRight);
-                }
-                break;
-            default:
-                break;
+            new SwerveModuleSim(flDriveMotor, flAngleMotor, flEncoder, TunerConstants.FrontLeft);
+            new SwerveModuleSim(frDriveMotor, frAngleMotor, frEncoder, TunerConstants.FrontRight);
+            new SwerveModuleSim(blDriveMotor, blAngleMotor, blEncoder, TunerConstants.BackLeft);
+            new SwerveModuleSim(brDriveMotor, brAngleMotor, brEncoder, TunerConstants.BackRight);
         }
     }
 

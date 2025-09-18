@@ -29,7 +29,7 @@ public class Arm extends SubsystemBase {
         // CAN device ID for the arm motor controller
         public static final int motorId = 22;
         // Angle offset (radians) to line up the absolute encoder zero with the real arm zero
-        public static final double offset = -12; // -2.85;
+        public static final double offset = -2.85; // -2.85;
         // Whether to flip motor direction (true means reverse forward/backward)
         public static final boolean motorInverted = false;
 

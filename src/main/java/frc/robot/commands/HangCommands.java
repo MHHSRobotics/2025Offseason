@@ -17,21 +17,21 @@ public class HangCommands {
 
     // Tell the hang motor how fast to spin (percent [-1 to 1], -1 = full down, 1 = full up)
     public Command setSpeed(DoubleSupplier speed) {
-        return new InstantCommand(() -> hang.setSpeed(speed.getAsDouble()), hang);
+        return new InstantCommand(() -> hang.setSpeed(speed.getAsDouble()), hang).withName("hang set speed");
     }
 
     // Tell the hang motor to stop all movement
     public Command stop() {
-        return new InstantCommand(() -> hang.stop(), hang);
+        return new InstantCommand(() -> hang.stop(), hang).withName("hang stop");
     }
 
     // Tell the hang to extend up at full speed (for climbing up)
     public Command extendUp() {
-        return setSpeed(() -> 1.0);
+        return setSpeed(() -> 1.0).withName("hang extend up");
     }
 
     // Tell the hang to retract down at full speed (for lowering down)
     public Command retractDown() {
-        return setSpeed(() -> -1.0);
+        return setSpeed(() -> -1.0).withName("hang retract down");
     }
 }
