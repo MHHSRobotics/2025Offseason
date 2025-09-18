@@ -11,6 +11,8 @@ public class GyroIOPigeon extends GyroIO {
     private Pigeon2 gyro;
     private Pigeon2SimState sim;
 
+    private boolean disconnected = false;
+
     public GyroIOPigeon(int id, CANBus canBus) {
         gyro = new Pigeon2(id, canBus);
         gyro.getConfigurator().apply(new Pigeon2Configuration());
@@ -29,7 +31,7 @@ public class GyroIOPigeon extends GyroIO {
 
     @Override
     public void update() {
-        inputs.connected = gyro.isConnected();
+        inputs.connected = disconnected ? false : gyro.isConnected();
         inputs.yawPositionRad = Units.degreesToRadians(gyro.getYaw().getValueAsDouble());
         inputs.yawVelocityRadPerSec =
                 Units.degreesToRadians(gyro.getAngularVelocityZWorld().getValueAsDouble());
@@ -47,5 +49,10 @@ public class GyroIOPigeon extends GyroIO {
     @Override
     public void setMechYawVelocity(double yawVelocity) {
         sim.setAngularVelocityZ(Units.radiansToDegrees(yawVelocity));
+    }
+
+    @Override
+    public void disconnect() {
+        disconnected = true;
     }
 }

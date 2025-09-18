@@ -83,4 +83,8 @@ public class GyroIO {
     public void setMechYawVelocity(double yawVelocity) {
         unsupportedFeature();
     }
+
+    public void disconnect() {
+        unsupportedFeature();
+    }
 }
