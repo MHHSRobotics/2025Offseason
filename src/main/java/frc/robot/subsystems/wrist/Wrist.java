@@ -206,7 +206,6 @@ public class Wrist extends SubsystemBase {
     // Tell the wrist to go to a target angle (radians). Example: 0 rad ≈ wrist straight forward.
     // We clamp to safe limits so the wrist won't try to drive past its allowed range.
     public void setGoal(double angle) {
-        System.out.println(angle);
         motor.setGoalWithCurrentMagic(MathUtil.clamp(angle, Constants.minAngle, Constants.maxAngle));
     }
 
