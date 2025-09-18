@@ -9,6 +9,8 @@ import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.signals.SensorDirectionValue;
 import com.ctre.phoenix6.sim.CANcoderSimState;
 
+import frc.robot.Constants;
+import frc.robot.Constants.Mode;
 import frc.robot.util.Alerts;
 
 /**
@@ -188,6 +190,10 @@ public class EncoderIOCANcoder extends EncoderIO {
      */
     @Override
     public void setMechPosition(double position) {
+        if (Constants.currentMode == Mode.REAL) {
+            Alerts.create("Used sim-only method setMechPosition on " + getName(), AlertType.kWarning);
+            return;
+        }
         // Reverse the position calculation:
         // 1. Add back the software offset: position + extraOffset
         // 2. Apply gear ratio: (position + extraOffset) * encoderRatio
@@ -209,6 +215,10 @@ public class EncoderIOCANcoder extends EncoderIO {
      */
     @Override
     public void setMechVelocity(double velocity) {
+        if (Constants.currentMode == Mode.REAL) {
+            Alerts.create("Used sim-only method setMechVelocity on " + getName(), AlertType.kWarning);
+            return;
+        }
         // Convert mechanism velocity to encoder velocity
         double encoderVel = Units.radiansToRotations(velocity * encoderRatio);
 

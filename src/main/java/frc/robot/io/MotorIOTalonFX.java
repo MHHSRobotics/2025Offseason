@@ -28,6 +28,8 @@ import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.sim.TalonFXSimState;
 
+import frc.robot.Constants;
+import frc.robot.Constants.Mode;
 import frc.robot.util.Alerts;
 
 import static edu.wpi.first.units.Units.Radians;
@@ -497,7 +499,10 @@ public class MotorIOTalonFX extends MotorIO {
     // We apply invert after adding offset because invert is applied before offset in the position reading code
     @Override
     public void setMechPosition(double position) {
-
+        if (Constants.currentMode == Mode.REAL) {
+            Alerts.create("Used sim-only method setMechPosition on " + getName(), AlertType.kWarning);
+            return;
+        }
         double rotorPos = Units.radiansToRotations(
                 (position + extraOffset) * config.Feedback.RotorToSensorRatio * config.Feedback.SensorToMechanismRatio);
         if (config.Feedback.FeedbackSensorSource == FeedbackSensorSourceValue.RotorSensor) {
@@ -509,6 +514,10 @@ public class MotorIOTalonFX extends MotorIO {
 
     @Override
     public void setMechVelocity(double velocity) {
+        if (Constants.currentMode == Mode.REAL) {
+            Alerts.create("Used sim-only method setMechVelocity on " + getName(), AlertType.kWarning);
+            return;
+        }
         double rotorVel = Units.radiansToRotations(
                 velocity * config.Feedback.RotorToSensorRatio * config.Feedback.SensorToMechanismRatio);
         rotorVel = config.MotorOutput.Inverted.equals(InvertedValue.Clockwise_Positive) ? -rotorVel : rotorVel;
