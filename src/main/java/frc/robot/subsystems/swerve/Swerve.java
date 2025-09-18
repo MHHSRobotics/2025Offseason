@@ -1,13 +1,17 @@
 package frc.robot.subsystems.swerve;
 
+import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.math.numbers.N1;
+import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj.util.Color8Bit;
@@ -137,7 +141,7 @@ public class Swerve extends SubsystemBase {
         SwerveModuleState[] states = getModuleStates();
         for (int i = 0; i < 4; i++) {
             // Scale length down so it fits nicely on screen
-            speeds[i].setLength(states[i].speedMetersPerSecond / 10);
+            speeds[i].setLength(states[i].speedMetersPerSecond / 3);
             speeds[i].setAngle(states[i].angle);
         }
     }
@@ -163,6 +167,15 @@ public class Swerve extends SubsystemBase {
         SwerveModulePosition[] states = new SwerveModulePosition[4];
         for (int i = 0; i < 4; i++) {
             states[i] = modules[i].getPosition();
+        }
+        return states;
+    }
+
+    // Find out each wheel's change in position
+    public SwerveModulePosition[] getModuleDeltas() {
+        SwerveModulePosition[] states = new SwerveModulePosition[4];
+        for (int i = 0; i < 4; i++) {
+            states[i] = modules[i].getPositionDelta();
         }
         return states;
     }
@@ -237,6 +250,12 @@ public class Swerve extends SubsystemBase {
         return getMaxLinearSpeedMetersPerSec() / driveBaseRadius;
     }
 
+    // Add a vision measurement with the given pose, timestamp, and standard deviations
+    public void addVisionMeasurement(
+            Pose2d visionRobotPoseMeters, double timestampSeconds, Matrix<N3, N1> visionMeasurementStdDevs) {
+        estimator.addVisionMeasurement(visionRobotPoseMeters, timestampSeconds, visionMeasurementStdDevs);
+    }
+
     @Override
     public void periodic() {
         // This runs every robot loop (~50 times per second)
@@ -250,6 +269,15 @@ public class Swerve extends SubsystemBase {
         // 2) Update the gyro inputs (logging and alerts happen automatically)
         gyro.update();
 
+        if (gyro.getInputs().connected) {
+            // If gyro is connected, read the angle
+            gyroAngle = Rotation2d.fromRadians(gyro.getInputs().yawPositionRad);
+        } else {
+            // If gyro is disconnected, like in sim, get module deltas and use odometry to figure out the change in
+            // angle
+            Twist2d twist = kinematics.toTwist2d(getModuleDeltas());
+            gyroAngle = gyroAngle.plus(Rotation2d.fromRadians(twist.dtheta));
+        }
         // 3) Feed odometry to the pose estimator (time, heading, and wheel distances)
         estimator.updateWithTime(RobotController.getFPGATime(), gyroAngle, getModulePositions());
 

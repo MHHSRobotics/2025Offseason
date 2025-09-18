@@ -1,7 +1,7 @@
 package frc.robot.io;
 
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.Alert.AlertType;
 
 import com.ctre.phoenix6.CANBus;
 import com.ctre.phoenix6.configs.Slot0Configs;
@@ -21,11 +21,16 @@ import com.ctre.phoenix6.controls.VelocityTorqueCurrentFOC;
 import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.ControlModeValue;
 import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
 import com.ctre.phoenix6.signals.GravityTypeValue;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.sim.TalonFXSimState;
+
+import frc.robot.Constants;
+import frc.robot.Constants.Mode;
+import frc.robot.util.Alerts;
 
 import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
@@ -58,11 +63,14 @@ public class MotorIOTalonFX extends MotorIO {
     private VelocityTorqueCurrentFOC velocityCurrent = new VelocityTorqueCurrentFOC(0);
     private Follower follow = new Follower(0, false);
 
-    // Current offset of the motor
-    private double offset = 0;
-
     // Whether the motor is disabled
     private boolean disabled = false;
+
+    // Software offset in mechanism radians
+    private double extraOffset;
+
+    // Encoder connected to this motor
+    private EncoderIOCANcoder connectedEncoder;
 
     // Make a TalonFX on the given CAN bus
     public MotorIOTalonFX(int id, CANBus canBus) {
@@ -93,7 +101,7 @@ public class MotorIOTalonFX extends MotorIO {
         inputs.connected = motor.isConnected();
 
         // Convert rotations to radians for mechanism units
-        inputs.position = Units.rotationsToRadians(motor.getPosition().getValueAsDouble()) - offset;
+        inputs.position = Units.rotationsToRadians(motor.getPosition().getValueAsDouble()) - extraOffset;
         inputs.velocity = Units.rotationsToRadians(motor.getVelocity().getValueAsDouble());
         inputs.accel = Units.rotationsToRadians(motor.getAcceleration().getValueAsDouble());
 
@@ -102,10 +110,34 @@ public class MotorIOTalonFX extends MotorIO {
         inputs.supplyCurrent = motor.getSupplyCurrent().getValueAsDouble();
         inputs.torqueCurrent = motor.getTorqueCurrent().getValueAsDouble();
 
-        inputs.controlMode = motor.getControlMode().getValue().toString();
+        ControlModeValue controlMode = motor.getControlMode().getValue();
+        inputs.controlMode = controlMode.toString();
 
-        inputs.setpoint =
-                Units.rotationsToRadians(motor.getClosedLoopReference().getValueAsDouble()) - offset;
+        double setpoint =
+                Units.rotationsToRadians(motor.getClosedLoopReference().getValueAsDouble());
+        if (controlMode == ControlModeValue.CoastOut
+                || controlMode == ControlModeValue.DisabledOutput
+                || controlMode == ControlModeValue.Follower
+                || controlMode == ControlModeValue.VoltageOut
+                || controlMode == ControlModeValue.DutyCycleOut
+                || controlMode == ControlModeValue.VoltageFOC
+                || controlMode == ControlModeValue.DutyCycleFOC) {
+            inputs.setpoint = 0;
+        } else if (controlMode == ControlModeValue.MotionMagicVelocityDutyCycle
+                || controlMode == ControlModeValue.MotionMagicVelocityDutyCycleFOC
+                || controlMode == ControlModeValue.MotionMagicVelocityTorqueCurrentFOC
+                || controlMode == ControlModeValue.MotionMagicVelocityVoltage
+                || controlMode == ControlModeValue.MotionMagicVelocityVoltageFOC
+                || controlMode == ControlModeValue.VelocityDutyCycle
+                || controlMode == ControlModeValue.VelocityDutyCycleFOC
+                || controlMode == ControlModeValue.VelocityTorqueCurrentFOC
+                || controlMode == ControlModeValue.VelocityVoltage
+                || controlMode == ControlModeValue.VelocityVoltageFOC) {
+            inputs.setpoint = setpoint;
+        } else {
+            inputs.setpoint = setpoint - extraOffset;
+        }
+
         inputs.error = Units.rotationsToRadians(motor.getClosedLoopError().getValueAsDouble());
         inputs.feedforward = motor.getClosedLoopFeedForward().getValueAsDouble();
         inputs.derivOutput = motor.getClosedLoopDerivativeOutput().getValueAsDouble();
@@ -151,14 +183,14 @@ public class MotorIOTalonFX extends MotorIO {
     @Override
     public void setGoalWithCurrentMagic(double position) {
         if (disabled) return;
-        motor.setControl(motionMagicTorqueCurrent.withPosition(Radians.of(position + offset)));
+        motor.setControl(motionMagicTorqueCurrent.withPosition(Radians.of(position + extraOffset)));
     }
 
     // Tell the motor to go to a target position using Motion Magic with voltage control (radians)
     @Override
     public void setGoalWithVoltageMagic(double position) {
         if (disabled) return;
-        motor.setControl(motionMagicVoltage.withPosition(Radians.of(position + offset)));
+        motor.setControl(motionMagicVoltage.withPosition(Radians.of(position + extraOffset)));
     }
 
     // Tell the motor to reach a target speed using Motion Magic with current control (rad/s)
@@ -179,14 +211,14 @@ public class MotorIOTalonFX extends MotorIO {
     @Override
     public void setGoalWithCurrent(double position) {
         if (disabled) return;
-        motor.setControl(positionCurrent.withPosition(Radians.of(position + offset)));
+        motor.setControl(positionCurrent.withPosition(Radians.of(position + extraOffset)));
     }
 
     // Tell the motor to go to a target position using voltage control (radians)
     @Override
     public void setGoalWithVoltage(double position) {
         if (disabled) return;
-        motor.setControl(positionVoltage.withPosition(Radians.of(position + offset)));
+        motor.setControl(positionVoltage.withPosition(Radians.of(position + extraOffset)));
     }
 
     // Tell the motor to reach a target speed using current control (rad/s)
@@ -347,42 +379,69 @@ public class MotorIOTalonFX extends MotorIO {
 
     // Tell the motor to use a remote encoder with gear ratios:
     // - motorToSensorRatio: motor rotations to sensor rotations (unitless)
-    // - sensorToMechanismRatio: sensor rotations to mechanism rotations (unitless)
     // Only use ONE of connectEncoder OR setGearRatio for a motor, not both.
     // Currently only supports CANcoders.
     @Override
-    public void connectEncoder(EncoderIO encoder, double motorToSensorRatio, double sensorToMechanismRatio) {
+    public void connectEncoder(EncoderIO encoder, double motorToSensorRatio) {
         if (encoder instanceof EncoderIOCANcoder cancoder) {
             config.Feedback.FeedbackRemoteSensorID = cancoder.getId();
             config.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.FusedCANcoder;
             config.Feedback.RotorToSensorRatio = motorToSensorRatio;
-            config.Feedback.SensorToMechanismRatio = sensorToMechanismRatio;
+            config.Feedback.SensorToMechanismRatio = cancoder.getRatio();
+            connectedEncoder = cancoder;
             configChanged = true;
         } else {
-            DriverStation.reportWarning("TalonFX doesn't support feedback sources other than CANcoders", false);
+            Alerts.create(
+                    "TalonFX " + getName() + " doesn't support feedback sources other than CANcoders",
+                    AlertType.kError);
         }
     }
 
-    // Tell the motor to use its internal sensor with a gear ratio to the mechanism (unitless)
-    // TODO: Add offset support
+    // Tell the motor to use its internal sensor with a gear ratio to the mechanism
     @Override
     public void setGearRatio(double motorToMechanismRatio) {
-        if (1.0 != config.Feedback.RotorToSensorRatio
-                || motorToMechanismRatio != config.Feedback.SensorToMechanismRatio
-                || config.Feedback.FeedbackSensorSource != FeedbackSensorSourceValue.RotorSensor) {
-            config.Feedback.RotorToSensorRatio = 1;
-            config.Feedback.SensorToMechanismRatio = motorToMechanismRatio;
-            config.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.RotorSensor;
-
-            configChanged = true;
-        }
+        config.Feedback.RotorToSensorRatio = 1;
+        config.Feedback.SensorToMechanismRatio = motorToMechanismRatio;
+        config.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.RotorSensor;
+        configChanged = true;
     }
 
-    // Set the offset of this motor, or what it reports at the 0 position. This will be subtracted from the reported
-    // position. Make sure to call this before setting limits!
+    // Use after connectEncoder/setGearRatio. Sets the mechanism offset.
     @Override
     public void setOffset(double offset) {
-        // this.offset = offset;
+        if (config.Feedback.FeedbackSensorSource == FeedbackSensorSourceValue.FusedCANcoder) {
+            connectedEncoder.setOffset(offset);
+            extraOffset = connectedEncoder.getExtraOffset();
+        } else if (config.Feedback.FeedbackSensorSource == FeedbackSensorSourceValue.RotorSensor) {
+            double ratio = config.Feedback.SensorToMechanismRatio;
+
+            // Convert mechanism offset to mech rotations
+            double rotOffset = Units.radiansToRotations(offset);
+
+            // Wrap to [-0.5, 0.5] range to find the fractional rotation part
+            double remOffset = rotOffset - Math.round(rotOffset);
+
+            double rotorOffset = remOffset * ratio;
+
+            if (Math.abs(rotorOffset) <= 1) {
+                config.Feedback.FeedbackRotorOffset = rotorOffset;
+
+                // extraOffset handles the integer rotations (converted back to mechanism radians)
+                // This will be a multiple of 2π, preserving periodicity
+                extraOffset = Units.rotationsToRadians(rotOffset - remOffset);
+            } else {
+                config.Feedback.FeedbackRotorOffset = 0;
+                extraOffset = offset;
+
+                // Warn because non-2π multiples in extraOffset break gravity compensation assumptions
+                Alerts.create(
+                        "extraOffset is not a multiple of 2pi--if " + getName()
+                                + " is used in an arm mechanism, kG will not account for gravity correctly",
+                        AlertType.kWarning);
+            }
+        } else {
+            Alerts.create("Invalid sensor source for TalonFX " + getName(), AlertType.kError);
+        }
     }
 
     // Current limits:
@@ -423,8 +482,8 @@ public class MotorIOTalonFX extends MotorIO {
 
     @Override
     public void setLimits(double min, double max) {
-        double newForwardThreshold = Units.radiansToRotations(max + offset);
-        double newReverseThreshold = Units.radiansToRotations(min + offset);
+        double newForwardThreshold = Units.radiansToRotations(max + extraOffset);
+        double newReverseThreshold = Units.radiansToRotations(min + extraOffset);
         if (!config.SoftwareLimitSwitch.ForwardSoftLimitEnable
                 || newForwardThreshold != config.SoftwareLimitSwitch.ForwardSoftLimitThreshold
                 || !config.SoftwareLimitSwitch.ReverseSoftLimitEnable
@@ -440,14 +499,25 @@ public class MotorIOTalonFX extends MotorIO {
     // We apply invert after adding offset because invert is applied before offset in the position reading code
     @Override
     public void setMechPosition(double position) {
+        if (Constants.currentMode == Mode.REAL) {
+            Alerts.create("Used sim-only method setMechPosition on " + getName(), AlertType.kWarning);
+            return;
+        }
         double rotorPos = Units.radiansToRotations(
-                (position + offset) * config.Feedback.RotorToSensorRatio * config.Feedback.SensorToMechanismRatio);
+                (position + extraOffset) * config.Feedback.RotorToSensorRatio * config.Feedback.SensorToMechanismRatio);
+        if (config.Feedback.FeedbackSensorSource == FeedbackSensorSourceValue.RotorSensor) {
+            rotorPos += config.Feedback.FeedbackRotorOffset;
+        }
         rotorPos = config.MotorOutput.Inverted.equals(InvertedValue.Clockwise_Positive) ? -rotorPos : rotorPos;
         sim.setRawRotorPosition(rotorPos);
     }
 
     @Override
     public void setMechVelocity(double velocity) {
+        if (Constants.currentMode == Mode.REAL) {
+            Alerts.create("Used sim-only method setMechVelocity on " + getName(), AlertType.kWarning);
+            return;
+        }
         double rotorVel = Units.radiansToRotations(
                 velocity * config.Feedback.RotorToSensorRatio * config.Feedback.SensorToMechanismRatio);
         rotorVel = config.MotorOutput.Inverted.equals(InvertedValue.Clockwise_Positive) ? -rotorVel : rotorVel;

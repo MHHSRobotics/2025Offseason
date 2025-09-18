@@ -29,7 +29,7 @@ public class Arm extends SubsystemBase {
         // CAN device ID for the arm motor controller
         public static final int motorId = 22;
         // Angle offset (radians) to line up the absolute encoder zero with the real arm zero
-        public static final double offset = 0; // -2.85;
+        public static final double offset = -2.85; // -2.85;
         // Whether to flip motor direction (true means reverse forward/backward)
         public static final boolean motorInverted = false;
 
@@ -108,9 +108,6 @@ public class Arm extends SubsystemBase {
     private final LoggedMechanismLigament2d arm =
             root.append(new LoggedMechanismLigament2d("Arm", 1.0, 0, 6, new Color8Bit(Color.kRed)));
 
-    private final LoggedMechanismLigament2d middle =
-            root.append(new LoggedMechanismLigament2d("Middle", 0.0, 0, 10, new Color8Bit(Color.kBlue)));
-
     // Drawing that shows the arm's target angle (radians)
     private final LoggedMechanismLigament2d goalArm =
             root.append(new LoggedMechanismLigament2d("GoalArm", 1.0, 0, 6, new Color8Bit(Color.kYellow)));
@@ -137,6 +134,14 @@ public class Arm extends SubsystemBase {
             fRoot.append(new LoggedMechanismLigament2d("FAmount", 1.0, 90, 6, new Color8Bit(Color.kWhite)));
 
     public Arm(MotorIO motorIO, EncoderIO encoderIO) {
+        encoder = encoderIO;
+        // Tell the encoder what to call itself for alerts and where to log data
+        encoder.setName("arm encoder");
+        encoder.setPath("Arm/Encoder");
+        // Tell the encoder which direction is positive and the gear ratio to the arm
+        encoder.setInverted(Constants.encoderInverted);
+        encoder.setGearRatio(Constants.encoderRatio);
+
         motor = motorIO;
 
         // Tell the motor what to call itself for alerts and where to log data
@@ -146,20 +151,16 @@ public class Arm extends SubsystemBase {
         // Tell the motor which direction is forward (true = invert)
         motor.setInverted(Constants.motorInverted);
         // Tell the motor which encoder to use and how motor/encoder/arm relate (ratios are unitless)
-        motor.connectEncoder(encoderIO, Constants.rotorToSensorRatio, Constants.encoderRatio);
-        // Tell the motor the encoder zero offset (radians) so arm angles match real life
-        motor.setOffset(Constants.offset);
+        motor.connectEncoder(encoderIO, Constants.rotorToSensorRatio);
 
         // Make the motor use cosine gravity compensation (more help when the arm is level)
         motor.setFeedforwardType(GravityTypeValue.Arm_Cosine);
 
-        encoder = encoderIO;
-        // Tell the encoder what to call itself for alerts and where to log data
-        encoder.setName("arm encoder");
-        encoder.setPath("Arm/Encoder");
-        // Tell the encoder which direction is positive and the gear ratio to the arm
-        encoder.setInverted(Constants.encoderInverted);
-        encoder.setRatioAndOffset(Constants.encoderRatio, Constants.offset);
+        // Set motor offset
+        motor.setOffset(Constants.offset);
+
+        // Add middle dot to visualization
+        root.append(new LoggedMechanismLigament2d("Middle", 0.0, 0, 10, new Color8Bit(Color.kBlue)));
     }
 
     // Tell the arm motor how fast to spin (percent [-1 to 1], -1 = full backward, 1 = full forward)

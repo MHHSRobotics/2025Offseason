@@ -6,6 +6,10 @@ import edu.wpi.first.wpilibj.Alert.AlertType;
 import org.littletonrobotics.junction.AutoLog;
 import org.littletonrobotics.junction.Logger;
 
+import frc.robot.Constants;
+import frc.robot.Constants.Mode;
+import frc.robot.util.Alerts;
+
 public class EncoderIO {
     @AutoLog
     public static class EncoderIOInputs {
@@ -43,7 +47,7 @@ public class EncoderIO {
     }
 
     public String getName() {
-        return name;
+        return name == null ? "encoder" : name;
     }
 
     // Tell the EncoderIO where to log its data (like "Arm/Encoder" or "Drive/Module0/AngleEncoder")
@@ -73,11 +77,29 @@ public class EncoderIO {
         return inputs;
     }
 
-    public void setRatioAndOffset(double ratio, double offset) {}
+    private void unsupportedFeature() {
+        if (Constants.currentMode != Mode.REPLAY) {
+            Alerts.create("An unsupported feature was used on " + getName(), AlertType.kWarning);
+        }
+    }
 
-    public void setInverted(boolean inverted) {}
+    public void setGearRatio(double ratio) {
+        unsupportedFeature();
+    }
 
-    public void setMechPosition(double position) {}
+    public void setOffset(double offset) {
+        unsupportedFeature();
+    }
 
-    public void setMechVelocity(double velocity) {}
+    public void setInverted(boolean inverted) {
+        unsupportedFeature();
+    }
+
+    public void setMechPosition(double position) {
+        unsupportedFeature();
+    }
+
+    public void setMechVelocity(double velocity) {
+        unsupportedFeature();
+    }
 }

@@ -25,6 +25,8 @@ import org.littletonrobotics.junction.networktables.NT4Publisher;
 import org.littletonrobotics.junction.wpilog.WPILOGReader;
 import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 
+import frc.robot.util.Alerts;
+
 public class Robot extends LoggedRobot {
     private Command autonomousCommand;
 
@@ -83,7 +85,7 @@ public class Robot extends LoggedRobot {
             Watchdog watchdog = (Watchdog) watchdogField.get(this);
             watchdog.setTimeout(Constants.loopOverrunWarningTimeout);
         } catch (Exception e) {
-            DriverStation.reportWarning("Failed to disable loop overrun warnings.", false);
+            Alerts.create("Failed to disable loop overrun warnings", AlertType.kWarning);
         }
         CommandScheduler.getInstance().setPeriod(Constants.loopOverrunWarningTimeout);
 

@@ -6,6 +6,10 @@ import edu.wpi.first.wpilibj.Alert.AlertType;
 import org.littletonrobotics.junction.AutoLog;
 import org.littletonrobotics.junction.Logger;
 
+import frc.robot.Constants;
+import frc.robot.Constants.Mode;
+import frc.robot.util.Alerts;
+
 public class GyroIO {
     @AutoLog
     public static class GyroIOInputs {
@@ -17,6 +21,8 @@ public class GyroIO {
 
     private String logPath = "";
 
+    private String name;
+
     // Alert objects to show gyro problems on the dashboard
     private Alert disconnectAlert;
     private Alert hardwareFaultAlert;
@@ -27,9 +33,15 @@ public class GyroIO {
 
     // Tell the GyroIO what to call this gyro for alerts (like "gyro" or "main gyro")
     public void setName(String name) {
+        this.name = name;
+
         // Create alerts with descriptive names for this gyro
         disconnectAlert = new Alert("The " + name + " is disconnected", AlertType.kError);
         hardwareFaultAlert = new Alert("The " + name + " has encountered a hardware fault", AlertType.kError);
+    }
+
+    public String getName() {
+        return name == null ? "gyro" : name;
     }
 
     // Tell the GyroIO where to log its data (like "Drive/Gyro")
@@ -58,7 +70,21 @@ public class GyroIO {
         return inputs;
     }
 
-    public void setMechYaw(double yaw) {}
+    private void unsupportedFeature() {
+        if (Constants.currentMode != Mode.REPLAY) {
+            Alerts.create("An unsupported feature was used on " + getName(), AlertType.kWarning);
+        }
+    }
 
-    public void setMechYawVelocity(double yawVelocity) {}
+    public void setMechYaw(double yaw) {
+        unsupportedFeature();
+    }
+
+    public void setMechYawVelocity(double yawVelocity) {
+        unsupportedFeature();
+    }
+
+    public void disconnect() {
+        unsupportedFeature();
+    }
 }

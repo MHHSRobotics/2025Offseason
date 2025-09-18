@@ -146,6 +146,14 @@ public class Elevator extends SubsystemBase {
             fRoot.append(new LoggedMechanismLigament2d("FAmount", 1.0, 90, 6, new Color8Bit(Color.kWhite)));
 
     public Elevator(MotorIO leftMotorIO, MotorIO rightMotorIO, EncoderIO encoderIO) {
+        encoder = encoderIO;
+        // Tell the encoder what to call itself for alerts and where to log data
+        encoder.setName("elevator encoder");
+        encoder.setPath("Elevator/Encoder");
+        // Tell the encoder which direction is positive and the gear ratio to the elevator
+        encoder.setInverted(Constants.encoderInverted);
+        encoder.setGearRatio(Constants.encoderRatio);
+
         leftMotor = leftMotorIO;
         rightMotor = rightMotorIO;
 
@@ -160,7 +168,7 @@ public class Elevator extends SubsystemBase {
         rightMotor.setInverted(Constants.rightMotorInverted);
 
         // Tell the left motor which encoder to use and how motor/encoder/elevator relate (ratios are unitless)
-        leftMotor.connectEncoder(encoderIO, Constants.rotorToSensorRatio, Constants.encoderRatio);
+        leftMotor.connectEncoder(encoderIO, Constants.rotorToSensorRatio);
 
         // Make the motors use elevator gravity compensation (constant help against gravity)
         leftMotor.setFeedforwardType(GravityTypeValue.Elevator_Static);
@@ -169,13 +177,7 @@ public class Elevator extends SubsystemBase {
         // Make the right motor follow the left motor (they should move together)
         rightMotor.follow(Constants.leftMotorId, false); // false means same direction
 
-        encoder = encoderIO;
-        // Tell the encoder what to call itself for alerts and where to log data
-        encoder.setName("elevator encoder");
-        encoder.setPath("Elevator/Encoder");
-        // Tell the encoder which direction is positive and the gear ratio to the elevator
-        encoder.setInverted(Constants.encoderInverted);
-        encoder.setRatioAndOffset(Constants.encoderRatio, Constants.offset);
+        leftMotor.setOffset(Constants.offset);
     }
 
     // Tell the elevator motors how fast to spin (percent [-1 to 1], -1 = full down, 1 = full up)

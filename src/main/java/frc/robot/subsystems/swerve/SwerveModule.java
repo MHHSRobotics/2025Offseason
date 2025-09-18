@@ -21,6 +21,9 @@ public class SwerveModule {
 
     private int index;
 
+    private SwerveModulePosition lastPosition = new SwerveModulePosition();
+    private SwerveModulePosition currentPosition = new SwerveModulePosition();
+
     public SwerveModule(
             MotorIO driveMotorIO,
             MotorIO angleMotorIO,
@@ -62,18 +65,18 @@ public class SwerveModule {
         driveMotor.setStatorCurrentLimit(constants.SlipCurrent);
         driveMotor.setInverted(constants.DriveMotorInverted);
 
-        angleMotor.setBraking(true);
-        angleMotor.setGains(constants.SteerMotorGains);
-        angleMotor.connectEncoder(angleEncoder, constants.SteerMotorGearRatio, 1);
-        angleMotor.setContinuousWrap(true);
-        angleMotor.setInverted(constants.SteerMotorInverted);
-        angleMotor.setOffset(Units.rotationsToRadians(
-                constants.EncoderOffset)); // Fix encoder zero position (convert from rotations to radians)
-
         // Tell the encoder what to call itself for alerts and where to log data
         angleEncoder.setName(modulePos + " encoder");
         angleEncoder.setPath("Drive/Module" + index + "/AngleEncoder");
         angleEncoder.setInverted(constants.EncoderInverted);
+
+        angleMotor.setBraking(true);
+        angleMotor.setGains(constants.SteerMotorGains);
+        angleMotor.connectEncoder(angleEncoder, constants.SteerMotorGearRatio);
+        angleMotor.setContinuousWrap(true);
+        angleMotor.setInverted(constants.SteerMotorInverted);
+        angleMotor.setOffset(Units.rotationsToRadians(
+                constants.EncoderOffset)); // Fix encoder zero position (convert from rotations to radians)
     }
 
     // Sets whether the drive and angle motors should brake
@@ -155,7 +158,18 @@ public class SwerveModule {
 
     // Get the module's current position: how far it's driven and which way it's pointing
     public SwerveModulePosition getPosition() {
-        return new SwerveModulePosition(getPositionMeters(), Rotation2d.fromRadians(getAngle()));
+        return currentPosition;
+    }
+
+    // Get the position of the swerve module in the last tick
+    public SwerveModulePosition getLastPosition() {
+        return lastPosition;
+    }
+
+    // Gets the change in position in the last tick
+    public SwerveModulePosition getPositionDelta() {
+        return new SwerveModulePosition(
+                currentPosition.distanceMeters - lastPosition.distanceMeters, currentPosition.angle);
     }
 
     // Get the module's current state: how fast it's going and which way it's pointing
@@ -169,5 +183,11 @@ public class SwerveModule {
         driveMotor.update();
         angleMotor.update();
         angleEncoder.update();
+
+        // Update last position
+        lastPosition = currentPosition;
+
+        // Update current position
+        currentPosition = new SwerveModulePosition(getPositionMeters(), Rotation2d.fromRadians(getAngle()));
     }
 }
