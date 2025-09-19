@@ -29,7 +29,7 @@ public class Arm extends SubsystemBase {
         // CAN device ID for the arm motor controller
         public static final int motorId = 22;
         // Angle offset (radians) to line up the absolute encoder zero with the real arm zero
-        public static final double offset = -2.85; // -2.85;
+        public static final double offset = -3.86; // -2.85;
         // Whether to flip motor direction (true means reverse forward/backward)
         public static final boolean motorInverted = false;
 
@@ -39,7 +39,7 @@ public class Arm extends SubsystemBase {
         public static final boolean encoderInverted = true;
 
         public static final double gearRatio = 700 / 9.; // Ratio of motor rotations to arm rotations (unitless)
-        public static final double encoderRatio = 28 / 9.; // Ratio of encoder rotations to arm rotations (unitless)
+        public static final double encoderRatio = 1; // Ratio of encoder rotations to arm rotations (unitless)
 
         public static final LoggedNetworkNumber kP =
                 new LoggedNetworkNumber("Arm/kP", 150); // (volts per radian) more voltage when farther from target
