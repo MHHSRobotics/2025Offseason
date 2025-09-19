@@ -119,6 +119,7 @@ public class Robot extends LoggedRobot {
 
     @Override
     public void robotPeriodic() {
+        // Run allactive commands and call periodic() on subsystems
         CommandScheduler.getInstance().run();
 
         if (RobotController.getBatteryVoltage() <= Constants.lowBatteryVoltage && DriverStation.isEnabled()) {
@@ -134,6 +135,9 @@ public class Robot extends LoggedRobot {
         CANBusStatus status = Constants.swerveBus.getStatus();
         Logger.recordOutput("CANivore/Utilization", status.BusUtilization);
         Logger.recordOutput("CANivore/Status", status.Status.isOK());
+
+        // RobotContainer periodic gets called _after_ the subsystems
+        robotContainer.periodic();
     }
 
     @Override

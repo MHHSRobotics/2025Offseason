@@ -34,7 +34,7 @@ public class ElevatorSubsystemSim extends SubsystemBase {
                 Elevator.Constants.drumRadius,
                 Elevator.Constants.minHeight,
                 Elevator.Constants.maxHeight,
-                false,
+                true,
                 Elevator.Constants.startHeight);
     }
 

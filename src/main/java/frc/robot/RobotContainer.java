@@ -17,6 +17,7 @@ import frc.robot.io.GyroIO;
 import frc.robot.io.GyroIOPigeon;
 import frc.robot.io.MotorIO;
 import frc.robot.io.MotorIOTalonFX;
+import frc.robot.network.RobotPublisher;
 import frc.robot.subsystems.arm.Arm;
 import frc.robot.subsystems.arm.ArmSim;
 import frc.robot.subsystems.elevator.Elevator;
@@ -52,6 +53,9 @@ public class RobotContainer {
     // Controller for SysId commands
     private final CommandPS5Controller sysIdController = new CommandPS5Controller(2);
 
+    // Publishes all robot data to AdvantageScope
+    private RobotPublisher publisher;
+
     public RobotContainer() {
         // Initialize all the IO objects, subsystems, and mechanism simulators
         initSubsystems();
@@ -64,6 +68,9 @@ public class RobotContainer {
 
         // Add SysId bindings
         configureSysId();
+
+        // Initialize the publisher
+        publisher = new RobotPublisher(arm, wrist, intake, elevator, hang, swerve);
     }
 
     private void initSubsystems() {
@@ -335,5 +342,9 @@ public class RobotContainer {
 
     public Command getAutonomousCommand() {
         return Commands.print("No autonomous command configured");
+    }
+
+    public void periodic() {
+        publisher.publish();
     }
 }

@@ -19,7 +19,10 @@ public final class Constants {
         SIM,
 
         /** Replaying from a log file. */
-        REPLAY
+        REPLAY,
+
+        // WIP physics simulator
+        PHYSICS_SIM,
     }
 
     public static final CANBus defaultBus = new CANBus("rio");
