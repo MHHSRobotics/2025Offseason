@@ -46,8 +46,6 @@ public class Wrist extends SubsystemBase {
 
         public static final LoggedNetworkNumber kP =
                 new LoggedNetworkNumber("Wrist/kP", 3); // (volts per radian) more voltage when farther from target
-        public static final LoggedNetworkNumber kI =
-                new LoggedNetworkNumber("Wrist/kI", 0); // (volts per radian-second) helps eliminate steady-state error
         public static final LoggedNetworkNumber kD =
                 new LoggedNetworkNumber("Wrist/kD", 0.2); // (volts per rad/s) reacts to how fast error is changing
 
@@ -134,9 +132,6 @@ public class Wrist extends SubsystemBase {
     // Base point for the proportional (P) bar visualization
     private final LoggedMechanismRoot2d pRoot = mech.getRoot("PRoot", 2.5, 2);
 
-    // Base point for the integral (I) bar visualization
-    private final LoggedMechanismRoot2d iRoot = mech.getRoot("IRoot", 2.55, 2);
-
     // Base point for the derivative (D) bar visualization
     private final LoggedMechanismRoot2d dRoot = mech.getRoot("DRoot", 2.6, 2);
 
@@ -146,10 +141,6 @@ public class Wrist extends SubsystemBase {
     // Proportional (P) amount bar
     private final LoggedMechanismLigament2d pAmount =
             pRoot.append(new LoggedMechanismLigament2d("PAmount", 1.0, 90, 6, new Color8Bit(Color.kBlue)));
-
-    // Integral (I) amount bar
-    private final LoggedMechanismLigament2d iAmount =
-            iRoot.append(new LoggedMechanismLigament2d("IAmount", 1.0, 90, 6, new Color8Bit(Color.kPurple)));
 
     // Derivative (D) amount bar
     private final LoggedMechanismLigament2d dAmount =
@@ -241,21 +232,18 @@ public class Wrist extends SubsystemBase {
             // If the motor is using Motion Magic (PID to a target), show the target and P/I/D/FF bars
             goalWrist.setLineWeight(6);
             pAmount.setLineWeight(6);
-            iAmount.setLineWeight(6);
             dAmount.setLineWeight(6);
             fAmount.setLineWeight(6);
 
             // Set the target angle and how big each control term is (scaled down for drawing)
             goalWrist.setAngle(Rotation2d.fromRadians(motor.getInputs().setpoint));
             pAmount.setLength(motor.getInputs().propOutput / 100);
-            iAmount.setLength(motor.getInputs().intOutput / 100);
             dAmount.setLength(motor.getInputs().derivOutput / 100);
             fAmount.setLength(motor.getInputs().feedforward / 100);
         } else {
             // Hide the target and P/I/D/FF bars when not using Motion Magic
             goalWrist.setLineWeight(0);
             pAmount.setLineWeight(0);
-            iAmount.setLineWeight(0);
             dAmount.setLineWeight(0);
             fAmount.setLineWeight(0);
         }
@@ -265,7 +253,6 @@ public class Wrist extends SubsystemBase {
 
         // 4) Read tuning numbers and apply them to the motor controller (units noted above)
         motor.setkP(Constants.kP.get());
-        motor.setkI(Constants.kI.get());
         motor.setkD(Constants.kD.get());
         motor.setkG(Constants.kG.get());
         motor.setkS(Constants.kS.get());

@@ -17,7 +17,7 @@ public class WristCommands {
     }
 
     // Tell the wrist motor how fast to spin (percent [-1 to 1], -1 = full backward, 1 = full forward)
-    public Command setDutyCycle(DoubleSupplier speed) {
+    public Command setSpeed(DoubleSupplier speed) {
         return new InstantCommand(() -> wrist.setDutyCycle(speed.getAsDouble()), wrist)
                 .withName("wrist set duty cycle");
     }
@@ -35,7 +35,7 @@ public class WristCommands {
 
     // Tell the wrist to stop all motor output
     public Command stop() {
-        return setDutyCycle(() -> 0).withName("wrist stop");
+        return setSpeed(() -> 0).withName("wrist stop");
     }
 
     // Tell the wrist to go to the straight forward position (0 radians = 0°)

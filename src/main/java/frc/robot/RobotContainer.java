@@ -4,6 +4,8 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandPS5Controller;
 
+import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
+
 import frc.robot.Constants.Mode;
 import frc.robot.commands.ArmCommands;
 import frc.robot.commands.ElevatorCommands;
@@ -52,6 +54,10 @@ public class RobotContainer {
 
     // Controller for SysId commands
     private final CommandPS5Controller sysIdController = new CommandPS5Controller(2);
+
+    // Virtual controller for sim
+    private final CommandPS5Controller testController = new CommandPS5Controller(3);
+    private LoggedDashboardChooser<String> testControllerChooser;
 
     // Publishes all robot data to AdvantageScope
     private RobotPublisher publisher;
@@ -238,15 +244,17 @@ public class RobotContainer {
     }
 
     private void configureBindings() {
+        /* ---- Main controller bindings ---- */
+
         // PID-based forward movement (CCW)
-        controller.cross().and(() -> !Arm.Constants.manualArm.get()).onTrue(armCommands.setGoal(() -> 0));
+        controller.cross().and(() -> !Arm.Constants.manualArm.get()).onTrue(elevatorCommands.setGoal(() -> 0.5));
 
         // Manual forward movement (CCW)
         controller
                 .cross()
                 .and(() -> Arm.Constants.manualArm.get())
-                .onTrue(armCommands.setSpeed(() -> 0.2))
-                .onFalse(armCommands.stop());
+                .onTrue(elevatorCommands.setSpeed(() -> 0.2))
+                .onFalse(elevatorCommands.stop());
 
         // PID-based backward movement (CW)
         controller.circle().and(() -> !Arm.Constants.manualArm.get()).onTrue(armCommands.setGoal(() -> 2));
@@ -297,7 +305,7 @@ public class RobotContainer {
         controller
                 .triangle()
                 .and(() -> Wrist.Constants.manualWrist.get())
-                .onTrue(wristCommands.setDutyCycle(() -> 0.2))
+                .onTrue(wristCommands.setSpeed(() -> 0.2))
                 .onFalse(wristCommands.stop());
 
         // PID-based wrist to down position (square button)
@@ -307,7 +315,7 @@ public class RobotContainer {
         controller
                 .square()
                 .and(() -> Wrist.Constants.manualWrist.get())
-                .onTrue(wristCommands.setDutyCycle(() -> -0.2))
+                .onTrue(wristCommands.setSpeed(() -> -0.2))
                 .onFalse(wristCommands.stop());
 
         // PID-based wrist to stow position (R2 button)
@@ -317,7 +325,7 @@ public class RobotContainer {
         controller
                 .R2()
                 .and(() -> Wrist.Constants.manualWrist.get())
-                .onTrue(wristCommands.setDutyCycle(() -> -0.3))
+                .onTrue(wristCommands.setSpeed(() -> -0.3))
                 .onFalse(wristCommands.stop());
 
         // Hang controls (for climbing at end of match)
@@ -336,6 +344,74 @@ public class RobotContainer {
 
         swerve.setDefaultCommand(swerveCommands.drive(
                 () -> -controller.getLeftY(), () -> -controller.getLeftX(), () -> -controller.getRightX(), () -> true));
+
+        /* ---- Test controller bindings ---- */
+        testControllerChooser = new LoggedDashboardChooser<>("Test/Type");
+        testControllerChooser.addOption("Arm", "Arm");
+        testControllerChooser.addOption("Elevator", "Elevator");
+        testControllerChooser.addOption("Wrist", "Wrist");
+        testControllerChooser.addOption("Hang", "Hang");
+        testControllerChooser.addOption("Intake", "Intake");
+
+        testController
+                .cross()
+                .onTrue(Commands.runOnce(() -> {
+                    System.out.println(testControllerChooser.get());
+                    System.out.println(testControllerChooser.get().equals("Elevator"));
+                    if (testControllerChooser.get().equals("Arm")) {
+                        arm.setDutyCycle(0.2);
+                    } else if (testControllerChooser.get().equals("Elevator")) {
+                        elevator.setDutyCycle(0.2);
+                    } else if (testControllerChooser.get() == "Wrist") {
+                        wristCommands.setSpeed(() -> 0.2);
+                    } else if (testControllerChooser.get() == "Hang") {
+                        hangCommands.setSpeed(() -> 0.2);
+                    } else if (testControllerChooser.get() == "Intake") {
+                        intakeCommands.setSpeed(() -> 0.2);
+                    }
+                }))
+                .onFalse(Commands.runOnce(() -> {
+                    if (testControllerChooser.get() == "Arm") {
+                        armCommands.setSpeed(() -> 0);
+                    } else if (testControllerChooser.get() == "Elevator") {
+                        elevatorCommands.setSpeed(() -> 0);
+                    } else if (testControllerChooser.get() == "Wrist") {
+                        wristCommands.setSpeed(() -> 0);
+                    } else if (testControllerChooser.get() == "Hang") {
+                        hangCommands.setSpeed(() -> 0);
+                    } else if (testControllerChooser.get() == "Intake") {
+                        intakeCommands.setSpeed(() -> 0);
+                    }
+                }));
+
+        testController
+                .circle()
+                .onTrue(Commands.runOnce(() -> {
+                    if (testControllerChooser.get() == "Arm") {
+                        armCommands.setSpeed(() -> -0.2);
+                    } else if (testControllerChooser.get() == "Elevator") {
+                        elevatorCommands.setSpeed(() -> -0.2);
+                    } else if (testControllerChooser.get() == "Wrist") {
+                        wristCommands.setSpeed(() -> -0.2);
+                    } else if (testControllerChooser.get() == "Hang") {
+                        hangCommands.setSpeed(() -> -0.2);
+                    } else if (testControllerChooser.get() == "Intake") {
+                        intakeCommands.setSpeed(() -> -0.2);
+                    }
+                }))
+                .onFalse(Commands.runOnce(() -> {
+                    if (testControllerChooser.get() == "Arm") {
+                        armCommands.setSpeed(() -> 0);
+                    } else if (testControllerChooser.get() == "Elevator") {
+                        elevatorCommands.setSpeed(() -> 0);
+                    } else if (testControllerChooser.get() == "Wrist") {
+                        wristCommands.setSpeed(() -> 0);
+                    } else if (testControllerChooser.get() == "Hang") {
+                        hangCommands.setSpeed(() -> 0);
+                    } else if (testControllerChooser.get() == "Intake") {
+                        intakeCommands.setSpeed(() -> 0);
+                    }
+                }));
     }
 
     private void configureSysId() {}

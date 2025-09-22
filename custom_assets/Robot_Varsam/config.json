@@ -8,7 +8,11 @@
     "components": [
         {
             "zeroedRotations":[],
-            "zeroedPosition":[0,0,0]
+            "zeroedPosition":[0,0.0635,0.1]
+        },
+        {
+            "zeroedRotations":[],
+            "zeroedPosition":[0,0.0635,0.13]
         }
     ]
 }
