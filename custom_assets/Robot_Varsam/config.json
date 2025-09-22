@@ -1,10 +1,14 @@
 {
     "name": "Varsam",
     "rotations": [],
-    "position": [0,0,0],
+    "position": [0,0,0.05],
     "disableSimplification": true,
     "cameras": [
     ],
     "components": [
+        {
+            "zeroedRotations":[],
+            "zeroedPosition":[0,0,0]
+        }
     ]
 }
