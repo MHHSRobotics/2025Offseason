@@ -72,6 +72,11 @@ public class RobotContainer {
         // Add controller bindings
         configureBindings();
 
+        // If in sim configure bindings for test controller
+        if(Constants.currentMode==Mode.SIM){
+            configureTestBindings();
+        }
+
         // Add SysId bindings
         configureSysId();
 
@@ -345,6 +350,24 @@ public class RobotContainer {
         swerve.setDefaultCommand(swerveCommands.drive(
                 () -> -controller.getLeftY(), () -> -controller.getLeftX(), () -> -controller.getRightX(), () -> true));
 
+        
+    }
+
+    // Run selected subsystem at given duty cycle
+    private void runSelectedTest(double dutyCycle){
+        if (testControllerChooser.get().equals("Arm")) {
+            arm.setDutyCycle(dutyCycle);
+        } else if (testControllerChooser.get().equals("Elevator")) {
+            elevator.setDutyCycle(dutyCycle);
+        } else if (testControllerChooser.get().equals("Wrist")) {
+            wrist.setDutyCycle(dutyCycle);
+        } else if (testControllerChooser.get().equals("Hang")) {
+            hang.setSpeed(dutyCycle);
+        } else if (testControllerChooser.get().equals("Intake")) {
+            intake.setSpeed(dutyCycle);
+        }
+    }
+    private void configureTestBindings(){
         /* ---- Test controller bindings ---- */
         testControllerChooser = new LoggedDashboardChooser<>("Test/Type");
         testControllerChooser.addOption("Arm", "Arm");
@@ -355,63 +378,13 @@ public class RobotContainer {
 
         testController
                 .cross()
-                .onTrue(Commands.runOnce(() -> {
-                    System.out.println(testControllerChooser.get());
-                    System.out.println(testControllerChooser.get().equals("Elevator"));
-                    if (testControllerChooser.get().equals("Arm")) {
-                        arm.setDutyCycle(0.2);
-                    } else if (testControllerChooser.get().equals("Elevator")) {
-                        elevator.setDutyCycle(0.2);
-                    } else if (testControllerChooser.get() == "Wrist") {
-                        wristCommands.setSpeed(() -> 0.2);
-                    } else if (testControllerChooser.get() == "Hang") {
-                        hangCommands.setSpeed(() -> 0.2);
-                    } else if (testControllerChooser.get() == "Intake") {
-                        intakeCommands.setSpeed(() -> 0.2);
-                    }
-                }))
-                .onFalse(Commands.runOnce(() -> {
-                    if (testControllerChooser.get() == "Arm") {
-                        armCommands.setSpeed(() -> 0);
-                    } else if (testControllerChooser.get() == "Elevator") {
-                        elevatorCommands.setSpeed(() -> 0);
-                    } else if (testControllerChooser.get() == "Wrist") {
-                        wristCommands.setSpeed(() -> 0);
-                    } else if (testControllerChooser.get() == "Hang") {
-                        hangCommands.setSpeed(() -> 0);
-                    } else if (testControllerChooser.get() == "Intake") {
-                        intakeCommands.setSpeed(() -> 0);
-                    }
-                }));
+                .onTrue(Commands.runOnce(() -> runSelectedTest(0.2)))
+                .onFalse(Commands.runOnce(() -> runSelectedTest(0)));
 
         testController
                 .circle()
-                .onTrue(Commands.runOnce(() -> {
-                    if (testControllerChooser.get() == "Arm") {
-                        armCommands.setSpeed(() -> -0.2);
-                    } else if (testControllerChooser.get() == "Elevator") {
-                        elevatorCommands.setSpeed(() -> -0.2);
-                    } else if (testControllerChooser.get() == "Wrist") {
-                        wristCommands.setSpeed(() -> -0.2);
-                    } else if (testControllerChooser.get() == "Hang") {
-                        hangCommands.setSpeed(() -> -0.2);
-                    } else if (testControllerChooser.get() == "Intake") {
-                        intakeCommands.setSpeed(() -> -0.2);
-                    }
-                }))
-                .onFalse(Commands.runOnce(() -> {
-                    if (testControllerChooser.get() == "Arm") {
-                        armCommands.setSpeed(() -> 0);
-                    } else if (testControllerChooser.get() == "Elevator") {
-                        elevatorCommands.setSpeed(() -> 0);
-                    } else if (testControllerChooser.get() == "Wrist") {
-                        wristCommands.setSpeed(() -> 0);
-                    } else if (testControllerChooser.get() == "Hang") {
-                        hangCommands.setSpeed(() -> 0);
-                    } else if (testControllerChooser.get() == "Intake") {
-                        intakeCommands.setSpeed(() -> 0);
-                    }
-                }));
+                .onTrue(Commands.runOnce(() -> runSelectedTest(-0.2)))
+                .onFalse(Commands.runOnce(() -> runSelectedTest(0)));
     }
 
     private void configureSysId() {}

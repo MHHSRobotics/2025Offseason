@@ -36,7 +36,6 @@ public class RobotPublisher {
         Pose2d pos = swerve.getPose();
         Pose3d pos3 = new Pose3d(pos);
         Logger.recordOutput("3DField/Chassis", pos3);
-        // System.out.println(elevator.getPosition());
         Logger.recordOutput(
                 "3DField/ElevatorMiddle",
                 pos3.plus(new Transform3d(0, 0, elevator.getPosition() / 2, new Rotation3d())));
