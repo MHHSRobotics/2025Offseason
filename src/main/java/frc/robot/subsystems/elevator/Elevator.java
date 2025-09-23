@@ -41,10 +41,11 @@ public class Elevator extends SubsystemBase {
         // Whether to flip encoder direction to match the elevator positive direction
         public static final boolean encoderInverted = false;
 
-        public static final double gearRatio = 8.0; // Ratio of motor rotations to elevator rotations (unitless)
+        public static final double gearRatio = 8.0; // Ratio of motor rotations to drum rotations (unitless)
         public static final double encoderRatio =
-                0.5; // Ratio of encoder rotations to elevator rotations (unitless, negative since encoder was inverted
-        // before)
+                0.5; // Ratio of encoder rotations to drum rotations (unitless)
+
+        public static final double drumRadius=0.022; // Ratio of meters to drum radians (meters)
 
         public static final LoggedNetworkNumber kP =
                 new LoggedNetworkNumber("Elevator/kP", 20); // (volts per meter) more voltage when farther from target
@@ -78,13 +79,14 @@ public class Elevator extends SubsystemBase {
 
         // Simulation constants
         public static final double carriageMass = 13.0; // (kg) estimated elevator carriage mass for simulation
-        public static final double drumRadius = 0.022; // (meters) radius of the drum that the cable wraps around
         public static final double minHeight = 0; // (meters) soft lower limit
         public static final double maxHeight = 1.2; // (meters) soft upper limit
         public static final double startHeight = 0.1; // (meters) start height in sim
 
         public static final double rotorToSensorRatio =
                 gearRatio / encoderRatio; // Ratio of motor rotations to encoder rotations (unitless)
+
+        public static final double sensorToMechanismRatio = encoderRatio/drumRadius; // Encoder radians per meter
 
         public static final LoggedNetworkBoolean manualElevator =
                 new LoggedNetworkBoolean("Elevator/Manual", false); // Toggle to enable manual control mode
