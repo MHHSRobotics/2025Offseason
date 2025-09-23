@@ -45,8 +45,6 @@ public class Wrist extends SubsystemBase {
 
         public static final LoggedNetworkNumber kP =
                 new LoggedNetworkNumber("Wrist/kP", 150); // (volts per radian) more voltage when farther from target
-        public static final LoggedNetworkNumber kI =
-                new LoggedNetworkNumber("Wrist/kI", 0); // (volts per radian-second) helps eliminate steady-state error
         public static final LoggedNetworkNumber kD =
                 new LoggedNetworkNumber("Wrist/kD", 30); // (volts per rad/s) reacts to how fast error is changing
 

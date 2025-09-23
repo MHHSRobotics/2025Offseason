@@ -382,13 +382,14 @@ public class MotorIOTalonFX extends MotorIO {
 
     // Tell the motor to use a remote encoder with gear ratios:
     // - motorToSensorRatio: motor rotations to sensor rotations (unitless)
+    // - fuse: Whether to use the internal rotor along with the CANcoder. Always set to true, unless there are issues with the reported position teleporting even after accounting for gear ratio and inversion, in which case it should be false
     // Only use ONE of connectEncoder OR setGearRatio for a motor, not both.
     // Currently only supports CANcoders.
     @Override
-    public void connectEncoder(EncoderIO encoder, double motorToSensorRatio) {
+    public void connectEncoder(EncoderIO encoder, double motorToSensorRatio,boolean fuse) {
         if (encoder instanceof EncoderIOCANcoder cancoder) {
             config.Feedback.FeedbackRemoteSensorID = cancoder.getId();
-            config.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.RemoteCANcoder;
+            config.Feedback.FeedbackSensorSource = fuse?FeedbackSensorSourceValue.FusedCANcoder:FeedbackSensorSourceValue.RemoteCANcoder;
             config.Feedback.RotorToSensorRatio = motorToSensorRatio;
             config.Feedback.SensorToMechanismRatio = cancoder.getRatio();
             connectedEncoder = cancoder;
