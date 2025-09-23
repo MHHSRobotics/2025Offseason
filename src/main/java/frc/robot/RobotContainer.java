@@ -357,11 +357,11 @@ public class RobotContainer {
     // Run selected subsystem at given duty cycle
     private void runSelectedTest(double dutyCycle){
         if (testControllerChooser.get().equals("Arm")) {
-            arm.setDutyCycle(dutyCycle);
+            arm.setSpeed(dutyCycle);
         } else if (testControllerChooser.get().equals("Elevator")) {
-            elevator.setDutyCycle(dutyCycle);
+            elevator.setSpeed(dutyCycle);
         } else if (testControllerChooser.get().equals("Wrist")) {
-            wrist.setDutyCycle(dutyCycle);
+            wrist.setSpeed(dutyCycle);
         } else if (testControllerChooser.get().equals("Hang")) {
             hang.setSpeed(dutyCycle);
         } else if (testControllerChooser.get().equals("Intake")) {

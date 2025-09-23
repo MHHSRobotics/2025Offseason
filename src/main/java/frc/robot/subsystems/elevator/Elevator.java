@@ -180,7 +180,7 @@ public class Elevator extends SubsystemBase {
     }
 
     // Tell the elevator motors how fast to spin (percent [-1 to 1], -1 = full down, 1 = full up)
-    public void setDutyCycle(double value) {
+    public void setSpeed(double value) {
         leftMotor.setDutyCycle(value);
         // Right motor follows automatically, no need to set it separately
     }

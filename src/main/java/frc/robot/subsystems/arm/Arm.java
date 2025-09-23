@@ -164,7 +164,7 @@ public class Arm extends SubsystemBase {
     }
 
     // Tell the arm motor how fast to spin (percent [-1 to 1], -1 = full backward, 1 = full forward)
-    public void setDutyCycle(double value) {
+    public void setSpeed(double value) {
         motor.setDutyCycle(value);
     }
 

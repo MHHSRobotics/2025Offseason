@@ -17,7 +17,7 @@ public class ElevatorCommands {
 
     // Tell the elevator motors how fast to spin (percent [-1 to 1], -1 = full down, 1 = full up)
     public Command setSpeed(DoubleSupplier speed) {
-        return new InstantCommand(() -> elevator.setDutyCycle(speed.getAsDouble()), elevator)
+        return new InstantCommand(() -> elevator.setSpeed(speed.getAsDouble()), elevator)
                 .withName("elevator set speed");
     }
 
