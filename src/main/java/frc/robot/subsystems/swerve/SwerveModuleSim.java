@@ -56,7 +56,7 @@ public class SwerveModuleSim extends SubsystemBase {
         steerMotor.setMechPosition(steerMech.getAngularPositionRad());
         steerMotor.setMechVelocity(steerMech.getAngularVelocityRadPerSec());
 
-        steerEncoder.setMechPosition(steerMech.getAngularPositionRad() - constants.EncoderOffset);
+        steerEncoder.setMechPosition(steerMech.getAngularPositionRad());
         steerEncoder.setMechVelocity(steerMech.getAngularVelocityRadPerSec());
     }
 }

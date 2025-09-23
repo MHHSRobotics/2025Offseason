@@ -76,7 +76,7 @@ public class SwerveModule {
         angleMotor.setContinuousWrap(true);
         angleMotor.setInverted(constants.SteerMotorInverted);
         angleMotor.setOffset(Units.rotationsToRadians(
-                constants.EncoderOffset)); // Fix encoder zero position (convert from rotations to radians)
+                -constants.EncoderOffset)); // Fix encoder zero position (convert from rotations to radians)
     }
 
     // Sets whether the drive and angle motors should brake
