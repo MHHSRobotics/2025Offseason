@@ -49,6 +49,8 @@ public class MotorIO {
         public boolean tempFault;
         public boolean forwardLimitFault;
         public boolean reverseLimitFault;
+
+        public double rawRotorPosition;
     }
 
     private String logPath = "";

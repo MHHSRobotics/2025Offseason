@@ -30,7 +30,7 @@ public class Elevator extends SubsystemBase {
         public static final int rightMotorId = 21;
 
         // Height offset (meters) to line up the absolute encoder zero with the real elevator zero
-        public static final double offset = 0;
+        public static final double offset = 0.14;
 
         // Whether to flip motor directions (true means reverse forward/backward)
         public static final boolean leftMotorInverted = false;
@@ -171,7 +171,7 @@ public class Elevator extends SubsystemBase {
         rightMotor.setFeedforwardType(GravityTypeValue.Elevator_Static);
 
         // Make the right motor follow the left motor (they should move together)
-        rightMotor.follow(Constants.leftMotorId, false); // false means same direction
+        rightMotor.follow(Constants.leftMotorId, true); // false means same direction
 
         leftMotor.setOffset(Constants.offset);
 

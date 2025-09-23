@@ -16,7 +16,6 @@ import org.littletonrobotics.junction.mechanism.LoggedMechanismRoot2d;
 import org.littletonrobotics.junction.networktables.LoggedNetworkBoolean;
 import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
 
-import frc.robot.Robot;
 import frc.robot.io.EncoderIO;
 import frc.robot.io.MotorIO;
 
@@ -45,22 +44,20 @@ public class Wrist extends SubsystemBase {
         // before)
 
         public static final LoggedNetworkNumber kP =
-                new LoggedNetworkNumber("Wrist/kP", 3); // (volts per radian) more voltage when farther from target
+                new LoggedNetworkNumber("Wrist/kP", 150); // (volts per radian) more voltage when farther from target
+        public static final LoggedNetworkNumber kI =
+                new LoggedNetworkNumber("Wrist/kI", 0); // (volts per radian-second) helps eliminate steady-state error
         public static final LoggedNetworkNumber kD =
-                new LoggedNetworkNumber("Wrist/kD", 0.2); // (volts per rad/s) reacts to how fast error is changing
+                new LoggedNetworkNumber("Wrist/kD", 30); // (volts per rad/s) reacts to how fast error is changing
 
         public static final LoggedNetworkNumber kS = new LoggedNetworkNumber(
-                "Wrist/kS",
-                Robot.isSimulation() ? 0.0 : 0.1); // (volts) voltage to get wrist moving (overcome static friction)
+                "Wrist/kS", 0.0); // (volts) voltage to get wrist moving (overcome static friction)
         public static final LoggedNetworkNumber kG = new LoggedNetworkNumber(
-                "Wrist/kG",
-                Robot.isSimulation()
-                        ? 0.0
-                        : 0.47); // (volts) voltage to hold the wrist level (compensate gravity at 0 rad)
+                "Wrist/kG", 0.0); // (volts) voltage to hold the wrist level (compensate gravity at 0 rad)
         public static final LoggedNetworkNumber kV = new LoggedNetworkNumber(
-                "Wrist/kV", 0.25757); // (volts per rad/s) voltage that scales with speed to overcome friction
-        public static final LoggedNetworkNumber kA = new LoggedNetworkNumber(
-                "Wrist/kA", 0.050664); // (volts per rad/s^2) extra voltage to help with acceleration
+                "Wrist/kV", 0); // (volts per rad/s) voltage that scales with speed to overcome friction
+        public static final LoggedNetworkNumber kA =
+                new LoggedNetworkNumber("Wrist/kA", 0); // (volts per rad/s^2) extra voltage to help with acceleration
 
         public static final LoggedNetworkNumber maxVelocity = new LoggedNetworkNumber(
                 "Wrist/maxVelocity",
