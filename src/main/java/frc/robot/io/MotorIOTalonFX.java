@@ -154,6 +154,9 @@ public class MotorIOTalonFX extends MotorIO {
         inputs.reverseLimitFault = motor.getFault_ReverseHardLimit().getValue()
                 || motor.getFault_ReverseSoftLimit().getValue();
 
+        inputs.rawRotorPosition =
+                Units.rotationsToRadians(motor.getRotorPosition().getValueAsDouble()
+                        / (config.Feedback.RotorToSensorRatio * config.Feedback.SensorToMechanismRatio));
         // Update alerts using the base class method (this checks all fault conditions and updates dashboard alerts)
         super.update();
     }
@@ -385,7 +388,7 @@ public class MotorIOTalonFX extends MotorIO {
     public void connectEncoder(EncoderIO encoder, double motorToSensorRatio) {
         if (encoder instanceof EncoderIOCANcoder cancoder) {
             config.Feedback.FeedbackRemoteSensorID = cancoder.getId();
-            config.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.FusedCANcoder;
+            config.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.RemoteCANcoder;
             config.Feedback.RotorToSensorRatio = motorToSensorRatio;
             config.Feedback.SensorToMechanismRatio = cancoder.getRatio();
             connectedEncoder = cancoder;
@@ -409,7 +412,8 @@ public class MotorIOTalonFX extends MotorIO {
     // Use after connectEncoder/setGearRatio. Sets the mechanism offset.
     @Override
     public void setOffset(double offset) {
-        if (config.Feedback.FeedbackSensorSource == FeedbackSensorSourceValue.FusedCANcoder) {
+        if (config.Feedback.FeedbackSensorSource == FeedbackSensorSourceValue.FusedCANcoder
+                || config.Feedback.FeedbackSensorSource == FeedbackSensorSourceValue.RemoteCANcoder) {
             connectedEncoder.setOffset(offset);
             extraOffset = connectedEncoder.getExtraOffset();
         } else if (config.Feedback.FeedbackSensorSource == FeedbackSensorSourceValue.RotorSensor) {
