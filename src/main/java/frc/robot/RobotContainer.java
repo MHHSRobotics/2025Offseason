@@ -1,5 +1,6 @@
 package frc.robot;
 
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandPS5Controller;
@@ -232,7 +233,10 @@ public class RobotContainer {
 
     private void configureBindings() {
         // PID-based forward movement (CCW)
-        controller.cross().and(() -> !Arm.Constants.manualArm.get()).onTrue(armCommands.setGoal(() -> 0));
+        controller
+                .cross()
+                .and(() -> !Arm.Constants.manualArm.get())
+                .onTrue(armCommands.setGoal(() -> Units.degreesToRadians(60)));
 
         // Manual forward movement (CCW)
         controller

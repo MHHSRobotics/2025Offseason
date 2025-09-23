@@ -29,7 +29,7 @@ public class Arm extends SubsystemBase {
         // CAN device ID for the arm motor controller
         public static final int motorId = 22;
         // Angle offset (radians) to line up the absolute encoder zero with the real arm zero
-        public static final double offset = -3.86; // -2.85;
+        public static final double offset = 2.45; // -2.85;
         // Whether to flip motor direction (true means reverse forward/backward)
         public static final boolean motorInverted = false;
 
@@ -38,13 +38,13 @@ public class Arm extends SubsystemBase {
         // Whether to flip encoder direction to match the arm positive direction
         public static final boolean encoderInverted = true;
 
-        public static final double gearRatio = 700 / 9.; // Ratio of motor rotations to arm rotations (unitless)
+        public static final double gearRatio = 175 / 2.; // Ratio of motor rotations to arm rotations (unitless)
         public static final double encoderRatio = 1; // Ratio of encoder rotations to arm rotations (unitless)
 
         public static final LoggedNetworkNumber kP =
                 new LoggedNetworkNumber("Arm/kP", 150); // (volts per radian) more voltage when farther from target
         public static final LoggedNetworkNumber kD =
-                new LoggedNetworkNumber("Arm/kD", 50); // (volts per rad/s) reacts to how fast error is changing
+                new LoggedNetworkNumber("Arm/kD", 40); // (volts per rad/s) reacts to how fast error is changing
 
         public static final LoggedNetworkNumber kS =
                 new LoggedNetworkNumber("Arm/kS", 0); // (volts) voltage to get arm moving (overcome static friction)
@@ -55,10 +55,10 @@ public class Arm extends SubsystemBase {
         public static final LoggedNetworkNumber kA =
                 new LoggedNetworkNumber("Arm/kA", 0); // (volts per rad/s^2) extra voltage to help with acceleration
 
-        public static final LoggedNetworkNumber maxVelocity = new LoggedNetworkNumber(
-                "Arm/maxVelocity", 100); // (rad/s) Motion Magic max speed for moving to a target
+        public static final LoggedNetworkNumber maxVelocity =
+                new LoggedNetworkNumber("Arm/maxVelocity", 10); // (rad/s) Motion Magic max speed for moving to a target
         public static final LoggedNetworkNumber maxAccel = new LoggedNetworkNumber(
-                "Arm/maxAccel", 20); // (rad/s^2) Motion Magic max acceleration for moving to a target
+                "Arm/maxAccel", 10); // (rad/s^2) Motion Magic max acceleration for moving to a target
 
         public static final double statorCurrentLimit = 70; // (amps) limit on motor torque output
         public static final double supplyCurrentLimit = 60; // (amps) normal current limit pulled from battery
