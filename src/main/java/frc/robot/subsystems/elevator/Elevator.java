@@ -168,10 +168,9 @@ public class Elevator extends SubsystemBase {
 
         // Make the motors use elevator gravity compensation (constant help against gravity)
         leftMotor.setFeedforwardType(GravityTypeValue.Elevator_Static);
-        rightMotor.setFeedforwardType(GravityTypeValue.Elevator_Static);
 
         // Make the right motor follow the left motor (they should move together)
-        rightMotor.follow(Constants.leftMotorId, true); // false means same direction
+        rightMotor.follow(Constants.leftMotorId, Constants.leftMotorInverted^Constants.rightMotorInverted); // take the XOR of the two inverts to calculate relative inversion
 
         leftMotor.setOffset(Constants.offset);
 
