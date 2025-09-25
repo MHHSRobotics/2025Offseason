@@ -25,6 +25,7 @@ import org.littletonrobotics.junction.mechanism.LoggedMechanismRoot2d;
 import org.littletonrobotics.junction.networktables.LoggedNetworkBoolean;
 
 import frc.robot.io.GyroIO;
+import frc.robot.util.Field;
 import frc.robot.util.RobotUtils;
 
 import static edu.wpi.first.units.Units.MetersPerSecond;
@@ -90,7 +91,8 @@ public class Swerve extends SubsystemBase {
         gyro.setName("gyro");
         gyro.setPath("Swerve/Gyro");
 
-        estimator = new SwerveDrivePoseEstimator(kinematics, gyroAngle, getModulePositions(), new Pose2d());
+        estimator = new SwerveDrivePoseEstimator(
+                kinematics, gyroAngle, getModulePositions(), new Pose2d(2.5, Field.fieldWidth / 2, new Rotation2d()));
         // Set up the on-screen visualization for the four modules
         initializeMechs();
     }

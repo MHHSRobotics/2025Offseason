@@ -23,8 +23,6 @@ public class SwerveModuleSim extends SubsystemBase {
     private DCMotorSim driveMech;
     private DCMotorSim steerMech;
 
-    private SwerveModuleConstants<TalonFXConfiguration, TalonFXConfiguration, CANcoderConfiguration> constants;
-
     public SwerveModuleSim(
             MotorIO driveMotorIO,
             MotorIO steerMotorIO,
@@ -33,7 +31,6 @@ public class SwerveModuleSim extends SubsystemBase {
         driveMotor = driveMotorIO;
         steerMotor = steerMotorIO;
         steerEncoder = steerEncoderIO;
-        this.constants = constants;
         driveMech = new DCMotorSim(
                 LinearSystemId.createDCMotorSystem(driveGearbox, constants.DriveInertia, constants.DriveMotorGearRatio),
                 driveGearbox);
@@ -56,7 +53,7 @@ public class SwerveModuleSim extends SubsystemBase {
         steerMotor.setMechPosition(steerMech.getAngularPositionRad());
         steerMotor.setMechVelocity(steerMech.getAngularVelocityRadPerSec());
 
-        steerEncoder.setMechPosition(steerMech.getAngularPositionRad() - constants.EncoderOffset);
+        steerEncoder.setMechPosition(steerMech.getAngularPositionRad());
         steerEncoder.setMechVelocity(steerMech.getAngularVelocityRadPerSec());
     }
 }

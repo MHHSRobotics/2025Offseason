@@ -151,7 +151,7 @@ public class Arm extends SubsystemBase {
         // Tell the motor which direction is forward (true = invert)
         motor.setInverted(Constants.motorInverted);
         // Tell the motor which encoder to use and how motor/encoder/arm relate (ratios are unitless)
-        motor.connectEncoder(encoderIO, Constants.rotorToSensorRatio);
+        motor.connectEncoder(encoderIO, Constants.rotorToSensorRatio, false);
 
         // Make the motor use cosine gravity compensation (more help when the arm is level)
         motor.setFeedforwardType(GravityTypeValue.Arm_Cosine);
@@ -164,7 +164,7 @@ public class Arm extends SubsystemBase {
     }
 
     // Tell the arm motor how fast to spin (percent [-1 to 1], -1 = full backward, 1 = full forward)
-    public void setDutyCycle(double value) {
+    public void setSpeed(double value) {
         motor.setDutyCycle(value);
     }
 

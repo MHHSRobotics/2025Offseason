@@ -45,6 +45,8 @@ public class MotorIO {
 
         public double dutyCycle; // Duty cycle command (-1 to 1)
 
+        public double encoderDiff;
+
         public boolean hardwareFault;
         public boolean tempFault;
         public boolean forwardLimitFault;
@@ -260,8 +262,13 @@ public class MotorIO {
     }
 
     // Tell the motor to use a remote encoder with given gear ratio (unitless)
-    public void connectEncoder(EncoderIO encoder, double motorToSensorRatio) {
+    public void connectEncoder(EncoderIO encoder, double motorToSensorRatio, boolean fuse) {
         unsupportedFeature();
+    }
+
+    // Fuse defaults to true
+    public void connectEncoder(EncoderIO encoder, double motorToSensorRatio) {
+        connectEncoder(encoder, motorToSensorRatio, true);
     }
 
     // Tell the motor to use its internal sensor with a gear ratio to the mechanism (unitless)

@@ -19,8 +19,6 @@ public class SwerveModule {
 
     private SwerveModuleConstants<TalonFXConfiguration, TalonFXConfiguration, CANcoderConfiguration> constants;
 
-    private int index;
-
     private SwerveModulePosition lastPosition = new SwerveModulePosition();
     private SwerveModulePosition currentPosition = new SwerveModulePosition();
 
@@ -31,7 +29,6 @@ public class SwerveModule {
             int index,
             SwerveModuleConstants<TalonFXConfiguration, TalonFXConfiguration, CANcoderConfiguration> constants) {
         this.constants = constants;
-        this.index = index;
 
         driveMotor = driveMotorIO;
         angleMotor = angleMotorIO;
@@ -55,9 +52,9 @@ public class SwerveModule {
 
         // Tell the motors what to call themselves for alerts and where to log data
         driveMotor.setName(modulePos + " drive");
-        driveMotor.setPath("Drive/Module" + index + "/DriveMotor");
+        driveMotor.setPath("Swerve/Module" + index + "/DriveMotor");
         angleMotor.setName(modulePos + " angle");
-        angleMotor.setPath("Drive/Module" + index + "/AngleMotor");
+        angleMotor.setPath("Swerve/Module" + index + "/AngleMotor");
 
         driveMotor.setBraking(true);
         driveMotor.setGains(constants.DriveMotorGains);
@@ -67,7 +64,7 @@ public class SwerveModule {
 
         // Tell the encoder what to call itself for alerts and where to log data
         angleEncoder.setName(modulePos + " encoder");
-        angleEncoder.setPath("Drive/Module" + index + "/AngleEncoder");
+        angleEncoder.setPath("Swerve/Module" + index + "/AngleEncoder");
         angleEncoder.setInverted(constants.EncoderInverted);
 
         angleMotor.setBraking(true);
@@ -76,7 +73,7 @@ public class SwerveModule {
         angleMotor.setContinuousWrap(true);
         angleMotor.setInverted(constants.SteerMotorInverted);
         angleMotor.setOffset(Units.rotationsToRadians(
-                constants.EncoderOffset)); // Fix encoder zero position (convert from rotations to radians)
+                -constants.EncoderOffset)); // Fix encoder zero position (convert from rotations to radians)
     }
 
     // Sets whether the drive and angle motors should brake

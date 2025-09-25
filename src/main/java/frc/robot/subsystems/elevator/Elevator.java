@@ -41,10 +41,10 @@ public class Elevator extends SubsystemBase {
         // Whether to flip encoder direction to match the elevator positive direction
         public static final boolean encoderInverted = false;
 
-        public static final double gearRatio = 8.0; // Ratio of motor rotations to elevator rotations (unitless)
-        public static final double encoderRatio =
-                0.5; // Ratio of encoder rotations to elevator rotations (unitless, negative since encoder was inverted
-        // before)
+        public static final double gearRatio = 8.0; // Ratio of motor rotations to drum rotations (unitless)
+        public static final double encoderRatio = 0.5; // Ratio of encoder rotations to drum rotations (unitless)
+
+        public static final double drumRadius = 0.022; // Ratio of meters to drum radians (meters)
 
         public static final LoggedNetworkNumber kP =
                 new LoggedNetworkNumber("Elevator/kP", 20); // (volts per meter) more voltage when farther from target
@@ -78,13 +78,14 @@ public class Elevator extends SubsystemBase {
 
         // Simulation constants
         public static final double carriageMass = 13.0; // (kg) estimated elevator carriage mass for simulation
-        public static final double drumRadius = 0.022; // (meters) radius of the drum that the cable wraps around
         public static final double minHeight = 0; // (meters) soft lower limit
         public static final double maxHeight = 1.2; // (meters) soft upper limit
-        public static final double startHeight = 0.1; // (meters) start height in sim
+        public static final double startHeight = 0; // (meters) start height in sim
 
         public static final double rotorToSensorRatio =
                 gearRatio / encoderRatio; // Ratio of motor rotations to encoder rotations (unitless)
+
+        public static final double sensorToMechanismRatio = encoderRatio / drumRadius; // Encoder radians per meter
 
         public static final LoggedNetworkBoolean manualElevator =
                 new LoggedNetworkBoolean("Elevator/Manual", false); // Toggle to enable manual control mode
@@ -113,15 +114,15 @@ public class Elevator extends SubsystemBase {
     private final LoggedMechanismLigament2d elevator =
             root.append(new LoggedMechanismLigament2d("Elevator", 1.0, 90, 6, new Color8Bit(Color.kBlue)));
 
+    // The fixed base point for the elevator drawing
+    private final LoggedMechanismRoot2d goalRoot = mech.getRoot("ElevatorGoalRoot", 1.1, 0.1);
+
     // Drawing that shows the elevator's target height (meters)
     private final LoggedMechanismLigament2d goalElevator =
-            root.append(new LoggedMechanismLigament2d("GoalElevator", 1.0, 90, 6, new Color8Bit(Color.kYellow)));
+            goalRoot.append(new LoggedMechanismLigament2d("GoalElevator", 1.0, 90, 6, new Color8Bit(Color.kYellow)));
 
     // Base point for the proportional (P) bar visualization
     private final LoggedMechanismRoot2d pRoot = mech.getRoot("PRoot", 2.5, 2);
-
-    // Base point for the integral (I) bar visualization
-    private final LoggedMechanismRoot2d iRoot = mech.getRoot("IRoot", 2.55, 2);
 
     // Base point for the derivative (D) bar visualization
     private final LoggedMechanismRoot2d dRoot = mech.getRoot("DRoot", 2.6, 2);
@@ -132,10 +133,6 @@ public class Elevator extends SubsystemBase {
     // Proportional (P) amount bar
     private final LoggedMechanismLigament2d pAmount =
             pRoot.append(new LoggedMechanismLigament2d("PAmount", 1.0, 90, 6, new Color8Bit(Color.kBlue)));
-
-    // Integral (I) amount bar
-    private final LoggedMechanismLigament2d iAmount =
-            iRoot.append(new LoggedMechanismLigament2d("IAmount", 1.0, 90, 6, new Color8Bit(Color.kPurple)));
 
     // Derivative (D) amount bar
     private final LoggedMechanismLigament2d dAmount =
@@ -172,16 +169,22 @@ public class Elevator extends SubsystemBase {
 
         // Make the motors use elevator gravity compensation (constant help against gravity)
         leftMotor.setFeedforwardType(GravityTypeValue.Elevator_Static);
-        rightMotor.setFeedforwardType(GravityTypeValue.Elevator_Static);
 
         // Make the right motor follow the left motor (they should move together)
-        rightMotor.follow(Constants.leftMotorId, true); // false means same direction
+        rightMotor.follow(
+                Constants.leftMotorId,
+                Constants.leftMotorInverted
+                        ^ Constants
+                                .rightMotorInverted); // take the XOR of the two inverts to calculate relative inversion
 
         leftMotor.setOffset(Constants.offset);
+
+        // Add middle dot to visualization
+        root.append(new LoggedMechanismLigament2d("Middle", 0.0, 0, 10, new Color8Bit(Color.kGreen)));
     }
 
     // Tell the elevator motors how fast to spin (percent [-1 to 1], -1 = full down, 1 = full up)
-    public void setDutyCycle(double value) {
+    public void setSpeed(double value) {
         leftMotor.setDutyCycle(value);
         // Right motor follows automatically, no need to set it separately
     }
@@ -237,21 +240,18 @@ public class Elevator extends SubsystemBase {
             // If the motor is using Motion Magic (PID to a target), show the target and P/I/D/FF bars
             goalElevator.setLineWeight(6);
             pAmount.setLineWeight(6);
-            iAmount.setLineWeight(6);
             dAmount.setLineWeight(6);
             fAmount.setLineWeight(6);
 
             // Set the target height and how big each control term is (scaled down for drawing)
             goalElevator.setLength(leftMotor.getInputs().setpoint + 0.1); // Add 0.1 for visual base
             pAmount.setLength(leftMotor.getInputs().propOutput / 100);
-            iAmount.setLength(leftMotor.getInputs().intOutput / 100);
             dAmount.setLength(leftMotor.getInputs().derivOutput / 100);
             fAmount.setLength(leftMotor.getInputs().feedforward / 100);
         } else {
             // Hide the target and P/I/D/FF bars when not using Motion Magic
             goalElevator.setLineWeight(0);
             pAmount.setLineWeight(0);
-            iAmount.setLineWeight(0);
             dAmount.setLineWeight(0);
             fAmount.setLineWeight(0);
         }
@@ -261,7 +261,6 @@ public class Elevator extends SubsystemBase {
 
         // 4) Read tuning numbers and apply them to the motor controllers (units noted above)
         leftMotor.setkP(Constants.kP.get());
-        leftMotor.setkI(Constants.kI.get());
         leftMotor.setkD(Constants.kD.get());
         leftMotor.setkG(Constants.kG.get());
         leftMotor.setkS(Constants.kS.get());

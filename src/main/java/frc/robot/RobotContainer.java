@@ -1,9 +1,10 @@
 package frc.robot;
 
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandPS5Controller;
+
+import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 import frc.robot.Constants.Mode;
 import frc.robot.commands.ArmCommands;
@@ -18,6 +19,7 @@ import frc.robot.io.GyroIO;
 import frc.robot.io.GyroIOPigeon;
 import frc.robot.io.MotorIO;
 import frc.robot.io.MotorIOTalonFX;
+import frc.robot.network.RobotPublisher;
 import frc.robot.subsystems.arm.Arm;
 import frc.robot.subsystems.arm.ArmSim;
 import frc.robot.subsystems.elevator.Elevator;
@@ -50,8 +52,15 @@ public class RobotContainer {
     // Main drive controller
     private final CommandPS5Controller controller = new CommandPS5Controller(0);
 
-    // Controller for SysId commands
-    private final CommandPS5Controller sysIdController = new CommandPS5Controller(2);
+    // Controller for SysId commands (not working right now)
+    // private final CommandPS5Controller sysIdController = new CommandPS5Controller(2);
+
+    // Virtual controller for sim
+    private final CommandPS5Controller testController = new CommandPS5Controller(3);
+    private LoggedDashboardChooser<String> testControllerChooser;
+
+    // Publishes all robot data to AdvantageScope
+    private RobotPublisher publisher;
 
     public RobotContainer() {
         // Initialize all the IO objects, subsystems, and mechanism simulators
@@ -63,8 +72,16 @@ public class RobotContainer {
         // Add controller bindings
         configureBindings();
 
+        // If in sim configure bindings for test controller
+        if (Constants.currentMode == Mode.SIM) {
+            configureTestBindings();
+        }
+
         // Add SysId bindings
         configureSysId();
+
+        // Initialize the publisher
+        publisher = new RobotPublisher(arm, wrist, intake, elevator, hang, swerve);
     }
 
     private void initSubsystems() {
@@ -232,11 +249,10 @@ public class RobotContainer {
     }
 
     private void configureBindings() {
+        /* ---- Main controller bindings ---- */
+
         // PID-based forward movement (CCW)
-        controller
-                .cross()
-                .and(() -> !Arm.Constants.manualArm.get())
-                .onTrue(armCommands.setGoal(() -> Units.degreesToRadians(60)));
+        controller.cross().and(() -> !Arm.Constants.manualArm.get()).onTrue(armCommands.setGoal(() -> 0.5));
 
         // Manual forward movement (CCW)
         controller
@@ -294,7 +310,7 @@ public class RobotContainer {
         controller
                 .triangle()
                 .and(() -> Wrist.Constants.manualWrist.get())
-                .onTrue(wristCommands.setDutyCycle(() -> 0.2))
+                .onTrue(wristCommands.setSpeed(() -> 0.2))
                 .onFalse(wristCommands.stop());
 
         // PID-based wrist to down position (square button)
@@ -304,7 +320,7 @@ public class RobotContainer {
         controller
                 .square()
                 .and(() -> Wrist.Constants.manualWrist.get())
-                .onTrue(wristCommands.setDutyCycle(() -> -0.2))
+                .onTrue(wristCommands.setSpeed(() -> -0.2))
                 .onFalse(wristCommands.stop());
 
         // PID-based wrist to stow position (R2 button)
@@ -314,7 +330,7 @@ public class RobotContainer {
         controller
                 .R2()
                 .and(() -> Wrist.Constants.manualWrist.get())
-                .onTrue(wristCommands.setDutyCycle(() -> -0.3))
+                .onTrue(wristCommands.setSpeed(() -> -0.3))
                 .onFalse(wristCommands.stop());
 
         // Hang controls (for climbing at end of match)
@@ -335,9 +351,48 @@ public class RobotContainer {
                 () -> -controller.getLeftY(), () -> -controller.getLeftX(), () -> -controller.getRightX(), () -> true));
     }
 
+    // Run selected subsystem at given duty cycle
+    private void runSelectedTest(double dutyCycle) {
+        if (testControllerChooser.get().equals("Arm")) {
+            arm.setSpeed(dutyCycle);
+        } else if (testControllerChooser.get().equals("Elevator")) {
+            elevator.setSpeed(dutyCycle);
+        } else if (testControllerChooser.get().equals("Wrist")) {
+            wrist.setSpeed(dutyCycle);
+        } else if (testControllerChooser.get().equals("Hang")) {
+            hang.setSpeed(dutyCycle);
+        } else if (testControllerChooser.get().equals("Intake")) {
+            intake.setSpeed(dutyCycle);
+        }
+    }
+
+    private void configureTestBindings() {
+        /* ---- Test controller bindings ---- */
+        testControllerChooser = new LoggedDashboardChooser<>("Test/Type");
+        testControllerChooser.addOption("Arm", "Arm");
+        testControllerChooser.addOption("Elevator", "Elevator");
+        testControllerChooser.addOption("Wrist", "Wrist");
+        testControllerChooser.addOption("Hang", "Hang");
+        testControllerChooser.addOption("Intake", "Intake");
+
+        testController
+                .cross()
+                .onTrue(Commands.runOnce(() -> runSelectedTest(0.2)))
+                .onFalse(Commands.runOnce(() -> runSelectedTest(0)));
+
+        testController
+                .circle()
+                .onTrue(Commands.runOnce(() -> runSelectedTest(-0.2)))
+                .onFalse(Commands.runOnce(() -> runSelectedTest(0)));
+    }
+
     private void configureSysId() {}
 
     public Command getAutonomousCommand() {
         return Commands.print("No autonomous command configured");
+    }
+
+    public void periodic() {
+        publisher.publish();
     }
 }
