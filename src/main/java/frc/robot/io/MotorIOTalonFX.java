@@ -1,7 +1,5 @@
 package frc.robot.io;
 
-import edu.wpi.first.math.filter.Debouncer;
-import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 
@@ -48,9 +46,6 @@ public class MotorIOTalonFX extends MotorIO {
     private boolean configChanged = true;
 
     private TalonFXSimState sim;
-
-    // Debouncer for encoder sync fault
-    private Debouncer debounce = new Debouncer(Constants.encoderSyncAlertTime, DebounceType.kBoth);
 
     // Control objects (one per control mode)
     private NeutralOut neutral = new NeutralOut();
@@ -167,11 +162,6 @@ public class MotorIOTalonFX extends MotorIO {
 
         if (connectedEncoder != null) {
             inputs.encoderDiff = inputs.position - connectedEncoder.getInputs().positionRad;
-            // Generally there's a time interval of ~1 tick
-            // between encoder and motor signals, so we multiply
-            // by velocity*20ms
-            inputs.encoderSyncFault = debounce.calculate(Math.abs(inputs.encoderDiff)
-                    > (Math.abs(inputs.velocity) * 0.02 * Constants.encoderSyncAlertMin) + 0.05);
         }
     }
 

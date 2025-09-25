@@ -51,7 +51,6 @@ public class MotorIO {
         public boolean tempFault;
         public boolean forwardLimitFault;
         public boolean reverseLimitFault;
-        public boolean encoderSyncFault;
 
         public double rawRotorPosition;
     }
@@ -66,7 +65,6 @@ public class MotorIO {
     private Alert tempFaultAlert;
     private Alert forwardLimitAlert;
     private Alert reverseLimitAlert;
-    private Alert encoderSyncAlert;
 
     public MotorIO() {
         // Alerts will be created when setName() is called
@@ -82,7 +80,6 @@ public class MotorIO {
         tempFaultAlert = new Alert("The " + name + " motor is overheating!", AlertType.kWarning);
         forwardLimitAlert = new Alert("The " + name + " motor hit its forward limit", AlertType.kWarning);
         reverseLimitAlert = new Alert("The " + name + " motor hit its reverse limit", AlertType.kWarning);
-        encoderSyncAlert = new Alert("The " + name + " is out of sync with its encoder", AlertType.kWarning);
     }
 
     public String getName() {
@@ -115,7 +112,6 @@ public class MotorIO {
             tempFaultAlert.set(inputs.tempFault);
             forwardLimitAlert.set(inputs.forwardLimitFault);
             reverseLimitAlert.set(inputs.reverseLimitFault);
-            encoderSyncAlert.set(inputs.encoderSyncFault);
         }
     }
 

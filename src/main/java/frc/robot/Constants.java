@@ -38,10 +38,4 @@ public final class Constants {
 
     // How long to wait before reporting low battery
     public static final double lowBatteryTime = 0.5;
-
-    // How long to wait before removing the encoder sync alert
-    public static final double encoderSyncAlertTime = 0.5;
-
-    // How far apart the motor and encoder readings have to be to trigger the alert
-    public static final double encoderSyncAlertMin = 2;
 }
