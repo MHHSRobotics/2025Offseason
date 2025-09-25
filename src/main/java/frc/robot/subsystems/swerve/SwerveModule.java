@@ -19,8 +19,6 @@ public class SwerveModule {
 
     private SwerveModuleConstants<TalonFXConfiguration, TalonFXConfiguration, CANcoderConfiguration> constants;
 
-    private int index;
-
     private SwerveModulePosition lastPosition = new SwerveModulePosition();
     private SwerveModulePosition currentPosition = new SwerveModulePosition();
 
@@ -31,7 +29,6 @@ public class SwerveModule {
             int index,
             SwerveModuleConstants<TalonFXConfiguration, TalonFXConfiguration, CANcoderConfiguration> constants) {
         this.constants = constants;
-        this.index = index;
 
         driveMotor = driveMotorIO;
         angleMotor = angleMotorIO;

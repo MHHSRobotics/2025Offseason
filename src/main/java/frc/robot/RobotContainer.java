@@ -52,8 +52,8 @@ public class RobotContainer {
     // Main drive controller
     private final CommandPS5Controller controller = new CommandPS5Controller(0);
 
-    // Controller for SysId commands
-    private final CommandPS5Controller sysIdController = new CommandPS5Controller(2);
+    // Controller for SysId commands (not working right now)
+    // private final CommandPS5Controller sysIdController = new CommandPS5Controller(2);
 
     // Virtual controller for sim
     private final CommandPS5Controller testController = new CommandPS5Controller(3);
@@ -252,14 +252,14 @@ public class RobotContainer {
         /* ---- Main controller bindings ---- */
 
         // PID-based forward movement (CCW)
-        controller.cross().and(() -> !Arm.Constants.manualArm.get()).onTrue(elevatorCommands.setGoal(() -> 0.5));
+        controller.cross().and(() -> !Arm.Constants.manualArm.get()).onTrue(armCommands.setGoal(() -> 0.5));
 
         // Manual forward movement (CCW)
         controller
                 .cross()
                 .and(() -> Arm.Constants.manualArm.get())
-                .onTrue(elevatorCommands.setSpeed(() -> 0.2))
-                .onFalse(elevatorCommands.stop());
+                .onTrue(armCommands.setSpeed(() -> 0.2))
+                .onFalse(armCommands.stop());
 
         // PID-based backward movement (CW)
         controller.circle().and(() -> !Arm.Constants.manualArm.get()).onTrue(armCommands.setGoal(() -> 2));
