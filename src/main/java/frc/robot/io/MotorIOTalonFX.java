@@ -50,7 +50,7 @@ public class MotorIOTalonFX extends MotorIO {
     private TalonFXSimState sim;
 
     // Debouncer for encoder sync fault
-    private Debouncer debounce = new Debouncer(0.5, DebounceType.kFalling);
+    private Debouncer debounce = new Debouncer(Constants.encoderSyncAlertTime, DebounceType.kFalling);
 
     // Control objects (one per control mode)
     private NeutralOut neutral = new NeutralOut();
@@ -167,7 +167,7 @@ public class MotorIOTalonFX extends MotorIO {
 
         if (connectedEncoder != null) {
             inputs.encoderDiff = inputs.position - connectedEncoder.getInputs().positionRad;
-            inputs.encoderSyncFault = debounce.calculate(Math.abs(inputs.encoderDiff) > 0.1);
+            inputs.encoderSyncFault = debounce.calculate(Math.abs(inputs.encoderDiff) > Constants.encoderSyncAlertMin);
         }
     }
 
