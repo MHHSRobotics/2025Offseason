@@ -80,7 +80,7 @@ public class Elevator extends SubsystemBase {
         public static final double carriageMass = 13.0; // (kg) estimated elevator carriage mass for simulation
         public static final double minHeight = 0; // (meters) soft lower limit
         public static final double maxHeight = 1.2; // (meters) soft upper limit
-        public static final double startHeight = 0.1; // (meters) start height in sim
+        public static final double startHeight = 0; // (meters) start height in sim
 
         public static final double rotorToSensorRatio =
                 gearRatio / encoderRatio; // Ratio of motor rotations to encoder rotations (unitless)
