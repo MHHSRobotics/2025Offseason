@@ -55,9 +55,9 @@ public class SwerveModule {
 
         // Tell the motors what to call themselves for alerts and where to log data
         driveMotor.setName(modulePos + " drive");
-        driveMotor.setPath("Drive/Module" + index + "/DriveMotor");
+        driveMotor.setPath("Swerve/Module" + index + "/DriveMotor");
         angleMotor.setName(modulePos + " angle");
-        angleMotor.setPath("Drive/Module" + index + "/AngleMotor");
+        angleMotor.setPath("Swerve/Module" + index + "/AngleMotor");
 
         driveMotor.setBraking(true);
         driveMotor.setGains(constants.DriveMotorGains);
@@ -67,7 +67,7 @@ public class SwerveModule {
 
         // Tell the encoder what to call itself for alerts and where to log data
         angleEncoder.setName(modulePos + " encoder");
-        angleEncoder.setPath("Drive/Module" + index + "/AngleEncoder");
+        angleEncoder.setPath("Swerve/Module" + index + "/AngleEncoder");
         angleEncoder.setInverted(constants.EncoderInverted);
 
         angleMotor.setBraking(true);
