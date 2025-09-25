@@ -167,7 +167,7 @@ public class MotorIOTalonFX extends MotorIO {
 
         if (connectedEncoder != null) {
             inputs.encoderDiff = inputs.position - connectedEncoder.getInputs().positionRad;
-            inputs.encoderSyncFault = debounce.calculate(Math.abs(inputs.encoderDiff) > Constants.encoderSyncAlertMin);
+            inputs.encoderSyncFault = debounce.calculate(Math.abs(inputs.encoderDiff) > inputs.velocity*0.02*Constants.encoderSyncAlertMin); // Generally there's a time interval of ~1 tick between encoder and motor signals, so we multiply by velocity*20ms
         }
     }
 

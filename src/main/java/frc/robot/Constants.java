@@ -43,5 +43,5 @@ public final class Constants {
     public static final double encoderSyncAlertTime = 0.5;
 
     // How far apart the motor and encoder readings have to be to trigger the alert
-    public static final double encoderSyncAlertMin = 0.05;
+    public static final double encoderSyncAlertMin = 2;
 }
