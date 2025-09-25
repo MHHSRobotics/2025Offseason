@@ -1,5 +1,7 @@
 package frc.robot.io;
 
+import edu.wpi.first.math.filter.Debouncer;
+import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 
@@ -46,6 +48,9 @@ public class MotorIOTalonFX extends MotorIO {
     private boolean configChanged = true;
 
     private TalonFXSimState sim;
+
+    // Debouncer for encoder sync fault
+    private Debouncer debounce = new Debouncer(0.5, DebounceType.kFalling);
 
     // Control objects (one per control mode)
     private NeutralOut neutral = new NeutralOut();
@@ -159,6 +164,11 @@ public class MotorIOTalonFX extends MotorIO {
                         / (config.Feedback.RotorToSensorRatio * config.Feedback.SensorToMechanismRatio));
         // Update alerts using the base class method (this checks all fault conditions and updates dashboard alerts)
         super.update();
+
+        if (connectedEncoder != null) {
+            inputs.encoderDiff = inputs.position - connectedEncoder.getInputs().positionRad;
+            inputs.encoderSyncFault = debounce.calculate(Math.abs(inputs.encoderDiff) > 0.1);
+        }
     }
 
     // Tell the motor how fast to spin (percent, -1 = full reverse, 1 = full forward)
@@ -382,14 +392,17 @@ public class MotorIOTalonFX extends MotorIO {
 
     // Tell the motor to use a remote encoder with gear ratios:
     // - motorToSensorRatio: motor rotations to sensor rotations (unitless)
-    // - fuse: Whether to use the internal rotor along with the CANcoder. Always set to true, unless there are issues with the reported position teleporting even after accounting for gear ratio and inversion, in which case it should be false
+    // - fuse: Whether to use the internal rotor along with the CANcoder. Always set to true, unless there are issues
+    // with the reported position teleporting even after accounting for gear ratio and inversion, in which case it
+    // should be false
     // Only use ONE of connectEncoder OR setGearRatio for a motor, not both.
     // Currently only supports CANcoders.
     @Override
-    public void connectEncoder(EncoderIO encoder, double motorToSensorRatio,boolean fuse) {
+    public void connectEncoder(EncoderIO encoder, double motorToSensorRatio, boolean fuse) {
         if (encoder instanceof EncoderIOCANcoder cancoder) {
             config.Feedback.FeedbackRemoteSensorID = cancoder.getId();
-            config.Feedback.FeedbackSensorSource = fuse?FeedbackSensorSourceValue.FusedCANcoder:FeedbackSensorSourceValue.RemoteCANcoder;
+            config.Feedback.FeedbackSensorSource =
+                    fuse ? FeedbackSensorSourceValue.FusedCANcoder : FeedbackSensorSourceValue.RemoteCANcoder;
             config.Feedback.RotorToSensorRatio = motorToSensorRatio;
             config.Feedback.SensorToMechanismRatio = cancoder.getRatio();
             connectedEncoder = cancoder;

@@ -1,6 +1,5 @@
 package frc.robot;
 
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandPS5Controller;
@@ -74,7 +73,7 @@ public class RobotContainer {
         configureBindings();
 
         // If in sim configure bindings for test controller
-        if(Constants.currentMode==Mode.SIM){
+        if (Constants.currentMode == Mode.SIM) {
             configureTestBindings();
         }
 
@@ -350,12 +349,10 @@ public class RobotContainer {
 
         swerve.setDefaultCommand(swerveCommands.drive(
                 () -> -controller.getLeftY(), () -> -controller.getLeftX(), () -> -controller.getRightX(), () -> true));
-
-        
     }
 
     // Run selected subsystem at given duty cycle
-    private void runSelectedTest(double dutyCycle){
+    private void runSelectedTest(double dutyCycle) {
         if (testControllerChooser.get().equals("Arm")) {
             arm.setSpeed(dutyCycle);
         } else if (testControllerChooser.get().equals("Elevator")) {
@@ -368,7 +365,8 @@ public class RobotContainer {
             intake.setSpeed(dutyCycle);
         }
     }
-    private void configureTestBindings(){
+
+    private void configureTestBindings() {
         /* ---- Test controller bindings ---- */
         testControllerChooser = new LoggedDashboardChooser<>("Test/Type");
         testControllerChooser.addOption("Arm", "Arm");
