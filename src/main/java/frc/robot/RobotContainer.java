@@ -264,6 +264,9 @@ public class RobotContainer {
         // PID-based backward movement (CW)
         controller.circle().and(() -> !Arm.Constants.manualArm.get()).onTrue(armCommands.setGoal(() -> 2));
 
+        // PID-based backward movement (CW)
+        controller.create().and(() -> !Arm.Constants.manualArm.get()).onTrue(armCommands.setGoal(() -> Math.PI / 2));
+
         // Manual backward movement (CW)
         controller
                 .circle()
@@ -294,13 +297,6 @@ public class RobotContainer {
 
         // PID-based elevator to top position (R1 button)
         controller.R1().and(() -> !Elevator.Constants.manualElevator.get()).onTrue(elevatorCommands.goToTop());
-
-        // Manual elevator up faster (R1 button in manual mode)
-        controller
-                .R1()
-                .and(() -> Elevator.Constants.manualElevator.get())
-                .onTrue(elevatorCommands.setSpeed(() -> 0.5))
-                .onFalse(elevatorCommands.stop());
 
         // Wrist controls
         // PID-based wrist to straight position (triangle button)
@@ -342,10 +338,12 @@ public class RobotContainer {
 
         // Hang controls (for climbing at end of match)
         // Hang extend up at full speed (left stick up)
-        controller.L1().onTrue(intakeCommands.intakeFull()).onFalse(intakeCommands.stop());
+        controller.options().onTrue(intakeCommands.intakeFull()).onFalse(intakeCommands.stop());
 
         // Hang retract down at full speed (left stick down)
-        controller.R1().onTrue(intakeCommands.outtakeFull()).onFalse(intakeCommands.stop());
+        controller.R3().onTrue(intakeCommands.outtakeFull()).onFalse(intakeCommands.stop());
+
+        controller.R2().onTrue(swerveCommands.resetGyro());
 
         swerve.setDefaultCommand(swerveCommands.drive(
                 () -> -controller.getLeftY(), () -> -controller.getLeftX(), () -> -controller.getRightX(), () -> true));

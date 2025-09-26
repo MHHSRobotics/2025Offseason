@@ -39,7 +39,7 @@ public class WristCommands {
 
     // Tell the wrist to go to the straight forward position (0 radians = 0°)
     public Command goToStraight() {
-        return setGoal(() -> 0.0).withName("wrist go to straight");
+        return setGoal(() -> Units.degreesToRadians(-25)).withName("wrist go to straight");
     }
 
     // Tell the wrist to go to the up position (90° = π/2 radians)

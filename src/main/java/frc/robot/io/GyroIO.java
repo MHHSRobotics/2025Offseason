@@ -76,6 +76,10 @@ public class GyroIO {
         }
     }
 
+    public void setYaw(double yaw) {
+        unsupportedFeature();
+    }
+
     public void setMechYaw(double yaw) {
         unsupportedFeature();
     }

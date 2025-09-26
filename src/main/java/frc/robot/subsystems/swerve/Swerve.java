@@ -97,6 +97,10 @@ public class Swerve extends SubsystemBase {
         initializeMechs();
     }
 
+    public void resetGyro() {
+        gyro.setYaw(0);
+    }
+
     // Find out where the modules are mounted on the robot relative to the center (meters)
     public static Translation2d[] getModuleTranslations() {
         return new Translation2d[] {
