@@ -42,6 +42,11 @@ public class GyroIOPigeon extends GyroIO {
     }
 
     @Override
+    public void setYaw(double yaw) {
+        gyro.setYaw(yaw);
+    }
+
+    @Override
     public void setMechYaw(double yaw) {
         sim.setRawYaw(Units.radiansToDegrees(yaw));
     }

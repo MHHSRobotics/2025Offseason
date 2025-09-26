@@ -27,6 +27,10 @@ public class SwerveCommands {
         return new InstantCommand(() -> swerve.lock(), swerve).withName("swerve lock");
     }
 
+    public Command resetGyro() {
+        return new InstantCommand(() -> swerve.resetGyro());
+    }
+
     // Drives using the given dx, dy, omega, and field relative inputs. Applies a deadband and scales the values.
     public Command drive(DoubleSupplier dx, DoubleSupplier dy, DoubleSupplier omega, BooleanSupplier fieldRelative) {
         return Commands.run(

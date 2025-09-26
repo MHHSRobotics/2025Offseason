@@ -39,12 +39,12 @@ public class ElevatorCommands {
 
     // Tell the elevator to go to the bottom position (0 meters)
     public Command goToBottom() {
-        return setGoal(() -> 0.0).withName("elevator go to bottom");
+        return setGoal(() -> 0.1).withName("elevator go to bottom");
     }
 
     // Tell the elevator to go to the top position (1.2 meters)
     public Command goToTop() {
-        return setGoal(() -> 1.2).withName("elevator go to top");
+        return setGoal(() -> 1.1).withName("elevator go to top");
     }
 
     // Tell the elevator to go to the middle position (0.6 meters)

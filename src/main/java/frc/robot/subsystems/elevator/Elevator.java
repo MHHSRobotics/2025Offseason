@@ -14,7 +14,6 @@ import org.littletonrobotics.junction.mechanism.LoggedMechanismRoot2d;
 import org.littletonrobotics.junction.networktables.LoggedNetworkBoolean;
 import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
 
-import frc.robot.Robot;
 import frc.robot.io.EncoderIO;
 import frc.robot.io.MotorIO;
 
@@ -30,7 +29,7 @@ public class Elevator extends SubsystemBase {
         public static final int rightMotorId = 21;
 
         // Height offset (meters) to line up the absolute encoder zero with the real elevator zero
-        public static final double offset = 0.14;
+        public static final double offset = 0;
 
         // Whether to flip motor directions (true means reverse forward/backward)
         public static final boolean leftMotorInverted = false;
@@ -39,7 +38,7 @@ public class Elevator extends SubsystemBase {
         // CAN device ID for the absolute encoder
         public static final int encoderId = 27;
         // Whether to flip encoder direction to match the elevator positive direction
-        public static final boolean encoderInverted = false;
+        public static final boolean encoderInverted = true;
 
         public static final double gearRatio = 8.0; // Ratio of motor rotations to drum rotations (unitless)
         public static final double encoderRatio = 0.5; // Ratio of encoder rotations to drum rotations (unitless)
@@ -47,24 +46,23 @@ public class Elevator extends SubsystemBase {
         public static final double drumRadius = 0.022; // Ratio of meters to drum radians (meters)
 
         public static final LoggedNetworkNumber kP =
-                new LoggedNetworkNumber("Elevator/kP", 20); // (volts per meter) more voltage when farther from target
+                new LoggedNetworkNumber("Elevator/kP", 80); // (volts per meter) more voltage when farther from target
         public static final LoggedNetworkNumber kI = new LoggedNetworkNumber(
                 "Elevator/kI", 0); // (volts per meter-second) helps eliminate steady-state error
         public static final LoggedNetworkNumber kD =
-                new LoggedNetworkNumber("Elevator/kD", 0.5); // (volts per m/s) reacts to how fast error is changing
+                new LoggedNetworkNumber("Elevator/kD", 20); // (volts per m/s) reacts to how fast error is changing
 
         public static final LoggedNetworkNumber kS = new LoggedNetworkNumber(
-                "Elevator/kS",
-                Robot.isSimulation() ? 0.0 : 0.12); // (volts) voltage to get elevator moving (overcome static friction)
+                "Elevator/kS", 3); // (volts) voltage to get elevator moving (overcome static friction)
         public static final LoggedNetworkNumber kG = new LoggedNetworkNumber(
-                "Elevator/kG", 0.36); // (volts) voltage to hold the elevator up (compensate gravity)
+                "Elevator/kG", 13); // (volts) voltage to hold the elevator up (compensate gravity)
         public static final LoggedNetworkNumber kV = new LoggedNetworkNumber(
-                "Elevator/kV", 0.88); // (volts per m/s) voltage that scales with speed to overcome friction
-        public static final LoggedNetworkNumber kA = new LoggedNetworkNumber(
-                "Elevator/kA", 0.02); // (volts per m/s^2) extra voltage to help with acceleration
+                "Elevator/kV", 0); // (volts per m/s) voltage that scales with speed to overcome friction
+        public static final LoggedNetworkNumber kA =
+                new LoggedNetworkNumber("Elevator/kA", 0); // (volts per m/s^2) extra voltage to help with acceleration
 
         public static final LoggedNetworkNumber maxVelocity = new LoggedNetworkNumber(
-                "Elevator/maxVelocity", 2.5); // (m/s) Motion Magic max speed for moving to a target
+                "Elevator/maxVelocity", 3.5); // (m/s) Motion Magic max speed for moving to a target
         public static final LoggedNetworkNumber maxAccel = new LoggedNetworkNumber(
                 "Elevator/maxAccel", 8); // (m/s^2) Motion Magic max acceleration for moving to a target
 
@@ -149,7 +147,7 @@ public class Elevator extends SubsystemBase {
         encoder.setPath("Elevator/Encoder");
         // Tell the encoder which direction is positive and the gear ratio to the elevator
         encoder.setInverted(Constants.encoderInverted);
-        encoder.setGearRatio(Constants.encoderRatio);
+        encoder.setGearRatio(Constants.sensorToMechanismRatio);
 
         leftMotor = leftMotorIO;
         rightMotor = rightMotorIO;
