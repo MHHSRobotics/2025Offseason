@@ -55,7 +55,7 @@ public class MotorIO {
         public double rawRotorPosition;
     }
 
-    private String logPath = "";
+    private String logPath;
 
     private String name;
 
@@ -66,53 +66,36 @@ public class MotorIO {
     private Alert forwardLimitAlert;
     private Alert reverseLimitAlert;
 
-    public MotorIO() {
-        // Alerts will be created when setName() is called
-    }
-
-    // Tell the MotorIO what to call this motor for alerts (like "arm" or "FL drive")
-    public void setName(String name) {
+    public MotorIO(String name, String logPath) {
         this.name = name;
+        this.logPath = logPath;
+
         // Create alerts with descriptive names for this motor
-        disconnectAlert = new Alert("The " + name + " motor is disconnected", AlertType.kError);
-        hardwareFaultAlert =
-                new Alert("The " + name + " motor encountered an internal hardware fault", AlertType.kError);
-        tempFaultAlert = new Alert("The " + name + " motor is overheating!", AlertType.kWarning);
-        forwardLimitAlert = new Alert("The " + name + " motor hit its forward limit", AlertType.kWarning);
-        reverseLimitAlert = new Alert("The " + name + " motor hit its reverse limit", AlertType.kWarning);
+        disconnectAlert = new Alert("The " + name + " is disconnected", AlertType.kError);
+        hardwareFaultAlert = new Alert("The " + name + " encountered an internal hardware fault", AlertType.kError);
+        tempFaultAlert = new Alert("The " + name + " is overheating!", AlertType.kWarning);
+        forwardLimitAlert = new Alert("The " + name + " hit its forward limit", AlertType.kWarning);
+        reverseLimitAlert = new Alert("The " + name + " hit its reverse limit", AlertType.kWarning);
     }
 
     public String getName() {
-        return name == null ? "motor" : name;
-    }
-
-    // Tell the MotorIO where to log its data (like "Arm/Motor" or "Drive/Module0/DriveMotor")
-    public void setPath(String path) {
-        this.logPath = path;
+        return name;
     }
 
     protected MotorIOInputsAutoLogged inputs = new MotorIOInputsAutoLogged();
 
     // Find out the latest values from the motor and store them in inputs
     public void update() {
-        // Report warning for unnamed motors
-        if (name == null) {
-            Alerts.create("Motor is unnamed; errors will not be reported!", AlertType.kWarning);
-        }
-        // Log the inputs to AdvantageKit if a path has been set
-        if (!logPath.isEmpty()) {
-            Logger.processInputs(logPath, inputs);
-        }
+        // Log the inputs to AdvantageKit
+        Logger.processInputs(logPath, inputs);
 
         // Update alerts based on the current motor status (this runs after subclass updates inputs)
         // Only update alerts if they've been created (setName() was called)
-        if (disconnectAlert != null) {
-            disconnectAlert.set(!inputs.connected);
-            hardwareFaultAlert.set(inputs.hardwareFault);
-            tempFaultAlert.set(inputs.tempFault);
-            forwardLimitAlert.set(inputs.forwardLimitFault);
-            reverseLimitAlert.set(inputs.reverseLimitFault);
-        }
+        disconnectAlert.set(!inputs.connected);
+        hardwareFaultAlert.set(inputs.hardwareFault);
+        tempFaultAlert.set(inputs.tempFault);
+        forwardLimitAlert.set(inputs.forwardLimitFault);
+        reverseLimitAlert.set(inputs.reverseLimitFault);
     }
 
     private void unsupportedFeature() {
@@ -122,7 +105,7 @@ public class MotorIO {
     }
 
     // Find out the current inputs snapshot (read-only)
-    public MotorIOInputsAutoLogged getInputs() {
+    public MotorIOInputs getInputs() {
         return inputs;
     }
 

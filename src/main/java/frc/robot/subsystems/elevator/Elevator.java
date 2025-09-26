@@ -142,21 +142,12 @@ public class Elevator extends SubsystemBase {
 
     public Elevator(MotorIO leftMotorIO, MotorIO rightMotorIO, EncoderIO encoderIO) {
         encoder = encoderIO;
-        // Tell the encoder what to call itself for alerts and where to log data
-        encoder.setName("elevator encoder");
-        encoder.setPath("Elevator/Encoder");
         // Tell the encoder which direction is positive and the gear ratio to the elevator
         encoder.setInverted(Constants.encoderInverted);
         encoder.setGearRatio(Constants.sensorToMechanismRatio);
 
         leftMotor = leftMotorIO;
         rightMotor = rightMotorIO;
-
-        // Tell the motors what to call themselves for alerts and where to log data
-        leftMotor.setName("elevator left");
-        leftMotor.setPath("Elevator/LeftMotor");
-        rightMotor.setName("elevator right");
-        rightMotor.setPath("Elevator/RightMotor");
 
         // Tell the motors which direction is forward (true = invert)
         leftMotor.setInverted(Constants.leftMotorInverted);

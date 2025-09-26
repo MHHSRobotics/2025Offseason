@@ -13,7 +13,8 @@ public class GyroIOPigeon extends GyroIO {
 
     private boolean disconnected = false;
 
-    public GyroIOPigeon(int id, CANBus canBus) {
+    public GyroIOPigeon(int id, CANBus canBus, String name, String logPath) {
+        super(name, logPath);
         gyro = new Pigeon2(id, canBus);
         gyro.getConfigurator().apply(new Pigeon2Configuration());
         gyro.getConfigurator().setYaw(0);
@@ -21,12 +22,12 @@ public class GyroIOPigeon extends GyroIO {
         sim = gyro.getSimState();
     }
 
-    public GyroIOPigeon(int id, String canBus) {
-        this(id, new CANBus(canBus));
+    public GyroIOPigeon(int id, String canBus, String name, String logPath) {
+        this(id, new CANBus(canBus), name, logPath);
     }
 
-    public GyroIOPigeon(int id) {
-        this(id, new CANBus());
+    public GyroIOPigeon(int id, String name, String logPath) {
+        this(id, new CANBus(), name, logPath);
     }
 
     @Override

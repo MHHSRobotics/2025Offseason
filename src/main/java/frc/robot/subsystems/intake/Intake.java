@@ -34,10 +34,6 @@ public class Intake extends SubsystemBase {
     public Intake(MotorIO motorIO) {
         motor = motorIO;
 
-        // Tell the motor what to call itself for alerts and where to log data
-        motor.setName("intake");
-        motor.setPath("Intake/Motor");
-
         // Tell the motor which direction is forward (true = invert)
         motor.setInverted(Constants.motorInverted);
 

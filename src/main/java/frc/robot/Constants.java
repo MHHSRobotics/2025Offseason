@@ -1,5 +1,7 @@
 package frc.robot;
 
+import edu.wpi.first.apriltag.AprilTagFieldLayout;
+import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.wpilibj.RobotBase;
 
 import com.ctre.phoenix6.CANBus;
@@ -38,4 +40,7 @@ public final class Constants {
 
     // How long to wait before reporting low battery
     public static final double lowBatteryTime = 0.5;
+
+    // Get the april tag field layout for the current season
+    public static final AprilTagFieldLayout layout = AprilTagFieldLayout.loadField(AprilTagFields.kDefaultField);
 }

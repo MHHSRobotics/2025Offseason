@@ -1,5 +1,8 @@
 package frc.robot.subsystems.swerve;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -24,6 +27,8 @@ import org.littletonrobotics.junction.mechanism.LoggedMechanismLigament2d;
 import org.littletonrobotics.junction.mechanism.LoggedMechanismRoot2d;
 import org.littletonrobotics.junction.networktables.LoggedNetworkBoolean;
 
+import frc.robot.io.CameraIO;
+import frc.robot.io.CameraIO.CameraIOInputs;
 import frc.robot.io.GyroIO;
 import frc.robot.util.Field;
 import frc.robot.util.RobotUtils;
@@ -71,8 +76,10 @@ public class Swerve extends SubsystemBase {
     // Math helper that converts chassis speeds (vx, vy, omega) into wheel angles and speeds
     private SwerveDriveKinematics kinematics = new SwerveDriveKinematics(getModuleTranslations());
 
-    // Make the best guess of the robot's field position using wheel odometry and gyro (and vision if added later)
+    // Make the best guess of the robot's field position using wheel odometry, gyro, and vision
     private SwerveDrivePoseEstimator estimator;
+
+    private List<CameraIO> cameras = new ArrayList<>();
 
     // On-screen drawing of the drive to show module directions and speeds
     private final LoggedMechanism2d mech = new LoggedMechanism2d(3, 3);
@@ -86,10 +93,6 @@ public class Swerve extends SubsystemBase {
     public Swerve(GyroIO gyro, SwerveModule fl, SwerveModule fr, SwerveModule bl, SwerveModule br) {
         this.gyro = gyro;
         this.modules = new SwerveModule[] {fl, fr, bl, br};
-
-        // Tell the gyro what to call itself for alerts and where to log data
-        gyro.setName("gyro");
-        gyro.setPath("Swerve/Gyro");
 
         estimator = new SwerveDrivePoseEstimator(
                 kinematics, gyroAngle, getModulePositions(), new Pose2d(2.5, Field.fieldWidth / 2, new Rotation2d()));
@@ -262,6 +265,10 @@ public class Swerve extends SubsystemBase {
         estimator.addVisionMeasurement(visionRobotPoseMeters, timestampSeconds, visionMeasurementStdDevs);
     }
 
+    public void addCameraSource(CameraIO camera) {
+        cameras.add(camera);
+    }
+
     @Override
     public void periodic() {
         // This runs every robot loop (~50 times per second)
@@ -270,6 +277,19 @@ public class Swerve extends SubsystemBase {
             module.setLocked(Constants.swerveLocked.get());
             module.setDisabled(Constants.swerveDisabled.get());
             module.periodic();
+        }
+
+        for (CameraIO cam : cameras) {
+            CameraIOInputs inputs = cam.getInputs();
+            for (int i = 0; i < inputs.measurements; i++) {
+                addVisionMeasurement(
+                        new Pose2d(
+                                inputs.poseXMeters[i],
+                                inputs.poseYMeters[i],
+                                new Rotation2d(inputs.poseRotationRad[i])),
+                        inputs.poseTimestamps[i],
+                        null);
+            }
         }
 
         // 2) Update the gyro inputs (logging and alerts happen automatically)

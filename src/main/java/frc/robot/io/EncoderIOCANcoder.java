@@ -58,19 +58,20 @@ public class EncoderIOCANcoder extends EncoderIO {
     private int id;
     private CANBus canBus;
 
-    public EncoderIOCANcoder(int id, CANBus canBus) {
+    public EncoderIOCANcoder(int id, CANBus canBus, String name, String logPath) {
+        super(name, logPath);
         encoder = new CANcoder(id, canBus);
         sim = encoder.getSimState();
         this.id = id;
         this.canBus = canBus;
     }
 
-    public EncoderIOCANcoder(int id, String canBus) {
-        this(id, new CANBus(canBus));
+    public EncoderIOCANcoder(int id, String canBus, String name, String logPath) {
+        this(id, new CANBus(canBus), name, logPath);
     }
 
-    public EncoderIOCANcoder(int id) {
-        this(id, new CANBus());
+    public EncoderIOCANcoder(int id, String name, String logPath) {
+        this(id, new CANBus(), name, logPath);
     }
 
     public int getId() {
