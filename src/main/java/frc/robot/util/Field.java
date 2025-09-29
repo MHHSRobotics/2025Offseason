@@ -1,5 +1,8 @@
 package frc.robot.util;
 
+import edu.wpi.first.apriltag.AprilTagFieldLayout;
+import edu.wpi.first.apriltag.AprilTagFields;
+
 public class Field {
     // Field dimensions
     public static final double fieldLength = 17.55;
@@ -12,4 +15,7 @@ public class Field {
     }
 
     public static final FieldSymmetry symm = FieldSymmetry.C2;
+
+    // Get the april tag field layout for the current season
+    public static final AprilTagFieldLayout layout = AprilTagFieldLayout.loadField(AprilTagFields.kDefaultField);
 }

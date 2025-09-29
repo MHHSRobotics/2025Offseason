@@ -1,5 +1,6 @@
 package frc.robot.io;
 
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 
@@ -9,19 +10,19 @@ import org.littletonrobotics.junction.Logger;
 import frc.robot.Constants;
 import frc.robot.Constants.Mode;
 import frc.robot.util.Alerts;
+import org.photonvision.simulation.VisionSystemSim;
 
 public class CameraIO {
     @AutoLog
     public static class CameraIOInputs {
         public boolean connected;
 
-        // Camera pose data as separate arrays (AutoLog doesn't support complex types like List<Pair<Pose2d, Double>>)
-        public double[] poseXMeters = new double[64]; // X position of each pose (meters)
-        public double[] poseYMeters = new double[64]; // Y position of each pose (meters)
-        public double[] poseRotationRad = new double[64]; // Rotation of each pose (radians)
-        public double[] poseTimestamps = new double[64]; // Timestamp of each pose (seconds)
-
-        public int measurements;
+        // Camera pose data as separate arrays
+        public Pose3d[] poses = new Pose3d[Constants.maxMeasurements];
+        public double[] poseTimestamps = new double[Constants.maxMeasurements]; // Timestamp of each pose (seconds)
+        public double[] ambiguities = new double[Constants.maxMeasurements]; // Pose ambiguity for each measurement
+        public int[] tagCounts = new int[Constants.maxMeasurements]; // Number of tags in each measurement
+        public int measurements; // Number of pose measurements
     }
 
     private String name;
@@ -62,6 +63,10 @@ public class CameraIO {
     }
 
     public void clearMeasurements() {
+        unsupportedFeature();
+    }
+
+    public void startSim(VisionSystemSim sim) {
         unsupportedFeature();
     }
 }
