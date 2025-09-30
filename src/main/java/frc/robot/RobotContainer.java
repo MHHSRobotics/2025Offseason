@@ -310,8 +310,10 @@ public class RobotContainer {
             case REAL:
             case SIM:
                 testCam = new CameraIOPhotonCamera("test camera", "Vision/TestCamera", new Transform3d());
+                break;
             default:
                 testCam = new CameraIO("test camera", "Vision/TestCamera");
+                break;
         }
         swerve.addCameraSource(testCam);
 
