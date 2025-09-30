@@ -158,12 +158,12 @@ public class MotorIOTalonFX extends MotorIO {
         inputs.rawRotorPosition =
                 Units.rotationsToRadians(motor.getRotorPosition().getValueAsDouble()
                         / (config.Feedback.RotorToSensorRatio * config.Feedback.SensorToMechanismRatio));
-        // Update alerts using the base class method (this checks all fault conditions and updates dashboard alerts)
-        super.update();
 
         if (connectedEncoder != null) {
             inputs.encoderDiff = inputs.position - connectedEncoder.getInputs().positionRad;
         }
+        // Update alerts using the base class method (this checks all fault conditions and updates dashboard alerts)
+        super.update();
     }
 
     // Tell the motor how fast to spin (percent, -1 = full reverse, 1 = full forward)

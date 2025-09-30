@@ -30,6 +30,7 @@ public class CameraIOPhotonCamera extends CameraIO {
     @Override
     public void update() {
         inputs.connected = cam.isConnected();
+        inputs.measurements = 0;
 
         var unreadResults = cam.getAllUnreadResults();
         for (PhotonPipelineResult res : unreadResults) {
@@ -65,11 +66,8 @@ public class CameraIOPhotonCamera extends CameraIO {
                 }
             }
         }
-    }
 
-    @Override
-    public void clearMeasurements() {
-        inputs.measurements = 0;
+        super.update();
     }
 
     @Override

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import edu.wpi.first.math.Matrix;
+import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -296,7 +297,7 @@ public class Swerve extends SubsystemBase {
             thetaStdDev /= Math.sqrt(tagCount);
         }
 
-        return edu.wpi.first.math.VecBuilder.fill(xyStdDev, xyStdDev, thetaStdDev);
+        return VecBuilder.fill(xyStdDev, xyStdDev, thetaStdDev);
     }
 
     public void addCameraSource(CameraIO camera) {
@@ -325,7 +326,6 @@ public class Swerve extends SubsystemBase {
                         calculateVisionStdDevs(inputs.poses[i].toPose2d(), inputs.ambiguities[i], inputs.tagCounts[i]);
                 addVisionMeasurement(inputs.poses[i].toPose2d(), inputs.poseTimestamps[i], stdDevs);
             }
-            cam.clearMeasurements();
         }
 
         // 2) Update the gyro inputs (logging and alerts happen automatically)

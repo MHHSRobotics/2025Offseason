@@ -1,5 +1,6 @@
 package frc.robot;
 
+import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandPS5Controller;
@@ -13,6 +14,8 @@ import frc.robot.commands.HangCommands;
 import frc.robot.commands.IntakeCommands;
 import frc.robot.commands.SwerveCommands;
 import frc.robot.commands.WristCommands;
+import frc.robot.io.CameraIO;
+import frc.robot.io.CameraIOPhotonCamera;
 import frc.robot.io.EncoderIO;
 import frc.robot.io.EncoderIOCANcoder;
 import frc.robot.io.GyroIO;
@@ -31,6 +34,7 @@ import frc.robot.subsystems.swerve.Swerve;
 import frc.robot.subsystems.swerve.SwerveModule;
 import frc.robot.subsystems.swerve.SwerveModuleSim;
 import frc.robot.subsystems.swerve.TunerConstants;
+import frc.robot.subsystems.swerve.VisionSim;
 import frc.robot.subsystems.wrist.Wrist;
 import frc.robot.subsystems.wrist.WristSim;
 
@@ -299,6 +303,20 @@ public class RobotContainer {
             new SwerveModuleSim(brDriveMotor, brAngleMotor, brEncoder, TunerConstants.BackRight);
 
             new GyroSim(gyro);
+        }
+
+        CameraIO testCam;
+        switch (Constants.currentMode) {
+            case REAL:
+            case SIM:
+                testCam = new CameraIOPhotonCamera("test camera", "Vision/TestCamera", new Transform3d());
+            default:
+                testCam = new CameraIO("test camera", "Vision/TestCamera");
+        }
+        swerve.addCameraSource(testCam);
+
+        if (Constants.currentMode == Mode.SIM) {
+            new VisionSim(swerve.getCameras(), swerve);
         }
     }
 

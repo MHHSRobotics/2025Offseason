@@ -36,6 +36,11 @@ public class CameraIO {
 
         // Create alerts with descriptive names for this camera
         disconnectAlert = new Alert("The " + name + " is disconnected", AlertType.kError);
+
+        // Initialize Pose3d's so AKit doesn't try to log nulls
+        for (int i = 0; i < Constants.maxMeasurements; i++) {
+            inputs.poses[i] = new Pose3d();
+        }
     }
 
     public String getName() {
@@ -60,10 +65,6 @@ public class CameraIO {
         if (Constants.currentMode != Mode.REPLAY) {
             Alerts.create("An unsupported feature was used on " + getName(), AlertType.kWarning);
         }
-    }
-
-    public void clearMeasurements() {
-        unsupportedFeature();
     }
 
     public void startSim(VisionSystemSim sim) {
