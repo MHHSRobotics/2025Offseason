@@ -77,7 +77,7 @@ public class Swerve extends SubsystemBase {
         // Theta standard deviation multiplier based on distance
         public static final double visionThetaStdDevDistanceMultiplier = 0.2;
 
-        // The pose of the april tag in the test
+        // The pose of the april tag in the test, relative to the robot
         public static final Pose3d testAprilTagPose = new Pose3d(new Translation3d(2, 0, 0), new Rotation3d());
 
         // Whether the april tag test is enabled
