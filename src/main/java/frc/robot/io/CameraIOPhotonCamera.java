@@ -7,6 +7,7 @@ import edu.wpi.first.wpilibj.Alert.AlertType;
 
 import frc.robot.Constants;
 import frc.robot.Constants.Mode;
+import frc.robot.subsystems.swerve.Swerve;
 import frc.robot.util.Alerts;
 import frc.robot.util.Field;
 import org.photonvision.PhotonCamera;
@@ -55,8 +56,8 @@ public class CameraIOPhotonCamera extends CameraIO {
                     if (aprilTagPose.isPresent()) {
                         Pose3d aprilTagLocation = aprilTagPose.get();
                         Pose3d estimatedRobotPose = aprilTagLocation
-                                .plus(bestCameraToTarget.inverse())
-                                .plus(robotToCamera.inverse());
+                                .transformBy(bestCameraToTarget.inverse())
+                                .transformBy(robotToCamera.inverse());
                         inputs.poses[inputs.measurements] = estimatedRobotPose;
                         inputs.poseTimestamps[inputs.measurements] = res.getTimestampSeconds();
                         inputs.ambiguities[inputs.measurements] = target.getPoseAmbiguity();
@@ -65,6 +66,10 @@ public class CameraIOPhotonCamera extends CameraIO {
                     }
                 }
             }
+        }
+        if (inputs.measurements > 0 && Swerve.Constants.aprilTagTestEnabled.get()) {
+            Pose3d cameraToTarget = inputs.poses[0];
+            inputs.testPose = new Pose3d().transformBy(Swerve.Constants.testAprilTagPose.minus(cameraToTarget));
         }
 
         super.update();
