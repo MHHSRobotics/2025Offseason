@@ -69,7 +69,8 @@ public class CameraIOPhotonCamera extends CameraIO {
         }
         if (inputs.measurements > 0 && Swerve.Constants.aprilTagTestEnabled.get()) {
             // Get the latest camera→target detection
-            PhotonTrackedTarget target = unreadResults.get(unreadResults.size() - 1).getBestTarget();
+            PhotonTrackedTarget target =
+                    unreadResults.get(unreadResults.size() - 1).getBestTarget();
             Transform3d cameraToTarget = target.getBestCameraToTarget();
             // Calculate robot→camera: robot→tag + tag→camera
             inputs.testPose = Swerve.Constants.testAprilTagPose.transformBy(cameraToTarget.inverse());
