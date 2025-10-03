@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.BiConsumer;
 
+import edu.wpi.first.hal.AllianceStationID;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -12,6 +13,7 @@ import edu.wpi.first.wpilibj.IterativeRobotBase;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.Watchdog;
+import edu.wpi.first.wpilibj.simulation.DriverStationSim;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 
@@ -25,6 +27,7 @@ import org.littletonrobotics.junction.networktables.NT4Publisher;
 import org.littletonrobotics.junction.wpilog.WPILOGReader;
 import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 
+import frc.robot.Constants.Mode;
 import frc.robot.util.Alerts;
 
 public class Robot extends LoggedRobot {
@@ -119,7 +122,7 @@ public class Robot extends LoggedRobot {
 
     @Override
     public void robotPeriodic() {
-        // Run allactive commands and call periodic() on subsystems
+        // Run all active commands and call periodic() on subsystems
         CommandScheduler.getInstance().run();
 
         if (RobotController.getBatteryVoltage() <= Constants.lowBatteryVoltage && DriverStation.isEnabled()) {
@@ -166,6 +169,11 @@ public class Robot extends LoggedRobot {
 
     @Override
     public void teleopInit() {
+        if (Constants.currentMode == Mode.SIM) {
+            // In simulation start at Blue 2
+            DriverStationSim.setAllianceStationId(AllianceStationID.Blue2);
+        }
+
         if (autonomousCommand != null) {
             autonomousCommand.cancel();
         }

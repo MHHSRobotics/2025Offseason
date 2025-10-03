@@ -231,7 +231,6 @@ public class Swerve extends SubsystemBase {
     // - fieldRelative = true means the commands are relative to the field (forward = away from our driver station)
     //   and will auto-flip for alliance side using RobotUtils
     public void runSpeeds(double dx, double dy, double omega, boolean fieldRelative) {
-        System.out.println(dx);
         ChassisSpeeds speeds = new ChassisSpeeds(
                 dx * getMaxLinearSpeedMetersPerSec(),
                 dy * getMaxLinearSpeedMetersPerSec(),
