@@ -67,6 +67,9 @@ public class Swerve extends SubsystemBase {
         public static final LoggedNetworkBoolean swerveDisabled = new LoggedNetworkBoolean(
                 "Swerve/Disabled", false); // Toggle to completely disable all motors in the swerve subsystem
 
+        public static final LoggedNetworkBoolean swerveFieldCentric =
+                new LoggedNetworkBoolean("Swerve/FieldCentric", true); // Toggle for field centric controls
+
         // Vision standard deviation tuning constants
         // Base XY standard deviation in meters (tune based on testing)
         public static final double visionXYStdDevBase = 0.5;
@@ -119,6 +122,9 @@ public class Swerve extends SubsystemBase {
                 kinematics, gyroAngle, getModulePositions(), new Pose2d(2.5, Field.fieldWidth / 2, new Rotation2d()));
         // Set up the on-screen visualization for the four modules
         initializeMechs();
+
+        // Reset the gyro
+        resetGyro();
     }
 
     public void resetGyro() {
@@ -225,6 +231,7 @@ public class Swerve extends SubsystemBase {
     // - fieldRelative = true means the commands are relative to the field (forward = away from our driver station)
     //   and will auto-flip for alliance side using RobotUtils
     public void runSpeeds(double dx, double dy, double omega, boolean fieldRelative) {
+        System.out.println(dx);
         ChassisSpeeds speeds = new ChassisSpeeds(
                 dx * getMaxLinearSpeedMetersPerSec(),
                 dy * getMaxLinearSpeedMetersPerSec(),

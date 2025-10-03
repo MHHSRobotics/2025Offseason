@@ -448,7 +448,10 @@ public class RobotContainer {
         controller.R2().onTrue(swerveCommands.resetGyro());
 
         swerve.setDefaultCommand(swerveCommands.drive(
-                () -> -controller.getLeftY(), () -> -controller.getLeftX(), () -> -controller.getRightX(), () -> true));
+                () -> -controller.getLeftY(),
+                () -> -controller.getLeftX(),
+                () -> -controller.getRightX(),
+                () -> Swerve.Constants.swerveFieldCentric.get()));
     }
 
     // Run selected subsystem at given duty cycle
