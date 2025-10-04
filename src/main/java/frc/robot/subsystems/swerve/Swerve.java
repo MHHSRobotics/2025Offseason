@@ -1,10 +1,17 @@
 package frc.robot.subsystems.swerve;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import edu.wpi.first.math.Matrix;
+import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
@@ -24,6 +31,8 @@ import org.littletonrobotics.junction.mechanism.LoggedMechanismLigament2d;
 import org.littletonrobotics.junction.mechanism.LoggedMechanismRoot2d;
 import org.littletonrobotics.junction.networktables.LoggedNetworkBoolean;
 
+import frc.robot.io.CameraIO;
+import frc.robot.io.CameraIO.CameraIOInputs;
 import frc.robot.io.GyroIO;
 import frc.robot.util.Field;
 import frc.robot.util.RobotUtils;
@@ -57,6 +66,26 @@ public class Swerve extends SubsystemBase {
 
         public static final LoggedNetworkBoolean swerveDisabled = new LoggedNetworkBoolean(
                 "Swerve/Disabled", false); // Toggle to completely disable all motors in the swerve subsystem
+
+        public static final LoggedNetworkBoolean swerveFieldCentric =
+                new LoggedNetworkBoolean("Swerve/FieldCentric", true); // Toggle for field centric controls
+
+        // Vision standard deviation tuning constants
+        // Base XY standard deviation in meters (tune based on testing)
+        public static final double visionXYStdDevBase = 0.5;
+        // XY standard deviation multiplier based on distance squared
+        public static final double visionXYStdDevDistanceMultiplier = 0.1;
+        // Base theta standard deviation in radians
+        public static final double visionThetaStdDevBase = 0.5;
+        // Theta standard deviation multiplier based on distance
+        public static final double visionThetaStdDevDistanceMultiplier = 0.2;
+
+        // The pose of the april tag in the test, relative to the robot
+        public static final Pose3d testAprilTagPose = new Pose3d(new Translation3d(2, 0, 0), new Rotation3d());
+
+        // Whether the april tag test is enabled
+        public static final LoggedNetworkBoolean aprilTagTestEnabled =
+                new LoggedNetworkBoolean("Swerve/AprilTagTest", false);
     }
 
     // Find out the robot heading from the gyro (real or simulated)
@@ -71,8 +100,10 @@ public class Swerve extends SubsystemBase {
     // Math helper that converts chassis speeds (vx, vy, omega) into wheel angles and speeds
     private SwerveDriveKinematics kinematics = new SwerveDriveKinematics(getModuleTranslations());
 
-    // Make the best guess of the robot's field position using wheel odometry and gyro (and vision if added later)
+    // Make the best guess of the robot's field position using wheel odometry, gyro, and vision
     private SwerveDrivePoseEstimator estimator;
+
+    private List<CameraIO> cameras = new ArrayList<>();
 
     // On-screen drawing of the drive to show module directions and speeds
     private final LoggedMechanism2d mech = new LoggedMechanism2d(3, 3);
@@ -87,14 +118,13 @@ public class Swerve extends SubsystemBase {
         this.gyro = gyro;
         this.modules = new SwerveModule[] {fl, fr, bl, br};
 
-        // Tell the gyro what to call itself for alerts and where to log data
-        gyro.setName("gyro");
-        gyro.setPath("Swerve/Gyro");
-
         estimator = new SwerveDrivePoseEstimator(
                 kinematics, gyroAngle, getModulePositions(), new Pose2d(2.5, Field.fieldWidth / 2, new Rotation2d()));
         // Set up the on-screen visualization for the four modules
         initializeMechs();
+
+        // Reset the gyro
+        resetGyro();
     }
 
     public void resetGyro() {
@@ -262,6 +292,38 @@ public class Swerve extends SubsystemBase {
         estimator.addVisionMeasurement(visionRobotPoseMeters, timestampSeconds, visionMeasurementStdDevs);
     }
 
+    // Calculate vision standard deviations based on distance, ambiguity, and tag count
+    private Matrix<N3, N1> calculateVisionStdDevs(Pose2d visionPose, double ambiguity, int tagCount) {
+        // Distance from current pose to vision measurement
+        double distance = getPose().getTranslation().getDistance(visionPose.getTranslation());
+
+        // Base standard deviations (increases with distance)
+        double xyStdDev =
+                Constants.visionXYStdDevBase + (distance * distance * Constants.visionXYStdDevDistanceMultiplier);
+        double thetaStdDev =
+                Constants.visionThetaStdDevBase + (distance * Constants.visionThetaStdDevDistanceMultiplier);
+
+        // Scale by ambiguity (higher ambiguity = less trust)
+        xyStdDev *= (1 + ambiguity);
+        thetaStdDev *= (1 + ambiguity);
+
+        // Multi-tag measurements are more reliable
+        if (tagCount > 1) {
+            xyStdDev /= Math.sqrt(tagCount);
+            thetaStdDev /= Math.sqrt(tagCount);
+        }
+
+        return VecBuilder.fill(xyStdDev, xyStdDev, thetaStdDev);
+    }
+
+    public void addCameraSource(CameraIO camera) {
+        cameras.add(camera);
+    }
+
+    public List<CameraIO> getCameras() {
+        return cameras;
+    }
+
     @Override
     public void periodic() {
         // This runs every robot loop (~50 times per second)
@@ -270,6 +332,16 @@ public class Swerve extends SubsystemBase {
             module.setLocked(Constants.swerveLocked.get());
             module.setDisabled(Constants.swerveDisabled.get());
             module.periodic();
+        }
+
+        for (CameraIO cam : cameras) {
+            cam.update();
+            CameraIOInputs inputs = cam.getInputs();
+            for (int i = 0; i < inputs.measurements; i++) {
+                Matrix<N3, N1> stdDevs =
+                        calculateVisionStdDevs(inputs.poses[i].toPose2d(), inputs.ambiguities[i], inputs.tagCounts[i]);
+                addVisionMeasurement(inputs.poses[i].toPose2d(), inputs.poseTimestamps[i], stdDevs);
+            }
         }
 
         // 2) Update the gyro inputs (logging and alerts happen automatically)

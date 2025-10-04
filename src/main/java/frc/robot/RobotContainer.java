@@ -1,5 +1,6 @@
 package frc.robot;
 
+import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandPS5Controller;
@@ -13,6 +14,8 @@ import frc.robot.commands.HangCommands;
 import frc.robot.commands.IntakeCommands;
 import frc.robot.commands.SwerveCommands;
 import frc.robot.commands.WristCommands;
+import frc.robot.io.CameraIO;
+import frc.robot.io.CameraIOPhotonCamera;
 import frc.robot.io.EncoderIO;
 import frc.robot.io.EncoderIOCANcoder;
 import frc.robot.io.GyroIO;
@@ -31,6 +34,7 @@ import frc.robot.subsystems.swerve.Swerve;
 import frc.robot.subsystems.swerve.SwerveModule;
 import frc.robot.subsystems.swerve.SwerveModuleSim;
 import frc.robot.subsystems.swerve.TunerConstants;
+import frc.robot.subsystems.swerve.VisionSim;
 import frc.robot.subsystems.wrist.Wrist;
 import frc.robot.subsystems.wrist.WristSim;
 
@@ -87,155 +91,253 @@ public class RobotContainer {
     private void initSubsystems() {
         // Initialize subsystems in order: arm, elevator, wrist, intake, hang, swerve
         // Each subsystem is created immediately after its motor/encoder initialization
+        if (Constants.armEnabled) {
+            // Initialize arm motor and encoder
+            MotorIO armMotor;
+            EncoderIO armEncoder;
+            switch (Constants.currentMode) {
+                case REAL:
+                case SIM:
+                    armMotor =
+                            new MotorIOTalonFX(Arm.Constants.motorId, Constants.defaultBus, "arm motor", "Arm/Motor");
+                    armEncoder = new EncoderIOCANcoder(
+                            Arm.Constants.encoderId, Constants.defaultBus, "arm encoder", "Arm/Encoder");
+                    break;
+                default:
+                    armMotor = new MotorIO("arm motor", "Arm/Motor");
+                    armEncoder = new EncoderIO("arm encoder", "Arm/Encoder");
+                    break;
+            }
+            // Create arm subsystem
+            arm = new Arm(armMotor, armEncoder);
 
-        // Initialize arm motor and encoder
-        MotorIO armMotor;
-        EncoderIO armEncoder;
-        switch (Constants.currentMode) {
-            case REAL:
-            case SIM:
-                armMotor = new MotorIOTalonFX(Arm.Constants.motorId, Constants.defaultBus);
-                armEncoder = new EncoderIOCANcoder(Arm.Constants.encoderId, Constants.defaultBus);
-                break;
-            default:
-                armMotor = new MotorIO();
-                armEncoder = new EncoderIO();
-                break;
+            if (Constants.currentMode == Mode.SIM) {
+                new ArmSim(armMotor, armEncoder);
+            }
         }
-        // Create arm subsystem
-        arm = new Arm(armMotor, armEncoder);
 
-        // Initialize elevator motors and encoder
-        MotorIO elevatorLeftMotor;
-        MotorIO elevatorRightMotor;
-        EncoderIO elevatorEncoder;
-        switch (Constants.currentMode) {
-            case REAL:
-            case SIM:
-                elevatorLeftMotor = new MotorIOTalonFX(Elevator.Constants.leftMotorId, Constants.defaultBus);
-                elevatorRightMotor = new MotorIOTalonFX(Elevator.Constants.rightMotorId, Constants.defaultBus);
-                elevatorEncoder = new EncoderIOCANcoder(Elevator.Constants.encoderId, Constants.defaultBus);
-                break;
-            default:
-                elevatorLeftMotor = new MotorIO();
-                elevatorRightMotor = new MotorIO();
-                elevatorEncoder = new EncoderIO();
-                break;
+        if (Constants.elevatorEnabled) {
+            // Initialize elevator motors and encoder
+            MotorIO elevatorLeftMotor;
+            MotorIO elevatorRightMotor;
+            EncoderIO elevatorEncoder;
+            switch (Constants.currentMode) {
+                case REAL:
+                case SIM:
+                    elevatorLeftMotor = new MotorIOTalonFX(
+                            Elevator.Constants.leftMotorId,
+                            Constants.defaultBus,
+                            "elevator left motor",
+                            "Elevator/LeftMotor");
+                    elevatorRightMotor = new MotorIOTalonFX(
+                            Elevator.Constants.rightMotorId,
+                            Constants.defaultBus,
+                            "elevator right motor",
+                            "Elevator/RightMotor");
+                    elevatorEncoder = new EncoderIOCANcoder(
+                            Elevator.Constants.encoderId, Constants.defaultBus, "elevator encoder", "Elevator/Encoder");
+                    break;
+                default:
+                    elevatorLeftMotor = new MotorIO("elevator left motor", "Elevator/LeftMotor");
+                    elevatorRightMotor = new MotorIO("elevator right motor", "Elevator/RightMotor");
+                    elevatorEncoder = new EncoderIO("elevator encoder", "Elevator/Encoder");
+                    break;
+            }
+            // Create elevator subsystem
+            elevator = new Elevator(elevatorLeftMotor, elevatorRightMotor, elevatorEncoder);
+
+            if (Constants.currentMode == Mode.SIM) {
+                new ElevatorSubsystemSim(elevatorLeftMotor, elevatorRightMotor, elevatorEncoder);
+            }
         }
-        // Create elevator subsystem
-        elevator = new Elevator(elevatorLeftMotor, elevatorRightMotor, elevatorEncoder);
 
-        // Initialize wrist motor and encoder
-        MotorIO wristMotor;
-        EncoderIO wristEncoder;
-        switch (Constants.currentMode) {
-            case REAL:
-            case SIM:
-                wristMotor = new MotorIOTalonFX(Wrist.Constants.motorId, Constants.defaultBus);
-                wristEncoder = new EncoderIOCANcoder(Wrist.Constants.encoderId, Constants.defaultBus);
-                break;
-            default:
-                wristMotor = new MotorIO();
-                wristEncoder = new EncoderIO();
-                break;
+        if (Constants.wristEnabled) {
+            // Initialize wrist motor and encoder
+            MotorIO wristMotor;
+            EncoderIO wristEncoder;
+            switch (Constants.currentMode) {
+                case REAL:
+                case SIM:
+                    wristMotor = new MotorIOTalonFX(
+                            Wrist.Constants.motorId, Constants.defaultBus, "wrist motor", "Wrist/Motor");
+                    wristEncoder = new EncoderIOCANcoder(
+                            Wrist.Constants.encoderId, Constants.defaultBus, "wrist encoder", "Wrist/Encoder");
+                    break;
+                default:
+                    wristMotor = new MotorIO("wrist motor", "Wrist/Motor");
+                    wristEncoder = new EncoderIO("wrist encoder", "Wrist/Encoder");
+                    break;
+            }
+            // Create wrist subsystem
+            wrist = new Wrist(wristMotor, wristEncoder);
+
+            if (Constants.currentMode == Mode.SIM) {
+                new WristSim(wristMotor, wristEncoder);
+            }
         }
-        // Create wrist subsystem
-        wrist = new Wrist(wristMotor, wristEncoder);
 
-        // Initialize intake motor
-        MotorIO intakeMotor;
-        switch (Constants.currentMode) {
-            case REAL:
-            case SIM:
-                intakeMotor = new MotorIOTalonFX(Intake.Constants.motorId, Constants.defaultBus);
-                break;
-            default:
-                intakeMotor = new MotorIO();
-                break;
+        if (Constants.intakeEnabled) {
+            // Initialize intake motor
+            MotorIO intakeMotor;
+            switch (Constants.currentMode) {
+                case REAL:
+                case SIM:
+                    intakeMotor = new MotorIOTalonFX(
+                            Intake.Constants.motorId, Constants.defaultBus, "intake motor", "Intake/Motor");
+                    break;
+                default:
+                    intakeMotor = new MotorIO("intake motor", "Intake/Motor");
+                    break;
+            }
+            // Create intake subsystem
+            intake = new Intake(intakeMotor);
         }
-        // Create intake subsystem
-        intake = new Intake(intakeMotor);
 
-        // Initialize hang motor
-        MotorIO hangMotor;
-        switch (Constants.currentMode) {
-            case REAL:
-            case SIM:
-                hangMotor = new MotorIOTalonFX(Hang.Constants.motorId, Constants.defaultBus);
-                break;
-            default:
-                hangMotor = new MotorIO();
-                break;
+        if (Constants.hangEnabled) {
+            // Initialize hang motor
+            MotorIO hangMotor;
+            switch (Constants.currentMode) {
+                case REAL:
+                case SIM:
+                    hangMotor = new MotorIOTalonFX(
+                            Hang.Constants.motorId, Constants.defaultBus, "hang motor", "Hang/Motor");
+                    break;
+                default:
+                    hangMotor = new MotorIO("hang motor", "Hang/Motor");
+                    break;
+            }
+            // Create hang subsystem
+            hang = new Hang(hangMotor);
         }
-        // Create hang subsystem
-        hang = new Hang(hangMotor);
 
-        // Initialize swerve motors, encoders, and gyro
-        MotorIO flDriveMotor, flAngleMotor, frDriveMotor, frAngleMotor;
-        MotorIO blDriveMotor, blAngleMotor, brDriveMotor, brAngleMotor;
-        EncoderIO flEncoder, frEncoder, blEncoder, brEncoder;
-        GyroIO gyro;
-        switch (Constants.currentMode) {
-            case REAL:
-            case SIM:
-                flDriveMotor = new MotorIOTalonFX(TunerConstants.FrontLeft.DriveMotorId, Constants.swerveBus);
-                flAngleMotor = new MotorIOTalonFX(TunerConstants.FrontLeft.SteerMotorId, Constants.swerveBus);
-                flEncoder = new EncoderIOCANcoder(TunerConstants.FrontLeft.EncoderId, Constants.swerveBus);
+        if (Constants.swerveEnabled) {
+            // Initialize swerve motors, encoders, and gyro
+            MotorIO flDriveMotor, flAngleMotor, frDriveMotor, frAngleMotor;
+            MotorIO blDriveMotor, blAngleMotor, brDriveMotor, brAngleMotor;
+            EncoderIO flEncoder, frEncoder, blEncoder, brEncoder;
+            GyroIO gyro;
+            switch (Constants.currentMode) {
+                case REAL:
+                case SIM:
+                    flDriveMotor = new MotorIOTalonFX(
+                            TunerConstants.FrontLeft.DriveMotorId,
+                            Constants.swerveBus,
+                            "front left drive motor",
+                            "Swerve/FrontLeft/Drive");
+                    flAngleMotor = new MotorIOTalonFX(
+                            TunerConstants.FrontLeft.SteerMotorId,
+                            Constants.swerveBus,
+                            "front left angle motor",
+                            "Swerve/FrontLeft/Steer");
+                    flEncoder = new EncoderIOCANcoder(
+                            TunerConstants.FrontLeft.EncoderId,
+                            Constants.swerveBus,
+                            "front left encoder",
+                            "Swerve/FrontLeft/Encoder");
 
-                frDriveMotor = new MotorIOTalonFX(TunerConstants.FrontRight.DriveMotorId, Constants.swerveBus);
-                frAngleMotor = new MotorIOTalonFX(TunerConstants.FrontRight.SteerMotorId, Constants.swerveBus);
-                frEncoder = new EncoderIOCANcoder(TunerConstants.FrontRight.EncoderId, Constants.swerveBus);
+                    frDriveMotor = new MotorIOTalonFX(
+                            TunerConstants.FrontRight.DriveMotorId,
+                            Constants.swerveBus,
+                            "front right drive motor",
+                            "Swerve/FrontRight/Drive");
+                    frAngleMotor = new MotorIOTalonFX(
+                            TunerConstants.FrontRight.SteerMotorId,
+                            Constants.swerveBus,
+                            "front right angle motor",
+                            "Swerve/FrontRight/Steer");
+                    frEncoder = new EncoderIOCANcoder(
+                            TunerConstants.FrontRight.EncoderId,
+                            Constants.swerveBus,
+                            "front right encoder",
+                            "Swerve/FrontRight/Encoder");
 
-                blDriveMotor = new MotorIOTalonFX(TunerConstants.BackLeft.DriveMotorId, Constants.swerveBus);
-                blAngleMotor = new MotorIOTalonFX(TunerConstants.BackLeft.SteerMotorId, Constants.swerveBus);
-                blEncoder = new EncoderIOCANcoder(TunerConstants.BackLeft.EncoderId, Constants.swerveBus);
+                    blDriveMotor = new MotorIOTalonFX(
+                            TunerConstants.BackLeft.DriveMotorId,
+                            Constants.swerveBus,
+                            "back left drive motor",
+                            "Swerve/BackLeft/Drive");
+                    blAngleMotor = new MotorIOTalonFX(
+                            TunerConstants.BackLeft.SteerMotorId,
+                            Constants.swerveBus,
+                            "back left angle motor",
+                            "Swerve/BackLeft/Steer");
+                    blEncoder = new EncoderIOCANcoder(
+                            TunerConstants.BackLeft.EncoderId,
+                            Constants.swerveBus,
+                            "back left encoder",
+                            "Swerve/BackLeft/Encoder");
 
-                brDriveMotor = new MotorIOTalonFX(TunerConstants.BackRight.DriveMotorId, Constants.swerveBus);
-                brAngleMotor = new MotorIOTalonFX(TunerConstants.BackRight.SteerMotorId, Constants.swerveBus);
-                brEncoder = new EncoderIOCANcoder(TunerConstants.BackRight.EncoderId, Constants.swerveBus);
+                    brDriveMotor = new MotorIOTalonFX(
+                            TunerConstants.BackRight.DriveMotorId,
+                            Constants.swerveBus,
+                            "back right drive motor",
+                            "Swerve/BackRight/Drive");
+                    brAngleMotor = new MotorIOTalonFX(
+                            TunerConstants.BackRight.SteerMotorId,
+                            Constants.swerveBus,
+                            "back right angle motor",
+                            "Swerve/BackRight/Steer");
+                    brEncoder = new EncoderIOCANcoder(
+                            TunerConstants.BackRight.EncoderId,
+                            Constants.swerveBus,
+                            "back right encoder",
+                            "Swerve/BackRight/Encoder");
 
-                gyro = new GyroIOPigeon(TunerConstants.DrivetrainConstants.Pigeon2Id, Constants.swerveBus);
-                break;
-            default:
-                flDriveMotor = new MotorIO();
-                flAngleMotor = new MotorIO();
-                flEncoder = new EncoderIO();
+                    gyro = new GyroIOPigeon(
+                            TunerConstants.DrivetrainConstants.Pigeon2Id, Constants.swerveBus, "gyro", "Swerve/Gyro");
+                    break;
+                default:
+                    flDriveMotor = new MotorIO("front left drive motor", "Swerve/FrontLeft/Drive");
+                    flAngleMotor = new MotorIO("front left angle motor", "Swerve/FrontLeft/Steer");
+                    flEncoder = new EncoderIO("front left encoder", "Swerve/FrontLeft/Encoder");
 
-                frDriveMotor = new MotorIO();
-                frAngleMotor = new MotorIO();
-                frEncoder = new EncoderIO();
+                    frDriveMotor = new MotorIO("front right drive motor", "Swerve/FrontRight/Drive");
+                    frAngleMotor = new MotorIO("front right angle motor", "Swerve/FrontRight/Steer");
+                    frEncoder = new EncoderIO("front right encoder", "Swerve/FrontRight/Encoder");
 
-                blDriveMotor = new MotorIO();
-                blAngleMotor = new MotorIO();
-                blEncoder = new EncoderIO();
+                    blDriveMotor = new MotorIO("back left drive motor", "Swerve/BackLeft/Drive");
+                    blAngleMotor = new MotorIO("back left angle motor", "Swerve/BackLeft/Steer");
+                    blEncoder = new EncoderIO("back left encoder", "Swerve/BackLeft/Encoder");
 
-                brDriveMotor = new MotorIO();
-                brAngleMotor = new MotorIO();
-                brEncoder = new EncoderIO();
+                    brDriveMotor = new MotorIO("back right drive motor", "Swerve/BackRight/Drive");
+                    brAngleMotor = new MotorIO("back right angle motor", "Swerve/BackRight/Steer");
+                    brEncoder = new EncoderIO("back right encoder", "Swerve/BackRight/Encoder");
 
-                gyro = new GyroIO();
-                break;
+                    gyro = new GyroIO("gyro", "Swerve/Gyro");
+                    break;
+            }
+            // Create swerve subsystem
+            SwerveModule fl = new SwerveModule(flDriveMotor, flAngleMotor, flEncoder, TunerConstants.FrontLeft);
+            SwerveModule fr = new SwerveModule(frDriveMotor, frAngleMotor, frEncoder, TunerConstants.FrontRight);
+            SwerveModule bl = new SwerveModule(blDriveMotor, blAngleMotor, blEncoder, TunerConstants.BackLeft);
+            SwerveModule br = new SwerveModule(brDriveMotor, brAngleMotor, brEncoder, TunerConstants.BackRight);
+
+            swerve = new Swerve(gyro, fl, fr, bl, br);
+            if (Constants.currentMode == Mode.SIM) {
+                new SwerveModuleSim(flDriveMotor, flAngleMotor, flEncoder, TunerConstants.FrontLeft);
+                new SwerveModuleSim(frDriveMotor, frAngleMotor, frEncoder, TunerConstants.FrontRight);
+                new SwerveModuleSim(blDriveMotor, blAngleMotor, blEncoder, TunerConstants.BackLeft);
+                new SwerveModuleSim(brDriveMotor, brAngleMotor, brEncoder, TunerConstants.BackRight);
+
+                new GyroSim(gyro);
+            }
         }
-        // Create swerve subsystem
-        SwerveModule fl = new SwerveModule(flDriveMotor, flAngleMotor, flEncoder, 0, TunerConstants.FrontLeft);
-        SwerveModule fr = new SwerveModule(frDriveMotor, frAngleMotor, frEncoder, 1, TunerConstants.FrontRight);
-        SwerveModule bl = new SwerveModule(blDriveMotor, blAngleMotor, blEncoder, 2, TunerConstants.BackLeft);
-        SwerveModule br = new SwerveModule(brDriveMotor, brAngleMotor, brEncoder, 3, TunerConstants.BackRight);
 
-        swerve = new Swerve(gyro, fl, fr, bl, br);
-
-        if (Constants.currentMode == Mode.SIM) {
-            // Initialize simulations for each component in sim mode
-            new ArmSim(armMotor, armEncoder);
-            new ElevatorSubsystemSim(elevatorLeftMotor, elevatorRightMotor, elevatorEncoder);
-            new WristSim(wristMotor, wristEncoder);
-
-            new SwerveModuleSim(flDriveMotor, flAngleMotor, flEncoder, TunerConstants.FrontLeft);
-            new SwerveModuleSim(frDriveMotor, frAngleMotor, frEncoder, TunerConstants.FrontRight);
-            new SwerveModuleSim(blDriveMotor, blAngleMotor, blEncoder, TunerConstants.BackLeft);
-            new SwerveModuleSim(brDriveMotor, brAngleMotor, brEncoder, TunerConstants.BackRight);
-
-            new GyroSim(gyro);
+        if (Constants.visionEnabled) {
+            CameraIO testCam;
+            switch (Constants.currentMode) {
+                case REAL:
+                case SIM:
+                    testCam = new CameraIOPhotonCamera("test camera", "Vision/TestCamera", new Transform3d());
+                    break;
+                default:
+                    testCam = new CameraIO("test camera", "Vision/TestCamera");
+                    break;
+            }
+            swerve.addCameraSource(testCam);
+            if (Constants.currentMode == Mode.SIM) {
+                new VisionSim(swerve.getCameras(), swerve);
+            }
         }
     }
 
@@ -346,7 +448,10 @@ public class RobotContainer {
         controller.R2().onTrue(swerveCommands.resetGyro());
 
         swerve.setDefaultCommand(swerveCommands.drive(
-                () -> -controller.getLeftY(), () -> -controller.getLeftX(), () -> -controller.getRightX(), () -> true));
+                () -> -controller.getLeftY(),
+                () -> -controller.getLeftX(),
+                () -> -controller.getRightX(),
+                () -> Swerve.Constants.swerveFieldCentric.get()));
     }
 
     // Run selected subsystem at given duty cycle

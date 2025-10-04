@@ -19,7 +19,7 @@ public class GyroIO {
         public boolean hardwareFault;
     }
 
-    private String logPath = "";
+    private String logPath;
 
     private String name;
 
@@ -27,13 +27,9 @@ public class GyroIO {
     private Alert disconnectAlert;
     private Alert hardwareFaultAlert;
 
-    public GyroIO() {
-        // Alerts will be created when setName() is called
-    }
-
-    // Tell the GyroIO what to call this gyro for alerts (like "gyro" or "main gyro")
-    public void setName(String name) {
+    public GyroIO(String name, String logPath) {
         this.name = name;
+        this.logPath = logPath;
 
         // Create alerts with descriptive names for this gyro
         disconnectAlert = new Alert("The " + name + " is disconnected", AlertType.kError);
@@ -41,32 +37,23 @@ public class GyroIO {
     }
 
     public String getName() {
-        return name == null ? "gyro" : name;
-    }
-
-    // Tell the GyroIO where to log its data (like "Drive/Gyro")
-    public void setPath(String path) {
-        this.logPath = path;
+        return name;
     }
 
     protected GyroIOInputsAutoLogged inputs = new GyroIOInputsAutoLogged();
 
     // Find out the latest values from the gyro and store them in inputs
     public void update() {
-        // Log the inputs to AdvantageKit if a path has been set
-        if (!logPath.isEmpty()) {
-            Logger.processInputs(logPath, inputs);
-        }
+        // Log the inputs to AdvantageKit
+        Logger.processInputs(logPath, inputs);
 
         // Update alerts based on the current gyro status (this runs after subclass updates inputs)
         // Only update alerts if they've been created (setName() was called)
-        if (disconnectAlert != null) {
-            disconnectAlert.set(!inputs.connected);
-            hardwareFaultAlert.set(inputs.hardwareFault);
-        }
+        disconnectAlert.set(!inputs.connected);
+        hardwareFaultAlert.set(inputs.hardwareFault);
     }
 
-    public GyroIOInputsAutoLogged getInputs() {
+    public GyroIOInputs getInputs() {
         return inputs;
     }
 

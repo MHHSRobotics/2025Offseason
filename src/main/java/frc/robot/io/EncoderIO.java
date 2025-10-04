@@ -22,7 +22,7 @@ public class EncoderIO {
         public boolean hardwareFault;
     }
 
-    private String logPath = "";
+    private String logPath;
 
     private String name;
 
@@ -31,49 +31,34 @@ public class EncoderIO {
     private Alert hardwareFaultAlert;
     private Alert magnetFaultAlert;
 
-    public EncoderIO() {
-        // Alerts will be created when setName() is called
-    }
-
-    // Tell the EncoderIO what to call this encoder for alerts (like "arm encoder" or "FL encoder")
-    public void setName(String name) {
+    public EncoderIO(String name, String logPath) {
         this.name = name;
+        this.logPath = logPath;
 
         // Create alerts with descriptive names for this encoder
-        disconnectAlert = new Alert("The " + name + " encoder is disconnected", AlertType.kError);
-        hardwareFaultAlert =
-                new Alert("The " + name + " encoder encountered an internal hardware fault", AlertType.kError);
-        magnetFaultAlert = new Alert("The " + name + " encoder magnet is not functioning", AlertType.kError);
+        disconnectAlert = new Alert("The " + name + " is disconnected", AlertType.kError);
+        hardwareFaultAlert = new Alert("The " + name + " encountered an internal hardware fault", AlertType.kError);
+        magnetFaultAlert = new Alert("The " + name + " magnet is not functioning", AlertType.kError);
     }
 
     public String getName() {
-        return name == null ? "encoder" : name;
-    }
-
-    // Tell the EncoderIO where to log its data (like "Arm/Encoder" or "Drive/Module0/AngleEncoder")
-    public void setPath(String path) {
-        this.logPath = path;
+        return name;
     }
 
     protected EncoderIOInputsAutoLogged inputs = new EncoderIOInputsAutoLogged();
 
     // Find out the latest values from the encoder and store them in inputs
     public void update() {
-        // Log the inputs to AdvantageKit if a path has been set
-        if (!logPath.isEmpty()) {
-            Logger.processInputs(logPath, inputs);
-        }
+        // Log the inputs to AdvantageKit
+        Logger.processInputs(logPath, inputs);
 
         // Update alerts based on the current encoder status (this runs after subclass updates inputs)
-        // Only update alerts if they've been created (setName() was called)
-        if (disconnectAlert != null) {
-            disconnectAlert.set(!inputs.connected);
-            hardwareFaultAlert.set(inputs.hardwareFault);
-            magnetFaultAlert.set(inputs.badMagnetFault);
-        }
+        disconnectAlert.set(!inputs.connected);
+        hardwareFaultAlert.set(inputs.hardwareFault);
+        magnetFaultAlert.set(inputs.badMagnetFault);
     }
 
-    public EncoderIOInputsAutoLogged getInputs() {
+    public EncoderIOInputs getInputs() {
         return inputs;
     }
 

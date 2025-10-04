@@ -34,10 +34,6 @@ public class Hang extends SubsystemBase {
     public Hang(MotorIO motorIO) {
         motor = motorIO;
 
-        // Tell the motor what to call itself for alerts and where to log data
-        motor.setName("hang");
-        motor.setPath("Hang/Motor");
-
         // Tell the motor which direction is forward (true = invert)
         motor.setInverted(Constants.motorInverted);
 

@@ -147,18 +147,11 @@ public class Wrist extends SubsystemBase {
 
     public Wrist(MotorIO motorIO, EncoderIO encoderIO) {
         encoder = encoderIO;
-        // Tell the encoder what to call itself for alerts and where to log data
-        encoder.setName("wrist encoder");
-        encoder.setPath("Wrist/Encoder");
         // Tell the encoder which direction is positive and the gear ratio to the wrist
         encoder.setInverted(Constants.encoderInverted);
         encoder.setGearRatio(Constants.encoderRatio);
 
         motor = motorIO;
-
-        // Tell the motor what to call itself for alerts and where to log data
-        motor.setName("wrist");
-        motor.setPath("Wrist/Motor");
 
         // Tell the motor which direction is forward (true = invert)
         motor.setInverted(Constants.motorInverted);

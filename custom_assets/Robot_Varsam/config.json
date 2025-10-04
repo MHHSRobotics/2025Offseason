@@ -4,6 +4,13 @@
     "position": [0,0,0],
     "disableSimplification": true,
     "cameras": [
+        {
+            "name":"cam",
+            "rotations":[],
+            "position":[0.25,0,0.25],
+            "resolution":[320,240],
+            "fov":100
+        }
     ],
     "components": [
         {

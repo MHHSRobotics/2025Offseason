@@ -73,19 +73,20 @@ public class MotorIOTalonFX extends MotorIO {
     private EncoderIOCANcoder connectedEncoder;
 
     // Make a TalonFX on the given CAN bus
-    public MotorIOTalonFX(int id, CANBus canBus) {
+    public MotorIOTalonFX(int id, CANBus canBus, String name, String logPath) {
+        super(name, logPath);
         motor = new TalonFX(id, canBus);
         sim = motor.getSimState();
     }
 
     // Make a TalonFX on a named CAN bus (e.g., "rio", "canivore")
-    public MotorIOTalonFX(int id, String canBus) {
-        this(id, new CANBus(canBus));
+    public MotorIOTalonFX(int id, String canBus, String name, String logPath) {
+        this(id, new CANBus(canBus), name, logPath);
     }
 
     // Make a TalonFX on the default CAN bus
-    public MotorIOTalonFX(int id) {
-        this(id, new CANBus());
+    public MotorIOTalonFX(int id, String name, String logPath) {
+        this(id, new CANBus(), name, logPath);
     }
 
     @Override
@@ -157,12 +158,12 @@ public class MotorIOTalonFX extends MotorIO {
         inputs.rawRotorPosition =
                 Units.rotationsToRadians(motor.getRotorPosition().getValueAsDouble()
                         / (config.Feedback.RotorToSensorRatio * config.Feedback.SensorToMechanismRatio));
-        // Update alerts using the base class method (this checks all fault conditions and updates dashboard alerts)
-        super.update();
 
         if (connectedEncoder != null) {
             inputs.encoderDiff = inputs.position - connectedEncoder.getInputs().positionRad;
         }
+        // Update alerts using the base class method (this checks all fault conditions and updates dashboard alerts)
+        super.update();
     }
 
     // Tell the motor how fast to spin (percent, -1 = full reverse, 1 = full forward)

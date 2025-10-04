@@ -26,7 +26,6 @@ public class SwerveModule {
             MotorIO driveMotorIO,
             MotorIO angleMotorIO,
             EncoderIO angleEncoderIO,
-            int index,
             SwerveModuleConstants<TalonFXConfiguration, TalonFXConfiguration, CANcoderConfiguration> constants) {
         this.constants = constants;
 
@@ -34,37 +33,12 @@ public class SwerveModule {
         angleMotor = angleMotorIO;
         angleEncoder = angleEncoderIO;
 
-        String modulePos = "[UNKNOWN]";
-        switch (index) {
-            case 0:
-                modulePos = "FL";
-                break;
-            case 1:
-                modulePos = "FR";
-                break;
-            case 2:
-                modulePos = "BL";
-                break;
-            case 3:
-                modulePos = "BR";
-                break;
-        }
-
-        // Tell the motors what to call themselves for alerts and where to log data
-        driveMotor.setName(modulePos + " drive");
-        driveMotor.setPath("Swerve/Module" + index + "/DriveMotor");
-        angleMotor.setName(modulePos + " angle");
-        angleMotor.setPath("Swerve/Module" + index + "/AngleMotor");
-
         driveMotor.setBraking(true);
         driveMotor.setGains(constants.DriveMotorGains);
         driveMotor.setGearRatio(constants.DriveMotorGearRatio);
         driveMotor.setStatorCurrentLimit(constants.SlipCurrent);
         driveMotor.setInverted(constants.DriveMotorInverted);
 
-        // Tell the encoder what to call itself for alerts and where to log data
-        angleEncoder.setName(modulePos + " encoder");
-        angleEncoder.setPath("Swerve/Module" + index + "/AngleEncoder");
         angleEncoder.setInverted(constants.EncoderInverted);
 
         angleMotor.setBraking(true);

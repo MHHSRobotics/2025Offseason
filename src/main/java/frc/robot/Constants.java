@@ -38,4 +38,15 @@ public final class Constants {
 
     // How long to wait before reporting low battery
     public static final double lowBatteryTime = 0.5;
+
+    // How many robot pose measurements to store
+    public static final int maxMeasurements = 64;
+
+    public static final boolean armEnabled = true;
+    public static final boolean elevatorEnabled = true;
+    public static final boolean wristEnabled = true;
+    public static final boolean swerveEnabled = true;
+    public static final boolean hangEnabled = true;
+    public static final boolean intakeEnabled = true;
+    public static final boolean visionEnabled = true;
 }
