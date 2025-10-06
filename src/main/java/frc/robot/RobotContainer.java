@@ -499,13 +499,9 @@ public class RobotContainer {
                 .onTrue(Commands.runOnce(() -> runSelectedTest(-0.2)))
                 .onFalse(Commands.runOnce(() -> runSelectedTest(0)));
 
-        testController
-                .triangle()
-                .onTrue(Commands.runOnce(() -> runSelectedPIDTest(0)));
+        testController.triangle().onTrue(Commands.runOnce(() -> runSelectedPIDTest(0)));
 
-        testController
-                .square()
-                .onTrue(Commands.runOnce(() -> runSelectedPIDTest(1)));
+        testController.square().onTrue(Commands.runOnce(() -> runSelectedPIDTest(1)));
     }
 
     private void configureSysId() {}

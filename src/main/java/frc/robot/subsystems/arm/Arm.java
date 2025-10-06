@@ -154,6 +154,8 @@ public class Arm extends SubsystemBase {
         // Set motor offset
         motor.setOffset(Constants.offset);
 
+        motor.setLimits(Constants.minAngle, Constants.maxAngle);
+
         // Add middle dot to visualization
         root.append(new LoggedMechanismLigament2d("Middle", 0.0, 0, 10, new Color8Bit(Color.kBlue)));
     }

@@ -163,6 +163,9 @@ public class Wrist extends SubsystemBase {
 
         motor.setOffset(Constants.offset);
 
+        // Set limits on the motor
+        motor.setLimits(Constants.minAngle, Constants.maxAngle);
+
         // Add the middle dot to the visualization
         root.append(new LoggedMechanismLigament2d("Middle", 0.0, 0, 10, new Color8Bit(Color.kPurple)));
     }

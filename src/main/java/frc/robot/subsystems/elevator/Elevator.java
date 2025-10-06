@@ -50,12 +50,12 @@ public class Elevator extends SubsystemBase {
         public static final LoggedNetworkNumber kI = new LoggedNetworkNumber(
                 "Elevator/kI", 0); // (volts per meter-second) helps eliminate steady-state error
         public static final LoggedNetworkNumber kD =
-                new LoggedNetworkNumber("Elevator/kD", 20); // (volts per m/s) reacts to how fast error is changing
+                new LoggedNetworkNumber("Elevator/kD", 70); // (volts per m/s) reacts to how fast error is changing
 
         public static final LoggedNetworkNumber kS = new LoggedNetworkNumber(
-                "Elevator/kS", 3); // (volts) voltage to get elevator moving (overcome static friction)
+                "Elevator/kS", 0); // (volts) voltage to get elevator moving (overcome static friction)
         public static final LoggedNetworkNumber kG = new LoggedNetworkNumber(
-                "Elevator/kG", 13); // (volts) voltage to hold the elevator up (compensate gravity)
+                "Elevator/kG", 14.31); // (volts) voltage to hold the elevator up (compensate gravity)
         public static final LoggedNetworkNumber kV = new LoggedNetworkNumber(
                 "Elevator/kV", 0); // (volts per m/s) voltage that scales with speed to overcome friction
         public static final LoggedNetworkNumber kA =
@@ -156,6 +156,12 @@ public class Elevator extends SubsystemBase {
         // Tell the left motor which encoder to use and how motor/encoder/elevator relate (ratios are unitless)
         leftMotor.connectEncoder(encoderIO, Constants.rotorToSensorRatio);
 
+        // Add offset to motor
+        leftMotor.setOffset(Constants.offset);
+
+        // Add limits to motor (needs to be done after offset)
+        leftMotor.setLimits(Constants.minHeight, Constants.maxHeight);
+
         // Make the motors use elevator gravity compensation (constant help against gravity)
         leftMotor.setFeedforwardType(GravityTypeValue.Elevator_Static);
 
@@ -166,7 +172,7 @@ public class Elevator extends SubsystemBase {
                         ^ Constants
                                 .rightMotorInverted); // take the XOR of the two inverts to calculate relative inversion
 
-        leftMotor.setOffset(Constants.offset);
+        
 
         // Add middle dot to visualization
         root.append(new LoggedMechanismLigament2d("Middle", 0.0, 0, 10, new Color8Bit(Color.kGreen)));
