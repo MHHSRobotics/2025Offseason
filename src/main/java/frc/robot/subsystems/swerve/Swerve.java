@@ -5,6 +5,9 @@ import java.util.List;
 
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;
+import edu.wpi.first.math.controller.HolonomicDriveController;
+import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
@@ -19,6 +22,7 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
+import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj.util.Color8Bit;
@@ -86,6 +90,11 @@ public class Swerve extends SubsystemBase {
         // Whether the april tag test is enabled
         public static final LoggedNetworkBoolean aprilTagTestEnabled =
                 new LoggedNetworkBoolean("Swerve/AprilTagTest", false);
+
+        public static final double translationkP=0;
+        public static final double translationkD=0;
+        public static final double rotationkP=0;
+        public static final double rotationkD=0;
     }
 
     // Find out the robot heading from the gyro (real or simulated)
@@ -113,6 +122,18 @@ public class Swerve extends SubsystemBase {
 
     // Bars showing the speed (length) and direction (angle) of each module
     private final LoggedMechanismLigament2d[] speeds = new LoggedMechanismLigament2d[4];
+
+    // Holonomic controller for auto-align
+    private final HolonomicDriveController pidController = new HolonomicDriveController(new PIDController(Constants.translationkP, 0, Constants.translationkD), new PIDController(Constants.translationkP, 0, Constants.translationkD), new ProfiledPIDController(Constants.rotationkP, 0, Constants.rotationkD, new Constraints(10, 10)));
+
+    // Enum for current control command applied to the swerve
+    public static enum SwerveControl{
+        MANUAL,
+        PID
+    }
+
+    // Current control command applied to the swerve
+    private SwerveControl currentControl;
 
     public Swerve(GyroIO gyro, SwerveModule fl, SwerveModule fr, SwerveModule bl, SwerveModule br) {
         this.gyro = gyro;
