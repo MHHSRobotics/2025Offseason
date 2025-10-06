@@ -35,6 +35,7 @@ public class MotorIO {
         public String controlMode; // Current control type (e.g., DutyCycle, Voltage, MotionMagic)
 
         public double setpoint; // Current target (mechanism units)
+        public double setpointVelocity; // Velocity of the setpoint (mechanism units/s)
         public double error; // Target minus position (mechanism units)
         public double feedforward; // Controller feedforward (often amps for current control)
         public double derivOutput; // kD contribution (controller units)

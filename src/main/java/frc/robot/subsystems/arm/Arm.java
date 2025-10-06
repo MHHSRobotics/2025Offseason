@@ -44,12 +44,12 @@ public class Arm extends SubsystemBase {
         public static final LoggedNetworkNumber kP =
                 new LoggedNetworkNumber("Arm/kP", 75); // (volts per radian) more voltage when farther from target
         public static final LoggedNetworkNumber kD =
-                new LoggedNetworkNumber("Arm/kD", 20); // (volts per rad/s) reacts to how fast error is changing
+                new LoggedNetworkNumber("Arm/kD", 45); // (volts per rad/s) reacts to how fast error is changing
 
         public static final LoggedNetworkNumber kS =
                 new LoggedNetworkNumber("Arm/kS", 0); // (volts) voltage to get arm moving (overcome static friction)
         public static final LoggedNetworkNumber kG = new LoggedNetworkNumber(
-                "Arm/kG", 0); // (volts) voltage to hold the arm level (compensate gravity at 0 rad)
+                "Arm/kG", 17.4); // (volts) voltage to hold the arm level (compensate gravity at 0 rad)
         public static final LoggedNetworkNumber kV = new LoggedNetworkNumber(
                 "Arm/kV", 0); // (volts per rad/s) voltage that scales with speed to overcome friction
         public static final LoggedNetworkNumber kA =
@@ -59,6 +59,8 @@ public class Arm extends SubsystemBase {
                 new LoggedNetworkNumber("Arm/maxVelocity", 10); // (rad/s) Motion Magic max speed for moving to a target
         public static final LoggedNetworkNumber maxAccel = new LoggedNetworkNumber(
                 "Arm/maxAccel", 10); // (rad/s^2) Motion Magic max acceleration for moving to a target
+        public static final LoggedNetworkNumber maxJerk = new LoggedNetworkNumber(
+                "Arm/maxJerk", 0); // (rad/s^3) Motion Magic max jerk for moving to a target (0 for no jerk limit)
 
         public static final double statorCurrentLimit = 70; // (amps) limit on motor torque output
         public static final double supplyCurrentLimit = 60; // (amps) normal current limit pulled from battery
@@ -230,5 +232,6 @@ public class Arm extends SubsystemBase {
         motor.setkA(Constants.kA.get());
         motor.setMaxVelocity(Constants.maxVelocity.get());
         motor.setMaxAccel(Constants.maxAccel.get());
+        motor.setMaxJerk(Constants.maxJerk.get());
     }
 }
