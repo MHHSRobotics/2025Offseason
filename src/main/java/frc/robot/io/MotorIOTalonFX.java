@@ -139,6 +139,9 @@ public class MotorIOTalonFX extends MotorIO {
             inputs.setpoint = setpoint - extraOffset;
         }
 
+        inputs.setpointVelocity =
+                Units.rotationsToRadians(motor.getClosedLoopReferenceSlope().getValueAsDouble());
+
         inputs.error = Units.rotationsToRadians(motor.getClosedLoopError().getValueAsDouble());
         inputs.feedforward = motor.getClosedLoopFeedForward().getValueAsDouble();
         inputs.derivOutput = motor.getClosedLoopDerivativeOutput().getValueAsDouble();
@@ -162,6 +165,7 @@ public class MotorIOTalonFX extends MotorIO {
         if (connectedEncoder != null) {
             inputs.encoderDiff = inputs.position - connectedEncoder.getInputs().positionRad;
         }
+
         // Update alerts using the base class method (this checks all fault conditions and updates dashboard alerts)
         super.update();
     }

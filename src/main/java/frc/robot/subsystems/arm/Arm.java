@@ -44,12 +44,12 @@ public class Arm extends SubsystemBase {
         public static final LoggedNetworkNumber kP =
                 new LoggedNetworkNumber("Arm/kP", 75); // (volts per radian) more voltage when farther from target
         public static final LoggedNetworkNumber kD =
-                new LoggedNetworkNumber("Arm/kD", 20); // (volts per rad/s) reacts to how fast error is changing
+                new LoggedNetworkNumber("Arm/kD", 45); // (volts per rad/s) reacts to how fast error is changing
 
         public static final LoggedNetworkNumber kS =
                 new LoggedNetworkNumber("Arm/kS", 0); // (volts) voltage to get arm moving (overcome static friction)
         public static final LoggedNetworkNumber kG = new LoggedNetworkNumber(
-                "Arm/kG", 0); // (volts) voltage to hold the arm level (compensate gravity at 0 rad)
+                "Arm/kG", 17.4); // (volts) voltage to hold the arm level (compensate gravity at 0 rad)
         public static final LoggedNetworkNumber kV = new LoggedNetworkNumber(
                 "Arm/kV", 0); // (volts per rad/s) voltage that scales with speed to overcome friction
         public static final LoggedNetworkNumber kA =
@@ -151,6 +151,8 @@ public class Arm extends SubsystemBase {
 
         // Set motor offset
         motor.setOffset(Constants.offset);
+
+        motor.setLimits(Constants.minAngle, Constants.maxAngle);
 
         // Add middle dot to visualization
         root.append(new LoggedMechanismLigament2d("Middle", 0.0, 0, 10, new Color8Bit(Color.kBlue)));
