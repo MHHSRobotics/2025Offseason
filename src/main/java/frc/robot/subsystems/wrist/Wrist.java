@@ -44,9 +44,9 @@ public class Wrist extends SubsystemBase {
         // before)
 
         public static final LoggedNetworkNumber kP =
-                new LoggedNetworkNumber("Wrist/kP", 150); // (volts per radian) more voltage when farther from target
+                new LoggedNetworkNumber("Wrist/kP", 75); // (volts per radian) more voltage when farther from target
         public static final LoggedNetworkNumber kD =
-                new LoggedNetworkNumber("Wrist/kD", 30); // (volts per rad/s) reacts to how fast error is changing
+                new LoggedNetworkNumber("Wrist/kD", 80); // (volts per rad/s) reacts to how fast error is changing
 
         public static final LoggedNetworkNumber kS = new LoggedNetworkNumber(
                 "Wrist/kS", 0.0); // (volts) voltage to get wrist moving (overcome static friction)
@@ -58,11 +58,9 @@ public class Wrist extends SubsystemBase {
                 new LoggedNetworkNumber("Wrist/kA", 0); // (volts per rad/s^2) extra voltage to help with acceleration
 
         public static final LoggedNetworkNumber maxVelocity = new LoggedNetworkNumber(
-                "Wrist/maxVelocity",
-                Units.degreesToRadians(360)); // (rad/s) Motion Magic max speed for moving to a target
+                "Wrist/maxVelocity", 6.3); // (rad/s) Motion Magic max speed for moving to a target
         public static final LoggedNetworkNumber maxAccel = new LoggedNetworkNumber(
-                "Wrist/maxAccel",
-                Units.degreesToRadians(360)); // (rad/s^2) Motion Magic max acceleration for moving to a target
+                "Wrist/maxAccel", 6.3); // (rad/s^2) Motion Magic max acceleration for moving to a target
 
         public static final double statorCurrentLimit = 70; // (amps) limit on motor torque output
         public static final double supplyCurrentLimit = 60; // (amps) normal current limit pulled from battery

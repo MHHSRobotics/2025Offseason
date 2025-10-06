@@ -59,8 +59,6 @@ public class Arm extends SubsystemBase {
                 new LoggedNetworkNumber("Arm/maxVelocity", 10); // (rad/s) Motion Magic max speed for moving to a target
         public static final LoggedNetworkNumber maxAccel = new LoggedNetworkNumber(
                 "Arm/maxAccel", 10); // (rad/s^2) Motion Magic max acceleration for moving to a target
-        public static final LoggedNetworkNumber maxJerk = new LoggedNetworkNumber(
-                "Arm/maxJerk", 0); // (rad/s^3) Motion Magic max jerk for moving to a target (0 for no jerk limit)
 
         public static final double statorCurrentLimit = 70; // (amps) limit on motor torque output
         public static final double supplyCurrentLimit = 60; // (amps) normal current limit pulled from battery
@@ -234,6 +232,5 @@ public class Arm extends SubsystemBase {
         motor.setkA(Constants.kA.get());
         motor.setMaxVelocity(Constants.maxVelocity.get());
         motor.setMaxAccel(Constants.maxAccel.get());
-        motor.setMaxJerk(Constants.maxJerk.get());
     }
 }
