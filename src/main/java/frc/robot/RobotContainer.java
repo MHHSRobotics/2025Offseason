@@ -469,6 +469,17 @@ public class RobotContainer {
         }
     }
 
+    // Run selected subsystem to given goal
+    private void runSelectedPIDTest(double goal) {
+        if (testControllerChooser.get().equals("Arm")) {
+            arm.setGoal(goal);
+        } else if (testControllerChooser.get().equals("Elevator")) {
+            elevator.setGoal(goal);
+        } else if (testControllerChooser.get().equals("Wrist")) {
+            wrist.setGoal(goal);
+        }
+    }
+
     private void configureTestBindings() {
         /* ---- Test controller bindings ---- */
         testControllerChooser = new LoggedDashboardChooser<>("Test/Type");
@@ -487,6 +498,14 @@ public class RobotContainer {
                 .circle()
                 .onTrue(Commands.runOnce(() -> runSelectedTest(-0.2)))
                 .onFalse(Commands.runOnce(() -> runSelectedTest(0)));
+
+        testController
+                .triangle()
+                .onTrue(Commands.runOnce(() -> runSelectedPIDTest(0)));
+
+        testController
+                .square()
+                .onTrue(Commands.runOnce(() -> runSelectedPIDTest(1)));
     }
 
     private void configureSysId() {}
