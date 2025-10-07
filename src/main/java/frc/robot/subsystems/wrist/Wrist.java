@@ -44,9 +44,9 @@ public class Wrist extends SubsystemBase {
         // before)
 
         public static final LoggedNetworkNumber kP =
-                new LoggedNetworkNumber("Wrist/kP", 75); // (volts per radian) more voltage when farther from target
+                new LoggedNetworkNumber("Wrist/kP", 60); // (volts per radian) more voltage when farther from target
         public static final LoggedNetworkNumber kD =
-                new LoggedNetworkNumber("Wrist/kD", 80); // (volts per rad/s) reacts to how fast error is changing
+                new LoggedNetworkNumber("Wrist/kD", 20); // (volts per rad/s) reacts to how fast error is changing
 
         public static final LoggedNetworkNumber kS = new LoggedNetworkNumber(
                 "Wrist/kS", 0.0); // (volts) voltage to get wrist moving (overcome static friction)
@@ -154,7 +154,7 @@ public class Wrist extends SubsystemBase {
         // Tell the motor which direction is forward (true = invert)
         motor.setInverted(Constants.motorInverted);
         // Tell the motor which encoder to use and how motor/encoder/wrist relate (ratios are unitless)
-        motor.connectEncoder(encoderIO, Constants.rotorToSensorRatio);
+        motor.connectEncoder(encoderIO, Constants.rotorToSensorRatio, true);
 
         // Make the motor use cosine gravity compensation (more help when the wrist is level)
         motor.setFeedforwardType(GravityTypeValue.Arm_Cosine);

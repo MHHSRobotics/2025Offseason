@@ -367,7 +367,7 @@ public class RobotContainer {
         controller.circle().and(() -> !Arm.Constants.manualArm.get()).onTrue(armCommands.setGoal(() -> 1.3));
 
         // PID-based backward movement (CW)
-        controller.create().and(() -> !Arm.Constants.manualArm.get()).onTrue(armCommands.setGoal(() -> Math.PI / 2));
+        controller.create().and(() -> !Arm.Constants.manualArm.get()).onTrue(armCommands.setGoal(() -> 2));
 
         // Manual backward movement (CW)
         controller
