@@ -174,7 +174,8 @@ public class Arm extends SubsystemBase {
     // Tell the arm to go to a target angle (radians). Example: 0 rad ≈ arm straight forward.
     // We clamp to safe limits so the arm won't try to drive past its allowed range.
     public void setGoal(double pos) {
-        motor.setGoalWithCurrentMagic(MathUtil.clamp(pos, Constants.minAngle, Constants.maxAngle));
+        motor.setGoalWithCurrentMagic(
+                MathUtil.clamp(pos, Constants.minAngle, Constants.maxAngle));
     }
 
     // Find out the current target angle (radians)
@@ -200,7 +201,7 @@ public class Arm extends SubsystemBase {
         // 2) Update the on-screen arm drawing to match the current arm angle (radians)
         arm.setAngle(Rotation2d.fromRadians(motor.getInputs().position));
 
-        if (motor.getInputs().controlMode.startsWith("MotionMagic")) {
+        if (motor.getInputs().controlMode.startsWith("MM_")) {
             // If the motor is using Motion Magic (PID to a target), show the target and P/D/FF bars
             goalArm.setLineWeight(6);
             pAmount.setLineWeight(6);
