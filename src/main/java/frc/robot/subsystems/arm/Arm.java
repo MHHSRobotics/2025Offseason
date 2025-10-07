@@ -42,14 +42,14 @@ public class Arm extends SubsystemBase {
         public static final double encoderRatio = 1; // Ratio of encoder rotations to arm rotations (unitless)
 
         public static final LoggedNetworkNumber kP =
-                new LoggedNetworkNumber("Arm/kP", 75); // (volts per radian) more voltage when farther from target
+                new LoggedNetworkNumber("Arm/kP", 50); // (volts per radian) more voltage when farther from target
         public static final LoggedNetworkNumber kD =
-                new LoggedNetworkNumber("Arm/kD", 45); // (volts per rad/s) reacts to how fast error is changing
+                new LoggedNetworkNumber("Arm/kD", 20); // (volts per rad/s) reacts to how fast error is changing
 
         public static final LoggedNetworkNumber kS =
                 new LoggedNetworkNumber("Arm/kS", 0); // (volts) voltage to get arm moving (overcome static friction)
         public static final LoggedNetworkNumber kG = new LoggedNetworkNumber(
-                "Arm/kG", 17.4); // (volts) voltage to hold the arm level (compensate gravity at 0 rad)
+                "Arm/kG", 12); // (volts) voltage to hold the arm level (compensate gravity at 0 rad)
         public static final LoggedNetworkNumber kV = new LoggedNetworkNumber(
                 "Arm/kV", 0); // (volts per rad/s) voltage that scales with speed to overcome friction
         public static final LoggedNetworkNumber kA =
