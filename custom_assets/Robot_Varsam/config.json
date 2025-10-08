@@ -5,11 +5,11 @@
     "disableSimplification": true,
     "cameras": [
         {
-            "name":"cam",
+            "name":"BackRight_AT",
             "rotations":[],
-            "position":[0.25,0,0.25],
+            "position":[0.15,0.3,0.26],
             "resolution":[320,240],
-            "fov":100
+            "fov":80
         }
     ],
     "components": [
