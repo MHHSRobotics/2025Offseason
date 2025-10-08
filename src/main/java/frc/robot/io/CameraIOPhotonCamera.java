@@ -35,7 +35,7 @@ public class CameraIOPhotonCamera extends CameraIO {
 
         var unreadResults = cam.getAllUnreadResults();
         for (PhotonPipelineResult res : unreadResults) {
-            if (inputs.measurements < Constants.maxMeasurements && res.hasTargets()) {
+            if (inputs.measurements < Swerve.VisionConstants.maxMeasurements && res.hasTargets()) {
                 // Try multi-tag first (most accurate when multiple tags are visible)
                 var multiTagResult = res.getMultiTagResult();
                 if (multiTagResult.isPresent()) {
@@ -67,13 +67,13 @@ public class CameraIOPhotonCamera extends CameraIO {
                 }
             }
         }
-        if (inputs.measurements > 0 && Swerve.Constants.aprilTagTestEnabled.get()) {
+        if (inputs.measurements > 0 && Swerve.VisionConstants.aprilTagTestEnabled.get()) {
             // Get the latest camera→target detection
             PhotonTrackedTarget target =
                     unreadResults.get(unreadResults.size() - 1).getBestTarget();
             Transform3d cameraToTarget = target.getBestCameraToTarget();
             // Calculate robot→camera: robot→tag + tag→camera
-            inputs.testPose = Swerve.Constants.testAprilTagPose.transformBy(cameraToTarget.inverse());
+            inputs.testPose = Swerve.VisionConstants.testAprilTagPose.transformBy(cameraToTarget.inverse());
         }
 
         super.update();
@@ -87,8 +87,8 @@ public class CameraIOPhotonCamera extends CameraIO {
         }
         // Config for the camera sim
         SimCameraProperties cameraProp = new SimCameraProperties();
-        // 640x480 input with 100 degree FOV
-        cameraProp.setCalibration(640, 480, Rotation2d.fromDegrees(100));
+        // 640x480 input with 80 degree FOV
+        cameraProp.setCalibration(640, 480, Rotation2d.fromDegrees(80));
         // 50 FPS
         cameraProp.setFPS(50);
         // Latency of 35ms with standard deviation of 5ms
