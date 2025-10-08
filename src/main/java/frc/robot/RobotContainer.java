@@ -1,6 +1,5 @@
 package frc.robot;
 
-import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandPS5Controller;
@@ -324,17 +323,21 @@ public class RobotContainer {
         }
 
         if (Constants.visionEnabled) {
-            CameraIO testCam;
+            CameraIO brat;
+            CameraIO blat;
             switch (Constants.currentMode) {
                 case REAL:
                 case SIM:
-                    testCam = new CameraIOPhotonCamera("test camera", "Vision/TestCamera", new Transform3d());
+                    brat = new CameraIOPhotonCamera("BackRight_AT", "Vision/BRAT", Swerve.VisionConstants.bratPose);
+                    blat = new CameraIOPhotonCamera("BackLeft_AT", "Vision/BLAT", Swerve.VisionConstants.blatPose);
                     break;
                 default:
-                    testCam = new CameraIO("test camera", "Vision/TestCamera");
+                    brat = new CameraIO("BackRight_AT", "Vision/BRAT");
+                    blat = new CameraIO("BackLeft_AT", "Vision/BLAT");
                     break;
             }
-            swerve.addCameraSource(testCam);
+            swerve.addCameraSource(brat);
+            swerve.addCameraSource(blat);
             if (Constants.currentMode == Mode.SIM) {
                 new VisionSim(swerve.getCameras(), swerve);
             }
@@ -367,7 +370,7 @@ public class RobotContainer {
         controller.circle().and(() -> !Arm.Constants.manualArm.get()).onTrue(armCommands.setGoal(() -> 1.3));
 
         // PID-based backward movement (CW)
-        controller.create().and(() -> !Arm.Constants.manualArm.get()).onTrue(armCommands.setGoal(() -> Math.PI / 2));
+        controller.create().and(() -> !Arm.Constants.manualArm.get()).onTrue(armCommands.setGoal(() -> 2));
 
         // Manual backward movement (CW)
         controller

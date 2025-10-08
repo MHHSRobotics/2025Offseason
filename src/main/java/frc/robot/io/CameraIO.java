@@ -9,6 +9,7 @@ import org.littletonrobotics.junction.Logger;
 
 import frc.robot.Constants;
 import frc.robot.Constants.Mode;
+import frc.robot.subsystems.swerve.Swerve;
 import frc.robot.util.Alerts;
 import org.photonvision.simulation.VisionSystemSim;
 
@@ -18,10 +19,12 @@ public class CameraIO {
         public boolean connected;
 
         // Camera pose data as separate arrays
-        public Pose3d[] poses = new Pose3d[Constants.maxMeasurements];
-        public double[] poseTimestamps = new double[Constants.maxMeasurements]; // Timestamp of each pose (seconds)
-        public double[] ambiguities = new double[Constants.maxMeasurements]; // Pose ambiguity for each measurement
-        public int[] tagCounts = new int[Constants.maxMeasurements]; // Number of tags in each measurement
+        public Pose3d[] poses = new Pose3d[Swerve.VisionConstants.maxMeasurements];
+        public double[] poseTimestamps =
+                new double[Swerve.VisionConstants.maxMeasurements]; // Timestamp of each pose (seconds)
+        public double[] ambiguities =
+                new double[Swerve.VisionConstants.maxMeasurements]; // Pose ambiguity for each measurement
+        public int[] tagCounts = new int[Swerve.VisionConstants.maxMeasurements]; // Number of tags in each measurement
         public int measurements; // Number of pose measurements
         public Pose3d testPose = new Pose3d(); // Test pose for testing
     }
@@ -39,7 +42,7 @@ public class CameraIO {
         disconnectAlert = new Alert("The " + name + " is disconnected", AlertType.kError);
 
         // Initialize Pose3d's so AKit doesn't try to log nulls
-        for (int i = 0; i < Constants.maxMeasurements; i++) {
+        for (int i = 0; i < Swerve.VisionConstants.maxMeasurements; i++) {
             inputs.poses[i] = new Pose3d();
         }
     }

@@ -13,6 +13,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.geometry.Twist2d;
@@ -73,7 +74,9 @@ public class Swerve extends SubsystemBase {
 
         public static final LoggedNetworkBoolean swerveFieldCentric =
                 new LoggedNetworkBoolean("Swerve/FieldCentric", true); // Toggle for field centric controls
+    }
 
+    public static class VisionConstants {
         // Vision standard deviation tuning constants
         // Base XY standard deviation in meters (tune based on testing)
         public static final double visionXYStdDevBase = 0.5;
@@ -85,7 +88,7 @@ public class Swerve extends SubsystemBase {
         public static final double visionThetaStdDevDistanceMultiplier = 0.2;
 
         // The pose of the april tag in the test, relative to the robot
-        public static final Pose3d testAprilTagPose = new Pose3d(new Translation3d(2, 0, 0), new Rotation3d());
+        public static final Pose3d testAprilTagPose = new Pose3d(new Translation3d(-1.2, 0, 0.373), new Rotation3d());
 
         // Whether the april tag test is enabled
         public static final LoggedNetworkBoolean aprilTagTestEnabled =
@@ -95,6 +98,13 @@ public class Swerve extends SubsystemBase {
         public static final double translationkD=0;
         public static final double rotationkP=0;
         public static final double rotationkD=0;
+        public static final Transform3d bratPose =
+                new Transform3d(new Translation3d(-0.15, -0.3, 0.26), new Rotation3d(0, 0, Math.PI));
+
+        public static final Transform3d blatPose = new Transform3d();
+
+        // How many robot pose measurements to store per camera
+        public static final int maxMeasurements = 8;
     }
 
     // Find out the robot heading from the gyro (real or simulated)
@@ -140,7 +150,7 @@ public class Swerve extends SubsystemBase {
         this.modules = new SwerveModule[] {fl, fr, bl, br};
 
         estimator = new SwerveDrivePoseEstimator(
-                kinematics, gyroAngle, getModulePositions(), new Pose2d(2.5, Field.fieldWidth / 2, new Rotation2d()));
+                kinematics, gyroAngle, getModulePositions(), new Pose2d(2.5, Field.fieldWidth / 2, Rotation2d.k180deg));
         // Set up the on-screen visualization for the four modules
         initializeMechs();
 
@@ -319,10 +329,10 @@ public class Swerve extends SubsystemBase {
         double distance = getPose().getTranslation().getDistance(visionPose.getTranslation());
 
         // Base standard deviations (increases with distance)
-        double xyStdDev =
-                Constants.visionXYStdDevBase + (distance * distance * Constants.visionXYStdDevDistanceMultiplier);
-        double thetaStdDev =
-                Constants.visionThetaStdDevBase + (distance * Constants.visionThetaStdDevDistanceMultiplier);
+        double xyStdDev = VisionConstants.visionXYStdDevBase
+                + (distance * distance * VisionConstants.visionXYStdDevDistanceMultiplier);
+        double thetaStdDev = VisionConstants.visionThetaStdDevBase
+                + (distance * VisionConstants.visionThetaStdDevDistanceMultiplier);
 
         // Scale by ambiguity (higher ambiguity = less trust)
         xyStdDev *= (1 + ambiguity);
