@@ -1,6 +1,8 @@
 package frc.robot;
 
+import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandPS5Controller;
@@ -324,17 +326,24 @@ public class RobotContainer {
         }
 
         if (Constants.visionEnabled) {
-            CameraIO testCam;
+            CameraIO brat;
+            CameraIO blat;
             switch (Constants.currentMode) {
                 case REAL:
                 case SIM:
-                    testCam = new CameraIOPhotonCamera("test camera", "Vision/TestCamera", new Transform3d());
+                    brat = new CameraIOPhotonCamera(
+                            "BackRight_AT",
+                            "Vision/BRAT",
+                            new Transform3d(new Translation3d(-0.15, -0.3, 0.26), new Rotation3d(0, 0, Math.PI)));
+                    blat = new CameraIOPhotonCamera("BackLeft_AT", "Vision/BLAT", new Transform3d());
                     break;
                 default:
-                    testCam = new CameraIO("test camera", "Vision/TestCamera");
+                    brat = new CameraIO("BackRight_AT", "Vision/BRAT");
+                    blat = new CameraIO("BackLeft_AT", "Vision/BLAT");
                     break;
             }
-            swerve.addCameraSource(testCam);
+            swerve.addCameraSource(brat);
+            swerve.addCameraSource(blat);
             if (Constants.currentMode == Mode.SIM) {
                 new VisionSim(swerve.getCameras(), swerve);
             }
