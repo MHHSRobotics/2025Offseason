@@ -141,18 +141,14 @@ public class Swerve extends SubsystemBase {
             new PIDController(Constants.translationkP, 0, Constants.translationkD),
             new ProfiledPIDController(Constants.rotationkP, 0, Constants.rotationkD, new Constraints(10, 10)));
 
-    // Enum for current control command applied to the swerve
-    public static enum SwerveControl {
-        MANUAL,
-        PID,
-        LOCKED
-    }
+    private Pose2d targetPose;
 
-    // Current control command applied to the swerve
-    private SwerveControl currentControl = SwerveControl.MANUAL;
-
-    // Numbers associated with current control command
     private double x, y, theta;
+
+    private boolean pidPosition;
+    private boolean pidRotation;
+
+    private boolean locked;
 
     public Swerve(GyroIO gyro, SwerveModule fl, SwerveModule fr, SwerveModule bl, SwerveModule br) {
         this.gyro = gyro;
@@ -367,20 +363,6 @@ public class Swerve extends SubsystemBase {
             module.periodic();
         }
 
-        switch (currentControl) {
-            case MANUAL:
-                runSpeeds(x, y, theta, Constants.swerveFieldCentric.get());
-                break;
-            case LOCKED:
-                lock();
-                runSpeeds(0, 0, 0, false);
-                break;
-            case PID:
-                var chassisSpeeds = pidController.calculate(
-                        getPose(), new Pose2d(x, y, new Rotation2d(theta)), 0, new Rotation2d(theta));
-                runVelocity(chassisSpeeds);
-                break;
-        }
         // Get measurements from all connected cameras and add them to the pose estimator
         for (CameraIO cam : cameras) {
             cam.update();
