@@ -455,6 +455,8 @@ public class RobotContainer {
                 () -> -controller.getLeftX(),
                 () -> -controller.getRightX(),
                 () -> Swerve.Constants.swerveFieldCentric.get()));
+
+        controller.cross().onTrue(Commands.runOnce(() -> swerve.setPositionTarget(0, 0)));
     }
 
     // Run selected subsystem at given duty cycle

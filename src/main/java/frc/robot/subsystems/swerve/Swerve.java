@@ -90,9 +90,9 @@ public class Swerve extends SubsystemBase {
         public static final LoggedNetworkBoolean swerveFieldCentric =
                 new LoggedNetworkBoolean("Swerve/FieldCentric", true); // Toggle for field centric controls
 
-        public static final LoggedNetworkNumber translationkP = new LoggedNetworkNumber("Swerve/TransKP", 0);
+        public static final LoggedNetworkNumber translationkP = new LoggedNetworkNumber("Swerve/TransKP", 5);
         public static final LoggedNetworkNumber translationkD = new LoggedNetworkNumber("Swerve/TransKD", 0);
-        public static final LoggedNetworkNumber rotationkP = new LoggedNetworkNumber("Swerve/RotKP", 0);
+        public static final LoggedNetworkNumber rotationkP = new LoggedNetworkNumber("Swerve/RotKP", 5);
         public static final LoggedNetworkNumber rotationkD = new LoggedNetworkNumber("Swerve/RotKD", 0);
     }
 
@@ -156,7 +156,7 @@ public class Swerve extends SubsystemBase {
     private final ProfiledPIDController thetaController;
 
     // Target pose for auto-align
-    private Pose2d targetPose;
+    private Pose2d targetPose = new Pose2d();
 
     // Target dx, dy, dtheta for manual control
     private double dx, dy, dtheta;
@@ -185,6 +185,7 @@ public class Swerve extends SubsystemBase {
         yController = new PIDController(Constants.translationkP.get(), 0, Constants.translationkD.get());
         thetaController = new ProfiledPIDController(
                 Constants.rotationkP.get(), 0, Constants.rotationkD.get(), new Constraints(10, 10));
+        xController.setIZone(1);
 
         // Set wraparound on theta controller
         thetaController.enableContinuousInput(-Math.PI, Math.PI);
