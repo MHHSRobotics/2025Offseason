@@ -7,9 +7,16 @@
         {
             "name":"BackRight_AT",
             "rotations":[],
-            "position":[0.15,0.3,0.26],
+            "position":[0.18,0.3,0.26],
             "resolution":[320,240],
-            "fov":80
+            "fov":60
+        },
+        {
+            "name":"BackLeft_AT",
+            "rotations":[],
+            "position":[0.19,-0.09,0.28],
+            "resolution":[320,240],
+            "fov":70
         }
     ],
     "components": [

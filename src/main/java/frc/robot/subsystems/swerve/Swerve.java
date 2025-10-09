@@ -74,6 +74,11 @@ public class Swerve extends SubsystemBase {
 
         public static final LoggedNetworkBoolean swerveFieldCentric =
                 new LoggedNetworkBoolean("Swerve/FieldCentric", true); // Toggle for field centric controls
+
+        public static final double translationkP = 0;
+        public static final double translationkD = 0;
+        public static final double rotationkP = 0;
+        public static final double rotationkD = 0;
     }
 
     public static class VisionConstants {
@@ -94,14 +99,11 @@ public class Swerve extends SubsystemBase {
         public static final LoggedNetworkBoolean aprilTagTestEnabled =
                 new LoggedNetworkBoolean("Swerve/AprilTagTest", false);
 
-        public static final double translationkP=0;
-        public static final double translationkD=0;
-        public static final double rotationkP=0;
-        public static final double rotationkD=0;
         public static final Transform3d bratPose =
-                new Transform3d(new Translation3d(-0.15, -0.3, 0.26), new Rotation3d(0, 0, Math.PI));
+                new Transform3d(new Translation3d(-0.18, -0.3, 0.27), new Rotation3d(0, 0, Math.PI));
 
-        public static final Transform3d blatPose = new Transform3d();
+        public static final Transform3d blatPose =
+                new Transform3d(new Translation3d(-0.19, 0.09, 0.28), new Rotation3d(0, 0, Math.PI));
 
         // How many robot pose measurements to store per camera
         public static final int maxMeasurements = 8;
@@ -134,16 +136,23 @@ public class Swerve extends SubsystemBase {
     private final LoggedMechanismLigament2d[] speeds = new LoggedMechanismLigament2d[4];
 
     // Holonomic controller for auto-align
-    private final HolonomicDriveController pidController = new HolonomicDriveController(new PIDController(Constants.translationkP, 0, Constants.translationkD), new PIDController(Constants.translationkP, 0, Constants.translationkD), new ProfiledPIDController(Constants.rotationkP, 0, Constants.rotationkD, new Constraints(10, 10)));
+    private final HolonomicDriveController pidController = new HolonomicDriveController(
+            new PIDController(Constants.translationkP, 0, Constants.translationkD),
+            new PIDController(Constants.translationkP, 0, Constants.translationkD),
+            new ProfiledPIDController(Constants.rotationkP, 0, Constants.rotationkD, new Constraints(10, 10)));
 
     // Enum for current control command applied to the swerve
-    public static enum SwerveControl{
+    public static enum SwerveControl {
         MANUAL,
-        PID
+        PID,
+        LOCKED
     }
 
     // Current control command applied to the swerve
-    private SwerveControl currentControl;
+    private SwerveControl currentControl = SwerveControl.MANUAL;
+
+    // Numbers associated with current control command
+    private double x, y, theta;
 
     public Swerve(GyroIO gyro, SwerveModule fl, SwerveModule fr, SwerveModule bl, SwerveModule br) {
         this.gyro = gyro;
@@ -282,20 +291,13 @@ public class Swerve extends SubsystemBase {
         }
     }
 
-    // Tell the swerve to stop moving (vx = 0, vy = 0, omega = 0)
-    public void stop() {
-        runVelocity(new ChassisSpeeds());
-    }
-
     // Make the modules point in an X pattern so it's harder to push the robot.
-    // The next call to runVelocity() will return the modules to normal control.
     public void lock() {
         Rotation2d[] headings = new Rotation2d[4];
         for (int i = 0; i < 4; i++) {
             headings[i] = getModuleTranslations()[i].getAngle();
         }
         kinematics.resetHeadings(headings);
-        stop();
     }
 
     // Find out the robot's top speed (m/s) at 12 volts from characterization
@@ -358,13 +360,28 @@ public class Swerve extends SubsystemBase {
     @Override
     public void periodic() {
         // This runs every robot loop (~50 times per second)
-        // 1) Run each module's periodic to update sensors and control, and brake and disable if necessary
+        // Run each module's periodic to update sensors and control, and brake and disable if necessary
         for (SwerveModule module : modules) {
             module.setLocked(Constants.swerveLocked.get());
             module.setDisabled(Constants.swerveDisabled.get());
             module.periodic();
         }
 
+        switch (currentControl) {
+            case MANUAL:
+                runSpeeds(x, y, theta, Constants.swerveFieldCentric.get());
+                break;
+            case LOCKED:
+                lock();
+                runSpeeds(0, 0, 0, false);
+                break;
+            case PID:
+                var chassisSpeeds = pidController.calculate(
+                        getPose(), new Pose2d(x, y, new Rotation2d(theta)), 0, new Rotation2d(theta));
+                runVelocity(chassisSpeeds);
+                break;
+        }
+        // Get measurements from all connected cameras and add them to the pose estimator
         for (CameraIO cam : cameras) {
             cam.update();
             CameraIOInputs inputs = cam.getInputs();
@@ -375,7 +392,7 @@ public class Swerve extends SubsystemBase {
             }
         }
 
-        // 2) Update the gyro inputs (logging and alerts happen automatically)
+        // Update the gyro inputs (logging and alerts happen automatically)
         gyro.update();
 
         if (gyro.getInputs().connected) {

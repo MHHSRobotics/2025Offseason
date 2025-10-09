@@ -19,7 +19,8 @@ public class SwerveCommands {
 
     // Stops the movement of the swerve drive
     public Command stop() {
-        return new InstantCommand(() -> swerve.stop(), swerve).withName("swerve stop");
+        // return new InstantCommand(() -> swerve.stop(), swerve).withName("swerve stop");
+        return new InstantCommand();
     }
 
     // Puts the swerve drive into an X position so it can't be pushed
