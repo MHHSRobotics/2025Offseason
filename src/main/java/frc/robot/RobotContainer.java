@@ -114,6 +114,31 @@ public class RobotContainer {
             if (Constants.currentMode == Mode.SIM) {
                 new ArmSim(armMotor, armEncoder);
             }
+
+            if (Constants.wristEnabled) {
+                // Initialize wrist motor and encoder
+                MotorIO wristMotor;
+                EncoderIO wristEncoder;
+                switch (Constants.currentMode) {
+                    case REAL:
+                    case SIM:
+                        wristMotor = new MotorIOTalonFX(
+                                Wrist.Constants.motorId, Constants.defaultBus, "wrist motor", "Wrist/Motor");
+                        wristEncoder = new EncoderIOCANcoder(
+                                Wrist.Constants.encoderId, Constants.defaultBus, "wrist encoder", "Wrist/Encoder");
+                        break;
+                    default:
+                        wristMotor = new MotorIO("wrist motor", "Wrist/Motor");
+                        wristEncoder = new EncoderIO("wrist encoder", "Wrist/Encoder");
+                        break;
+                }
+                // Create wrist subsystem
+                wrist = new Wrist(wristMotor, wristEncoder, armMotor);
+
+                if (Constants.currentMode == Mode.SIM) {
+                    new WristSim(wristMotor, wristEncoder);
+                }
+            }
         }
 
         if (Constants.elevatorEnabled) {
@@ -148,31 +173,6 @@ public class RobotContainer {
 
             if (Constants.currentMode == Mode.SIM) {
                 new ElevatorSubsystemSim(elevatorLeftMotor, elevatorRightMotor, elevatorEncoder);
-            }
-        }
-
-        if (Constants.wristEnabled) {
-            // Initialize wrist motor and encoder
-            MotorIO wristMotor;
-            EncoderIO wristEncoder;
-            switch (Constants.currentMode) {
-                case REAL:
-                case SIM:
-                    wristMotor = new MotorIOTalonFX(
-                            Wrist.Constants.motorId, Constants.defaultBus, "wrist motor", "Wrist/Motor");
-                    wristEncoder = new EncoderIOCANcoder(
-                            Wrist.Constants.encoderId, Constants.defaultBus, "wrist encoder", "Wrist/Encoder");
-                    break;
-                default:
-                    wristMotor = new MotorIO("wrist motor", "Wrist/Motor");
-                    wristEncoder = new EncoderIO("wrist encoder", "Wrist/Encoder");
-                    break;
-            }
-            // Create wrist subsystem
-            wrist = new Wrist(wristMotor, wristEncoder);
-
-            if (Constants.currentMode == Mode.SIM) {
-                new WristSim(wristMotor, wristEncoder);
             }
         }
 

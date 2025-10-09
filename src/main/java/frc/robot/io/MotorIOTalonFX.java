@@ -34,9 +34,6 @@ import frc.robot.Constants;
 import frc.robot.Constants.Mode;
 import frc.robot.util.Alerts;
 
-import static edu.wpi.first.units.Units.Radians;
-import static edu.wpi.first.units.Units.RadiansPerSecond;
-
 // Make a CTRE TalonFX-backed implementation of MotorIO.
 // Units used:
 // - Mechanism position in radians (rad) for arms/flywheels, meters (m) for elevators
@@ -96,8 +93,8 @@ public class MotorIOTalonFX extends MotorIO {
     // Encoder connected to this motor
     private EncoderIOCANcoder connectedEncoder;
 
-    private double minLimit=Double.MIN_VALUE;
-    private double maxLimit=Double.MAX_VALUE;
+    private double minLimit = Double.MIN_VALUE;
+    private double maxLimit = Double.MAX_VALUE;
 
     // Make a TalonFX on the given CAN bus
     public MotorIOTalonFX(int id, CANBus canBus, String name, String logPath) {
@@ -260,7 +257,7 @@ public class MotorIOTalonFX extends MotorIO {
     // Tell the motor to go to a target position using Motion Magic with current control (radians)
     @Override
     public void setGoalWithCurrentMagic(double position, Supplier<Double> feedforward) {
-        position=MathUtil.clamp(position,minLimit,maxLimit);
+        position = MathUtil.clamp(position, minLimit, maxLimit);
         motionMagicTorqueCurrent.withPosition(Units.radiansToRotations(position + extraOffset));
         currentControl = ControlType.MM_POS_CURRENT;
         this.feedforward = feedforward;
@@ -269,7 +266,7 @@ public class MotorIOTalonFX extends MotorIO {
     // Tell the motor to go to a target position using Motion Magic with voltage control (radians)
     @Override
     public void setGoalWithVoltageMagic(double position) {
-        position=MathUtil.clamp(position,minLimit,maxLimit);
+        position = MathUtil.clamp(position, minLimit, maxLimit);
         motionMagicVoltage.withPosition(Units.radiansToRotations(position + extraOffset));
         currentControl = ControlType.MM_POS_VOLTAGE;
     }
@@ -291,7 +288,7 @@ public class MotorIOTalonFX extends MotorIO {
     // Tell the motor to go to a target position using current control (radians)
     @Override
     public void setGoalWithCurrent(double position) {
-        position=MathUtil.clamp(position,minLimit,maxLimit);
+        position = MathUtil.clamp(position, minLimit, maxLimit);
         positionCurrent.withPosition(Units.radiansToRotations(position + extraOffset));
         currentControl = ControlType.POS_CURRENT;
     }
@@ -299,7 +296,7 @@ public class MotorIOTalonFX extends MotorIO {
     // Tell the motor to go to a target position using voltage control (radians)
     @Override
     public void setGoalWithVoltage(double position) {
-        position=MathUtil.clamp(position,minLimit,maxLimit);
+        position = MathUtil.clamp(position, minLimit, maxLimit);
         positionVoltage.withPosition(Units.radiansToRotations(position + extraOffset));
         currentControl = ControlType.POS_VOLTAGE;
     }
@@ -570,8 +567,8 @@ public class MotorIOTalonFX extends MotorIO {
 
     @Override
     public void setLimits(double min, double max) {
-        minLimit=min;
-        maxLimit=max;
+        minLimit = min;
+        maxLimit = max;
         double newForwardThreshold = Units.radiansToRotations(max + extraOffset);
         double newReverseThreshold = Units.radiansToRotations(min + extraOffset);
         config.SoftwareLimitSwitch.ForwardSoftLimitEnable = true;

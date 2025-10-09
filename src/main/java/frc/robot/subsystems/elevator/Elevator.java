@@ -229,7 +229,7 @@ public class Elevator extends SubsystemBase {
         // 2) Update the on-screen elevator drawing to match the current elevator height (meters)
         elevator.setLength(leftMotor.getInputs().position + 0.1); // Add 0.1 for visual base
 
-        if (leftMotor.getInputs().controlMode.startsWith("MotionMagic")) {
+        if (leftMotor.getInputs().controlMode.startsWith("MM_")) {
             // If the motor is using Motion Magic (PID to a target), show the target and P/I/D/FF bars
             goalElevator.setLineWeight(6);
             pAmount.setLineWeight(6);
