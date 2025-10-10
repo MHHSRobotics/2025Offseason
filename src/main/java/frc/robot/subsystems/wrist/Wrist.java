@@ -46,12 +46,12 @@ public class Wrist extends SubsystemBase {
         public static final LoggedNetworkNumber kP =
                 new LoggedNetworkNumber("Wrist/kP", 60); // (volts per radian) more voltage when farther from target
         public static final LoggedNetworkNumber kD =
-                new LoggedNetworkNumber("Wrist/kD", 20); // (volts per rad/s) reacts to how fast error is changing
+                new LoggedNetworkNumber("Wrist/kD", 30); // (volts per rad/s) reacts to how fast error is changing
 
         public static final LoggedNetworkNumber kS = new LoggedNetworkNumber(
                 "Wrist/kS", 0.0); // (volts) voltage to get wrist moving (overcome static friction)
         public static final LoggedNetworkNumber kG = new LoggedNetworkNumber(
-                "Wrist/kG", 0.0); // (volts) voltage to hold the wrist level (compensate gravity at 0 rad)
+                "Wrist/kG", 25.0); // (volts) voltage to hold the wrist level (compensate gravity at 0 rad)
         public static final LoggedNetworkNumber kV = new LoggedNetworkNumber(
                 "Wrist/kV", 0); // (volts per rad/s) voltage that scales with speed to overcome friction
         public static final LoggedNetworkNumber kA =
@@ -108,6 +108,9 @@ public class Wrist extends SubsystemBase {
     // Absolute encoder interface; also supports simulation automatically
     private EncoderIO encoder;
 
+    // Arm motor for wrist gravity feedforward
+    private MotorIO armMotor;
+
     // On-screen drawing of the wrist for dashboards (length is visual only)
     private final LoggedMechanism2d mech = new LoggedMechanism2d(3, 3);
 
@@ -143,13 +146,15 @@ public class Wrist extends SubsystemBase {
     private final LoggedMechanismLigament2d fAmount =
             fRoot.append(new LoggedMechanismLigament2d("FAmount", 1.0, 90, 6, new Color8Bit(Color.kWhite)));
 
-    public Wrist(MotorIO motorIO, EncoderIO encoderIO) {
+    public Wrist(MotorIO motorIO, EncoderIO encoderIO, MotorIO armMotor) {
         encoder = encoderIO;
         // Tell the encoder which direction is positive and the gear ratio to the wrist
         encoder.setInverted(Constants.encoderInverted);
         encoder.setGearRatio(Constants.encoderRatio);
 
         motor = motorIO;
+
+        this.armMotor = armMotor;
 
         // Tell the motor which direction is forward (true = invert)
         motor.setInverted(Constants.motorInverted);
@@ -186,7 +191,9 @@ public class Wrist extends SubsystemBase {
     // Tell the wrist to go to a target angle (radians). Example: 0 rad ≈ wrist straight forward.
     // We clamp to safe limits so the wrist won't try to drive past its allowed range.
     public void setGoal(double angle) {
-        motor.setGoalWithCurrentMagic(MathUtil.clamp(angle, Constants.minAngle, Constants.maxAngle));
+        motor.setGoalWithCurrentMagic(
+                MathUtil.clamp(angle, Constants.minAngle, Constants.maxAngle),
+                () -> Constants.kG.get() * Math.cos(getPosition() + armMotor.getInputs().position));
     }
 
     // Find out the current target angle (radians)
@@ -217,7 +224,7 @@ public class Wrist extends SubsystemBase {
         // 2) Update the on-screen wrist drawing to match the current wrist angle (radians)
         wrist.setAngle(Rotation2d.fromRadians(motor.getInputs().position));
 
-        if (motor.getInputs().controlMode.startsWith("MotionMagic")) {
+        if (motor.getInputs().controlMode.startsWith("MM_")) {
             // If the motor is using Motion Magic (PID to a target), show the target and P/I/D/FF bars
             goalWrist.setLineWeight(6);
             pAmount.setLineWeight(6);
@@ -243,7 +250,6 @@ public class Wrist extends SubsystemBase {
         // 4) Read tuning numbers and apply them to the motor controller (units noted above)
         motor.setkP(Constants.kP.get());
         motor.setkD(Constants.kD.get());
-        motor.setkG(Constants.kG.get());
         motor.setkS(Constants.kS.get());
         motor.setkV(Constants.kV.get());
         motor.setkA(Constants.kA.get());

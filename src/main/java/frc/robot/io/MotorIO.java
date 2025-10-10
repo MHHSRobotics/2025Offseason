@@ -1,5 +1,7 @@
 package frc.robot.io;
 
+import java.util.function.Supplier;
+
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 
@@ -126,8 +128,12 @@ public class MotorIO {
     }
 
     // Tell the motor to go to a target position using Motion Magic with current control (mechanism units)
-    public void setGoalWithCurrentMagic(double goal) {
+    public void setGoalWithCurrentMagic(double goal, Supplier<Double> feedforward) {
         unsupportedFeature();
+    }
+
+    public void setGoalWithCurrentMagic(double goal) {
+        setGoalWithCurrentMagic(goal, null);
     }
 
     // Tell the motor to go to a target position using Motion Magic with voltage control (mechanism units)
