@@ -200,7 +200,7 @@ public class Arm extends SubsystemBase {
         // 2) Update the on-screen arm drawing to match the current arm angle (radians)
         arm.setAngle(Rotation2d.fromRadians(motor.getInputs().position));
 
-        if (motor.getInputs().controlMode.startsWith("MotionMagic")) {
+        if (motor.getInputs().controlMode.startsWith("MM_")) {
             // If the motor is using Motion Magic (PID to a target), show the target and P/D/FF bars
             goalArm.setLineWeight(6);
             pAmount.setLineWeight(6);
