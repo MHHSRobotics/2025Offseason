@@ -5,6 +5,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandPS5Controller;
 
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
+import org.littletonrobotics.junction.networktables.LoggedNetworkBoolean;
 
 import frc.robot.Constants.Mode;
 import frc.robot.commands.ArmCommands;
@@ -55,12 +56,10 @@ public class RobotContainer {
     // Main drive controller
     private final CommandPS5Controller controller = new CommandPS5Controller(0);
 
-    // Controller for SysId commands (not working right now)
-    // private final CommandPS5Controller sysIdController = new CommandPS5Controller(2);
-
-    // Virtual controller for sim
-    private final CommandPS5Controller testController = new CommandPS5Controller(3);
+    // Test controller for controlling one subsystem at a time
+    private final CommandPS5Controller testController = new CommandPS5Controller(1);
     private LoggedDashboardChooser<String> testControllerChooser;
+    private LoggedNetworkBoolean testControllerManual;
 
     // Publishes all robot data to AdvantageScope
     private RobotPublisher publisher;
@@ -75,10 +74,8 @@ public class RobotContainer {
         // Add controller bindings
         configureBindings();
 
-        // If in sim configure bindings for test controller
-        if (Constants.currentMode == Mode.SIM) {
-            configureTestBindings();
-        }
+        // Configure bindings for test controller
+        configureTestBindings();
 
         // Add SysId bindings
         configureSysId();
@@ -460,7 +457,7 @@ public class RobotContainer {
     }
 
     // Run selected subsystem at given duty cycle
-    private void runSelectedTest(double dutyCycle) {
+    private void runDutyCycleTest(double dutyCycle) {
         if (testControllerChooser.get().equals("Arm")) {
             arm.setSpeed(dutyCycle);
         } else if (testControllerChooser.get().equals("Elevator")) {
@@ -471,17 +468,21 @@ public class RobotContainer {
             hang.setSpeed(dutyCycle);
         } else if (testControllerChooser.get().equals("Intake")) {
             intake.setSpeed(dutyCycle);
+        } else if (testControllerChooser.get().equals("Swerve")){
+            swerve.setPositionOutput(dutyCycle, 0);
         }
     }
 
     // Run selected subsystem to given goal
-    private void runSelectedPIDTest(double goal) {
+    private void runPIDTest(double goal) {
         if (testControllerChooser.get().equals("Arm")) {
             arm.setGoal(goal);
         } else if (testControllerChooser.get().equals("Elevator")) {
             elevator.setGoal(goal);
         } else if (testControllerChooser.get().equals("Wrist")) {
             wrist.setGoal(goal);
+        } else if(testControllerChooser.get().equals("Swerve")){
+            swerve.setPositionTarget(0, 0);
         }
     }
 
@@ -493,20 +494,25 @@ public class RobotContainer {
         testControllerChooser.addOption("Wrist", "Wrist");
         testControllerChooser.addOption("Hang", "Hang");
         testControllerChooser.addOption("Intake", "Intake");
+        testControllerChooser.addOption("Swerve", "Swerve");
 
+        testControllerManual = new LoggedNetworkBoolean("Test/Manual");
+
+        // In sim, this is the X key
         testController
-                .cross()
-                .onTrue(Commands.runOnce(() -> runSelectedTest(0.2)))
-                .onFalse(Commands.runOnce(() -> runSelectedTest(0)));
+                .cross().and(()->testControllerManual.get())
+                .onTrue(Commands.runOnce(() -> runDutyCycleTest(0.2)))
+                .onFalse(Commands.runOnce(() -> runDutyCycleTest(0)));
 
+        // In sim, this is the C key
         testController
-                .circle()
-                .onTrue(Commands.runOnce(() -> runSelectedTest(-0.2)))
-                .onFalse(Commands.runOnce(() -> runSelectedTest(0)));
+                .circle().and(()->testControllerManual.get())
+                .onTrue(Commands.runOnce(() -> runDutyCycleTest(-0.2)))
+                .onFalse(Commands.runOnce(() -> runDutyCycleTest(0)));
 
-        testController.triangle().onTrue(Commands.runOnce(() -> runSelectedPIDTest(0)));
+        testController.cross().and(()->!testControllerManual.get()).onTrue(Commands.runOnce(() -> runPIDTest(0)));
 
-        testController.square().onTrue(Commands.runOnce(() -> runSelectedPIDTest(1)));
+        testController.square().and(()->!testControllerManual.get()).onTrue(Commands.runOnce(() -> runPIDTest(1)));
     }
 
     private void configureSysId() {}
