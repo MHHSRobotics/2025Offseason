@@ -29,8 +29,6 @@ import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-import com.ctre.phoenix6.Utils;
-
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.mechanism.LoggedMechanism2d;
@@ -427,7 +425,7 @@ public class Swerve extends SubsystemBase {
             cam.update();
             CameraIOInputs inputs = cam.getInputs();
             for (int i = 0; i < inputs.measurements; i++) {
-                System.out.println(inputs.ambiguities[0]);
+                System.out.println(inputs.poses[i].toPose2d().getX());
                 Matrix<N3, N1> stdDevs =
                         calculateVisionStdDevs(inputs.poses[i].toPose2d(), inputs.ambiguities[i], inputs.tagCounts[i]);
                 addVisionMeasurement(inputs.poses[i].toPose2d(), inputs.poseTimestamps[i], stdDevs);
@@ -447,8 +445,7 @@ public class Swerve extends SubsystemBase {
             gyroAngle = gyroAngle.plus(Rotation2d.fromRadians(twist.dtheta));
         }
         // 3) Feed odometry to the pose estimator (time, heading, and wheel distances)
-        estimator.updateWithTime(
-                Utils.fpgaToCurrentTime(RobotController.getFPGATime()), gyroAngle, getModulePositions());
+        estimator.updateWithTime(RobotController.getFPGATime() / 1000000., gyroAngle, getModulePositions());
 
         // 4) Update the module speed/direction drawing
         refreshVisualization();
