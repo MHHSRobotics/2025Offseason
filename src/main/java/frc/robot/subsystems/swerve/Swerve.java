@@ -23,10 +23,13 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+
+import com.ctre.phoenix6.Utils;
 
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
@@ -178,7 +181,12 @@ public class Swerve extends SubsystemBase {
         this.modules = new SwerveModule[] {fl, fr, bl, br};
 
         estimator = new SwerveDrivePoseEstimator(
-                kinematics, gyroAngle, getModulePositions(), new Pose2d(2.5, Field.fieldWidth / 2, Rotation2d.k180deg));
+                kinematics,
+                gyroAngle,
+                getModulePositions(),
+                new Pose2d(2.5, Field.fieldWidth / 2, Rotation2d.k180deg),
+                VecBuilder.fill(0.05, 0.05, Units.degreesToRadians(5)),
+                VecBuilder.fill(1, 1, 1));
 
         // Initialize PID controllers for auto align
         xController = new PIDController(Constants.translationkP.get(), 0, Constants.translationkD.get());
@@ -292,6 +300,14 @@ public class Swerve extends SubsystemBase {
         this.dy = dy;
     }
 
+    public boolean getPositionPIDSetting() {
+        return pidPosition;
+    }
+
+    public boolean getRotationPIDSetting() {
+        return pidRotation;
+    }
+
     // Set manual control for rotation
     public void setRotationOutput(double dtheta) {
         locked = false;
@@ -345,7 +361,8 @@ public class Swerve extends SubsystemBase {
             thetaStdDev /= Math.sqrt(tagCount);
         }
 
-        return VecBuilder.fill(xyStdDev, xyStdDev, thetaStdDev);
+        // return VecBuilder.fill(xyStdDev, xyStdDev, thetaStdDev);
+        return VecBuilder.fill(1, 1, 1);
     }
 
     // Adds a new CameraIO as a source of data
@@ -410,6 +427,7 @@ public class Swerve extends SubsystemBase {
             cam.update();
             CameraIOInputs inputs = cam.getInputs();
             for (int i = 0; i < inputs.measurements; i++) {
+                System.out.println(inputs.ambiguities[0]);
                 Matrix<N3, N1> stdDevs =
                         calculateVisionStdDevs(inputs.poses[i].toPose2d(), inputs.ambiguities[i], inputs.tagCounts[i]);
                 addVisionMeasurement(inputs.poses[i].toPose2d(), inputs.poseTimestamps[i], stdDevs);
@@ -429,7 +447,8 @@ public class Swerve extends SubsystemBase {
             gyroAngle = gyroAngle.plus(Rotation2d.fromRadians(twist.dtheta));
         }
         // 3) Feed odometry to the pose estimator (time, heading, and wheel distances)
-        estimator.updateWithTime(RobotController.getFPGATime(), gyroAngle, getModulePositions());
+        estimator.updateWithTime(
+                Utils.fpgaToCurrentTime(RobotController.getFPGATime()), gyroAngle, getModulePositions());
 
         // 4) Update the module speed/direction drawing
         refreshVisualization();

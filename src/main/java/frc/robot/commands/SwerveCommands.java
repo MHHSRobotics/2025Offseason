@@ -60,11 +60,15 @@ public class SwerveCommands {
                             rotation = Math.copySign(rotationScale, rotation);
 
                             // Run the swerve drive with the given values of x, y, and rotation
-                            if (x != 0 || y != 0 || rotation != 0) {
-                                swerve.setPositionOutput(x, y);
-                                swerve.setRotationOutput(rotation);
-                                swerve.setFieldOriented(fieldRelative.getAsBoolean());
+                            if (x != 0 || y != 0 || !swerve.getPositionPIDSetting()) {
+                                swerve.setPositionOutput(
+                                        x * Swerve.Constants.maxLinearSpeedMetersPerSec,
+                                        y * Swerve.Constants.maxLinearSpeedMetersPerSec);
                             }
+                            if (rotation != 0 || !swerve.getRotationPIDSetting()) {
+                                swerve.setRotationOutput(rotation * Swerve.Constants.maxAngularSpeedRadPerSec);
+                            }
+                            swerve.setFieldOriented(fieldRelative.getAsBoolean());
                         },
                         swerve)
                 .withName("swerve drive");
