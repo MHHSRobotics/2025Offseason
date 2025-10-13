@@ -93,8 +93,11 @@ public class Swerve extends SubsystemBase {
 
         public static final LoggedNetworkNumber translationkP = new LoggedNetworkNumber("Swerve/TransKP", 5);
         public static final LoggedNetworkNumber translationkD = new LoggedNetworkNumber("Swerve/TransKD", 0);
+        public static final LoggedNetworkNumber translationkI = new LoggedNetworkNumber("Swerve/TransKI", 0);
+
         public static final LoggedNetworkNumber rotationkP = new LoggedNetworkNumber("Swerve/RotKP", 5);
         public static final LoggedNetworkNumber rotationkD = new LoggedNetworkNumber("Swerve/RotKD", 0);
+        public static final LoggedNetworkNumber rotationkI = new LoggedNetworkNumber("Swerve/RotKI", 0);
     }
 
     public static class VisionConstants {
@@ -187,10 +190,15 @@ public class Swerve extends SubsystemBase {
                 VecBuilder.fill(1, 1, 1));
 
         // Initialize PID controllers for auto align
-        xController = new PIDController(Constants.translationkP.get(), 0, Constants.translationkD.get());
-        yController = new PIDController(Constants.translationkP.get(), 0, Constants.translationkD.get());
+        xController = new PIDController(
+                Constants.translationkP.get(), Constants.translationkI.get(), Constants.translationkD.get());
+        yController = new PIDController(
+                Constants.translationkP.get(), Constants.translationkI.get(), Constants.translationkD.get());
         thetaController = new ProfiledPIDController(
-                Constants.rotationkP.get(), 0, Constants.rotationkD.get(), new Constraints(10, 10));
+                Constants.rotationkP.get(),
+                Constants.rotationkI.get(),
+                Constants.rotationkD.get(),
+                new Constraints(10, 10));
         xController.setIZone(1);
 
         // Set wraparound on theta controller
@@ -453,12 +461,15 @@ public class Swerve extends SubsystemBase {
         // Update PID controllers
         xController.setP(Constants.translationkP.get());
         yController.setP(Constants.translationkP.get());
+        thetaController.setP(Constants.rotationkP.get());
 
         xController.setD(Constants.translationkD.get());
         yController.setD(Constants.translationkD.get());
-
-        thetaController.setP(Constants.rotationkP.get());
         thetaController.setD(Constants.rotationkD.get());
+
+        xController.setI(Constants.translationkI.get());
+        yController.setI(Constants.translationkI.get());
+        thetaController.setI(Constants.rotationkI.get());
     }
 
     // Make a white line between two modules in the visualization so the robot outline is visible
