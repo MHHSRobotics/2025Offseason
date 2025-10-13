@@ -22,10 +22,13 @@ public class CameraIOPhotonCamera extends CameraIO {
 
     private Transform3d robotToCamera;
 
-    public CameraIOPhotonCamera(String name, String logPath, Transform3d robotToCamera) {
+    private double fov;
+
+    public CameraIOPhotonCamera(String name, String logPath, Transform3d robotToCamera, double fov) {
         super(name, logPath);
         cam = new PhotonCamera(name);
         this.robotToCamera = robotToCamera;
+        this.fov = fov;
     }
 
     @Override
@@ -67,14 +70,6 @@ public class CameraIOPhotonCamera extends CameraIO {
                 }
             }
         }
-        if (inputs.measurements > 0 && Swerve.VisionConstants.aprilTagTestEnabled.get()) {
-            // Get the latest camera→target detection
-            PhotonTrackedTarget target =
-                    unreadResults.get(unreadResults.size() - 1).getBestTarget();
-            Transform3d cameraToTarget = target.getBestCameraToTarget();
-            // Calculate robot→camera: robot→tag + tag→camera
-            inputs.testPose = Swerve.VisionConstants.testAprilTagPose.transformBy(cameraToTarget.inverse());
-        }
 
         super.update();
     }
@@ -88,7 +83,7 @@ public class CameraIOPhotonCamera extends CameraIO {
         // Config for the camera sim
         SimCameraProperties cameraProp = new SimCameraProperties();
         // 640x480 input with 80 degree FOV
-        cameraProp.setCalibration(640, 480, Rotation2d.fromDegrees(80));
+        cameraProp.setCalibration(320, 240, Rotation2d.fromDegrees(fov));
         // 50 FPS
         cameraProp.setFPS(50);
         // Latency of 35ms with standard deviation of 5ms

@@ -17,11 +17,6 @@ public class SwerveCommands {
         this.swerve = swerve;
     }
 
-    // Stops the movement of the swerve drive
-    public Command stop() {
-        return new InstantCommand(() -> swerve.stop(), swerve).withName("swerve stop");
-    }
-
     // Puts the swerve drive into an X position so it can't be pushed
     public Command lock() {
         return new InstantCommand(() -> swerve.lock(), swerve).withName("swerve lock");
@@ -65,7 +60,15 @@ public class SwerveCommands {
                             rotation = Math.copySign(rotationScale, rotation);
 
                             // Run the swerve drive with the given values of x, y, and rotation
-                            swerve.runSpeeds(x, y, rotation, fieldRelative.getAsBoolean());
+                            if (x != 0 || y != 0 || !swerve.getPositionPIDSetting()) {
+                                swerve.setPositionOutput(
+                                        x * Swerve.Constants.maxLinearSpeedMetersPerSec,
+                                        y * Swerve.Constants.maxLinearSpeedMetersPerSec);
+                            }
+                            if (rotation != 0 || !swerve.getRotationPIDSetting()) {
+                                swerve.setRotationOutput(rotation * Swerve.Constants.maxAngularSpeedRadPerSec);
+                            }
+                            swerve.setFieldOriented(fieldRelative.getAsBoolean());
                         },
                         swerve)
                 .withName("swerve drive");

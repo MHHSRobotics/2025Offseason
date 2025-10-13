@@ -26,7 +26,6 @@ public class CameraIO {
                 new double[Swerve.VisionConstants.maxMeasurements]; // Pose ambiguity for each measurement
         public int[] tagCounts = new int[Swerve.VisionConstants.maxMeasurements]; // Number of tags in each measurement
         public int measurements; // Number of pose measurements
-        public Pose3d testPose = new Pose3d(); // Test pose for testing
     }
 
     private String name;

@@ -328,8 +328,8 @@ public class RobotContainer {
             switch (Constants.currentMode) {
                 case REAL:
                 case SIM:
-                    brat = new CameraIOPhotonCamera("BackRight_AT", "Vision/BRAT", Swerve.VisionConstants.bratPose);
-                    blat = new CameraIOPhotonCamera("BackLeft_AT", "Vision/BLAT", Swerve.VisionConstants.blatPose);
+                    brat = new CameraIOPhotonCamera("BackRight_AT", "Vision/BRAT", Swerve.VisionConstants.bratPose, 60);
+                    blat = new CameraIOPhotonCamera("BackLeft_AT", "Vision/BLAT", Swerve.VisionConstants.blatPose, 70);
                     break;
                 default:
                     brat = new CameraIO("BackRight_AT", "Vision/BRAT");
@@ -455,6 +455,8 @@ public class RobotContainer {
                 () -> -controller.getLeftX(),
                 () -> -controller.getRightX(),
                 () -> Swerve.Constants.swerveFieldCentric.get()));
+
+        // controller.cross().onTrue(Commands.runOnce(() -> swerve.setPositionTarget(0, 0)));
     }
 
     // Run selected subsystem at given duty cycle
