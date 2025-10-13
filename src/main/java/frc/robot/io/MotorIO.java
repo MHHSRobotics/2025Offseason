@@ -251,22 +251,22 @@ public class MotorIO {
         unsupportedFeature();
     }
 
-    // Tell the motor to use a remote encoder with given gear ratio (unitless)
+    // Tell the motor to use a remote encoder with given gear ratio (unitless). Make sure to set encoder settings before calling this.
     public void connectEncoder(EncoderIO encoder, double motorToSensorRatio, boolean fuse) {
         unsupportedFeature();
     }
 
-    // Fuse defaults to true
+    // Fuse defaults to true. Make sure to set encoder settings before calling this.
     public void connectEncoder(EncoderIO encoder, double motorToSensorRatio) {
         connectEncoder(encoder, motorToSensorRatio, true);
     }
 
-    // Tell the motor to use its internal sensor with a gear ratio to the mechanism (unitless)
+    // Tell the motor to use its internal sensor with a gear ratio to the mechanism (unitless). Don't call both this and connectEncoder.
     public void setGearRatio(double gearRatio) {
         unsupportedFeature();
     }
 
-    // Tell the motor the absolute offset of the mechanism zero (radians)
+    // Tell the motor the absolute offset of the mechanism zero (radians). Do this AFTER connecting the encoder and the GravityType.
     public void setOffset(double offset) {
         unsupportedFeature();
     }
@@ -291,18 +291,8 @@ public class MotorIO {
         unsupportedFeature();
     }
 
-    // Set soft limits (radians)
+    // Set soft limits (radians). Do this AFTER setting the offset.
     public void setLimits(double min, double max) {
-        unsupportedFeature();
-    }
-
-    // Make the simulated mechanism position update (radians)
-    public void setMechPosition(double position) {
-        unsupportedFeature();
-    }
-
-    // Make the simulated mechanism velocity update (rad/s)
-    public void setMechVelocity(double velocity) {
         unsupportedFeature();
     }
 
@@ -315,4 +305,16 @@ public class MotorIO {
     public void setDisabled(boolean disabled) {
         unsupportedFeature();
     }
+
+    // Make the simulated mechanism position update (radians). Simulation-only.
+    public void setMechPosition(double position) {
+        unsupportedFeature();
+    }
+
+    // Make the simulated mechanism velocity update (rad/s). Simulation-only.
+    public void setMechVelocity(double velocity) {
+        unsupportedFeature();
+    }
+
+    
 }
