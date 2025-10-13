@@ -85,9 +85,6 @@ public class Elevator extends SubsystemBase {
 
         public static final double sensorToMechanismRatio = encoderRatio / drumRadius; // Encoder radians per meter
 
-        public static final LoggedNetworkBoolean manualElevator =
-                new LoggedNetworkBoolean("Elevator/Manual", false); // Toggle to enable manual control mode
-
         public static final LoggedNetworkBoolean elevatorLocked =
                 new LoggedNetworkBoolean("Elevator/Locked", true); // Toggle to enable braking when stopped
 

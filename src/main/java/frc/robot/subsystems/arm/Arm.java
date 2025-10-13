@@ -82,9 +82,6 @@ public class Arm extends SubsystemBase {
         public static final double rotorToSensorRatio =
                 gearRatio / encoderRatio; // Ratio of motor rotations to encoder rotations (unitless)
 
-        public static final LoggedNetworkBoolean manualArm =
-                new LoggedNetworkBoolean("Arm/Manual", false); // Toggle to enable manual control mode
-
         public static final LoggedNetworkBoolean armLocked =
                 new LoggedNetworkBoolean("Arm/Locked", true); // Toggle to enable braking when stopped
 

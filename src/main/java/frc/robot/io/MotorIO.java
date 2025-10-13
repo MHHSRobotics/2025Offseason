@@ -251,7 +251,8 @@ public class MotorIO {
         unsupportedFeature();
     }
 
-    // Tell the motor to use a remote encoder with given gear ratio (unitless). Make sure to set encoder settings before calling this.
+    // Tell the motor to use a remote encoder with given gear ratio (unitless). Make sure to set encoder settings before
+    // calling this.
     public void connectEncoder(EncoderIO encoder, double motorToSensorRatio, boolean fuse) {
         unsupportedFeature();
     }
@@ -261,12 +262,14 @@ public class MotorIO {
         connectEncoder(encoder, motorToSensorRatio, true);
     }
 
-    // Tell the motor to use its internal sensor with a gear ratio to the mechanism (unitless). Don't call both this and connectEncoder.
+    // Tell the motor to use its internal sensor with a gear ratio to the mechanism (unitless). Don't call both this and
+    // connectEncoder.
     public void setGearRatio(double gearRatio) {
         unsupportedFeature();
     }
 
-    // Tell the motor the absolute offset of the mechanism zero (radians). Do this AFTER connecting the encoder and the GravityType.
+    // Tell the motor the absolute offset of the mechanism zero (radians). Do this AFTER connecting the encoder and the
+    // GravityType.
     public void setOffset(double offset) {
         unsupportedFeature();
     }
@@ -315,6 +318,4 @@ public class MotorIO {
     public void setMechVelocity(double velocity) {
         unsupportedFeature();
     }
-
-    
 }

@@ -352,108 +352,13 @@ public class RobotContainer {
 
     private void configureBindings() {
         /* ---- Main controller bindings ---- */
-
-        // PID-based forward movement (CCW)
-        controller.cross().and(() -> !Arm.Constants.manualArm.get()).onTrue(armCommands.setGoal(() -> 0));
-
-        // Manual forward movement (CCW)
-        controller
-                .cross()
-                .and(() -> Arm.Constants.manualArm.get())
-                .onTrue(armCommands.setSpeed(() -> 0.2))
-                .onFalse(armCommands.stop());
-
-        // PID-based backward movement (CW)
-        controller.circle().and(() -> !Arm.Constants.manualArm.get()).onTrue(armCommands.setGoal(() -> 1.3));
-
-        // PID-based backward movement (CW)
-        controller.create().and(() -> !Arm.Constants.manualArm.get()).onTrue(armCommands.setGoal(() -> 2));
-
-        // Manual backward movement (CW)
-        controller
-                .circle()
-                .and(() -> Arm.Constants.manualArm.get())
-                .onTrue(armCommands.setSpeed(() -> -0.2))
-                .onFalse(armCommands.stop());
-
-        // Elevator controls
-        // XPID-based elevator up to middle position (L1 button)
-        controller.L1().and(() -> !Elevator.Constants.manualElevator.get()).onTrue(elevatorCommands.goToMiddle());
-
-        // Manual elevator up (L1 button in manual mode)
-        controller
-                .L1()
-                .and(() -> Elevator.Constants.manualElevator.get())
-                .onTrue(elevatorCommands.setSpeed(() -> 0.3))
-                .onFalse(elevatorCommands.stop());
-
-        // PID-based elevator down to bottom position (L2 button)
-        controller.L2().and(() -> !Elevator.Constants.manualElevator.get()).onTrue(elevatorCommands.goToBottom());
-
-        // Manual elevator down (L2 button in manual mode)
-        controller
-                .L2()
-                .and(() -> Elevator.Constants.manualElevator.get())
-                .onTrue(elevatorCommands.setSpeed(() -> -0.3))
-                .onFalse(elevatorCommands.stop());
-
-        // PID-based elevator to top position (R1 button)
-        controller.R1().and(() -> !Elevator.Constants.manualElevator.get()).onTrue(elevatorCommands.goToTop());
-
-        // Wrist controls
-        // PID-based wrist to straight position (triangle button)
-        controller.triangle().and(() -> !Wrist.Constants.manualWrist.get()).onTrue(wristCommands.goToStraight());
-
-        // Manual wrist up (triangle button in manual mode)
-        controller
-                .triangle()
-                .and(() -> Wrist.Constants.manualWrist.get())
-                .onTrue(wristCommands.setSpeed(() -> 0.2))
-                .onFalse(wristCommands.stop());
-
-        // PID-based wrist to down position (square button)
-        controller.povDown().and(() -> !Wrist.Constants.manualWrist.get()).onTrue(wristCommands.goToDown());
-
-        // Manual wrist down (square button in manual mode)
-        controller
-                .square()
-                .and(() -> Wrist.Constants.manualWrist.get())
-                .onTrue(wristCommands.setSpeed(() -> -0.2))
-                .onFalse(wristCommands.stop());
-
-        // PID-based wrist to stow position (R2 button)
-        controller.povUp().and(() -> !Wrist.Constants.manualWrist.get()).onTrue(wristCommands.goToUp());
-
-        // Manual wrist down faster (R2 button in manual mode)
-        controller
-                .R2()
-                .and(() -> Wrist.Constants.manualWrist.get())
-                .onTrue(wristCommands.setSpeed(() -> -0.3))
-                .onFalse(wristCommands.stop());
-
-        // Hang controls (for climbing at end of match)
-        // Hang extend up at full speed (left stick up)
-        controller.povLeft().onTrue(hangCommands.extendUp()).onFalse(hangCommands.stop());
-
-        // Hang retract down at full speed (left stick down)
-        controller.povRight().onTrue(hangCommands.retractDown()).onFalse(hangCommands.stop());
-
-        // Hang controls (for climbing at end of match)
-        // Hang extend up at full speed (left stick up)
-        controller.options().onTrue(intakeCommands.intakeFull()).onFalse(intakeCommands.stop());
-
-        // Hang retract down at full speed (left stick down)
-        controller.R3().onTrue(intakeCommands.outtakeFull()).onFalse(intakeCommands.stop());
-
-        controller.R2().onTrue(swerveCommands.resetGyro());
+        controller.options().onTrue(swerveCommands.resetGyro());
 
         swerve.setDefaultCommand(swerveCommands.drive(
                 () -> -controller.getLeftY(),
                 () -> -controller.getLeftX(),
                 () -> -controller.getRightX(),
                 () -> Swerve.Constants.swerveFieldCentric.get()));
-
-        // controller.cross().onTrue(Commands.runOnce(() -> swerve.setPositionTarget(0, 0)));
     }
 
     // Run selected subsystem at given duty cycle
@@ -468,7 +373,7 @@ public class RobotContainer {
             hang.setSpeed(dutyCycle);
         } else if (testControllerChooser.get().equals("Intake")) {
             intake.setSpeed(dutyCycle);
-        } else if (testControllerChooser.get().equals("Swerve")){
+        } else if (testControllerChooser.get().equals("Swerve")) {
             swerve.setPositionOutput(dutyCycle, 0);
         }
     }
@@ -481,7 +386,7 @@ public class RobotContainer {
             elevator.setGoal(goal);
         } else if (testControllerChooser.get().equals("Wrist")) {
             wrist.setGoal(goal);
-        } else if(testControllerChooser.get().equals("Swerve")){
+        } else if (testControllerChooser.get().equals("Swerve")) {
             swerve.setPositionTarget(0, 0);
         }
     }
@@ -500,19 +405,21 @@ public class RobotContainer {
 
         // In sim, this is the X key
         testController
-                .cross().and(()->testControllerManual.get())
+                .cross()
+                .and(() -> testControllerManual.get())
                 .onTrue(Commands.runOnce(() -> runDutyCycleTest(0.2)))
                 .onFalse(Commands.runOnce(() -> runDutyCycleTest(0)));
 
         // In sim, this is the C key
         testController
-                .circle().and(()->testControllerManual.get())
+                .circle()
+                .and(() -> testControllerManual.get())
                 .onTrue(Commands.runOnce(() -> runDutyCycleTest(-0.2)))
                 .onFalse(Commands.runOnce(() -> runDutyCycleTest(0)));
 
-        testController.cross().and(()->!testControllerManual.get()).onTrue(Commands.runOnce(() -> runPIDTest(0)));
+        testController.cross().and(() -> !testControllerManual.get()).onTrue(Commands.runOnce(() -> runPIDTest(0)));
 
-        testController.square().and(()->!testControllerManual.get()).onTrue(Commands.runOnce(() -> runPIDTest(1)));
+        testController.square().and(() -> !testControllerManual.get()).onTrue(Commands.runOnce(() -> runPIDTest(1)));
     }
 
     private void configureSysId() {}
