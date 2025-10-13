@@ -359,8 +359,7 @@ public class Swerve extends SubsystemBase {
             thetaStdDev /= Math.sqrt(tagCount);
         }
 
-        // return VecBuilder.fill(xyStdDev, xyStdDev, thetaStdDev);
-        return VecBuilder.fill(1, 1, 1);
+        return VecBuilder.fill(xyStdDev, xyStdDev, thetaStdDev);
     }
 
     // Adds a new CameraIO as a source of data
@@ -443,13 +442,23 @@ public class Swerve extends SubsystemBase {
             Twist2d twist = kinematics.toTwist2d(getModuleDeltas());
             gyroAngle = gyroAngle.plus(Rotation2d.fromRadians(twist.dtheta));
         }
-        // 3) Feed odometry to the pose estimator (time, heading, and wheel distances)
+        // Feed odometry to the pose estimator (time, heading, and wheel distances)
         estimator.updateWithTime(RobotController.getFPGATime() / 1000000., gyroAngle, getModulePositions());
 
-        // 4) Update the module speed/direction drawing
+        // Update the module speed/direction drawing
         refreshVisualization();
 
         Logger.recordOutput("Swerve/Visualization", mech);
+
+        // Update PID controllers
+        xController.setP(Constants.translationkP.get());
+        yController.setP(Constants.translationkP.get());
+
+        xController.setD(Constants.translationkD.get());
+        yController.setD(Constants.translationkD.get());
+
+        thetaController.setP(Constants.rotationkP.get());
+        thetaController.setD(Constants.rotationkD.get());
     }
 
     // Make a white line between two modules in the visualization so the robot outline is visible

@@ -125,6 +125,9 @@ public class Elevator extends SubsystemBase {
     // Base point for the feedforward (FF) bar visualization
     private final LoggedMechanismRoot2d fRoot = mech.getRoot("FRoot", 2.7, 2);
 
+    // Base point for the feedforward (FF) bar visualization
+    private final LoggedMechanismRoot2d iRoot = mech.getRoot("IRoot", 2.8, 2);
+
     // Proportional (P) amount bar
     private final LoggedMechanismLigament2d pAmount =
             pRoot.append(new LoggedMechanismLigament2d("PAmount", 1.0, 90, 6, new Color8Bit(Color.kBlue)));
@@ -136,6 +139,10 @@ public class Elevator extends SubsystemBase {
     // Feedforward (FF) amount bar
     private final LoggedMechanismLigament2d fAmount =
             fRoot.append(new LoggedMechanismLigament2d("FAmount", 1.0, 90, 6, new Color8Bit(Color.kWhite)));
+
+    // Integral amount bar
+    private final LoggedMechanismLigament2d iAmount =
+            iRoot.append(new LoggedMechanismLigament2d("IAmount", 1.0, 90, 6, new Color8Bit(Color.kWhite)));
 
     public Elevator(MotorIO leftMotorIO, MotorIO rightMotorIO, EncoderIO encoderIO) {
         encoder = encoderIO;
@@ -232,18 +239,21 @@ public class Elevator extends SubsystemBase {
             pAmount.setLineWeight(6);
             dAmount.setLineWeight(6);
             fAmount.setLineWeight(6);
+            iAmount.setLineWeight(6);
 
             // Set the target height and how big each control term is (scaled down for drawing)
             goalElevator.setLength(leftMotor.getInputs().setpoint + 0.1); // Add 0.1 for visual base
             pAmount.setLength(leftMotor.getInputs().propOutput / 100);
             dAmount.setLength(leftMotor.getInputs().derivOutput / 100);
             fAmount.setLength(leftMotor.getInputs().feedforward / 100);
+            iAmount.setLength(leftMotor.getInputs().intOutput / 100);
         } else {
             // Hide the target and P/I/D/FF bars when not using Motion Magic
             goalElevator.setLineWeight(0);
             pAmount.setLineWeight(0);
             dAmount.setLineWeight(0);
             fAmount.setLineWeight(0);
+            iAmount.setLineWeight(0);
         }
 
         // 3) Send the mechanism drawing to the logs/dashboard
@@ -256,6 +266,7 @@ public class Elevator extends SubsystemBase {
         leftMotor.setkS(Constants.kS.get());
         leftMotor.setkV(Constants.kV.get());
         leftMotor.setkA(Constants.kA.get());
+        leftMotor.setkI(Constants.kI.get());
         leftMotor.setMaxVelocity(Constants.maxVelocity.get());
         leftMotor.setMaxAccel(Constants.maxAccel.get());
     }

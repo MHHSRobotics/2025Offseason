@@ -1,6 +1,7 @@
 package frc.robot;
 
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandPS5Controller;
 
@@ -349,6 +350,12 @@ public class RobotContainer {
 
     private void configureBindings() {
         /* ---- Main controller bindings ---- */
+        controller.L1().onTrue(intakeCommands.intake()).onFalse(intakeCommands.stop());
+        controller.L2().onTrue(intakeCommands.outtake()).onFalse(intakeCommands.stop());
+
+        controller.povUp().onTrue(hangCommands.extendUp()).onFalse(hangCommands.stop());
+        controller.povDown().onTrue(hangCommands.retractDown()).onFalse(hangCommands.stop());
+
         controller.options().onTrue(swerveCommands.resetGyro());
 
         swerve.setDefaultCommand(swerveCommands.drive(
@@ -356,6 +363,10 @@ public class RobotContainer {
                 () -> -controller.getLeftX(),
                 () -> -controller.getRightX(),
                 () -> Swerve.Constants.swerveFieldCentric.get()));
+
+        // Cancel all commands
+        controller.touchpad().onTrue(Commands.runOnce(() -> CommandScheduler.getInstance()
+                .cancelAll()));
     }
 
     // Run selected subsystem at given duty cycle
