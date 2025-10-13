@@ -425,7 +425,6 @@ public class Swerve extends SubsystemBase {
             cam.update();
             CameraIOInputs inputs = cam.getInputs();
             for (int i = 0; i < inputs.measurements; i++) {
-                System.out.println(inputs.poses[i].toPose2d().getX());
                 Matrix<N3, N1> stdDevs =
                         calculateVisionStdDevs(inputs.poses[i].toPose2d(), inputs.ambiguities[i], inputs.tagCounts[i]);
                 addVisionMeasurement(inputs.poses[i].toPose2d(), inputs.poseTimestamps[i], stdDevs);
