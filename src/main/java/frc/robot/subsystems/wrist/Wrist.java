@@ -78,11 +78,6 @@ public class Wrist extends SubsystemBase {
         public static final double wristTolerance =
                 Units.degreesToRadians(1); // (radians) how close we need to be to target (~1°)
 
-        // Angle bounds for SysId tests (radians). If the wrist hits a hard stop during SysId, the test fails.
-        // Keep these slightly inside the real mechanical limits to leave a few degrees of safety.
-        public static final double minSysIdAngle = Units.degreesToRadians(-120);
-        public static final double maxSysIdAngle = Units.degreesToRadians(75);
-
         public static final double rotorToSensorRatio =
                 gearRatio / encoderRatio; // Ratio of motor rotations to encoder rotations (unitless)
 

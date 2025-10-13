@@ -77,9 +77,6 @@ public class RobotContainer {
         // Configure bindings for test controller
         configureTestBindings();
 
-        // Add SysId bindings
-        configureSysId();
-
         // Initialize the publisher
         publisher = new RobotPublisher(arm, wrist, intake, elevator, hang, swerve);
     }
@@ -421,8 +418,6 @@ public class RobotContainer {
 
         testController.square().and(() -> !testControllerManual.get()).onTrue(Commands.runOnce(() -> runPIDTest(1)));
     }
-
-    private void configureSysId() {}
 
     public Command getAutonomousCommand() {
         return Commands.print("No autonomous command configured");

@@ -115,7 +115,7 @@ public class SwerveModule {
         setAnglePosition(state.angle.getRadians());
     }
 
-    // Special test mode for measuring how the robot moves (used by SysId tool)
+    // Special test mode for measuring how the robot moves
     public void runCharacterization(double volts) {
         setDriveVoltage(volts); // Apply test voltage
         setAnglePosition(0); // Keep wheel pointing straight forward

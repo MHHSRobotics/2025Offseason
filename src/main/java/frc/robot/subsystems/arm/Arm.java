@@ -74,11 +74,6 @@ public class Arm extends SubsystemBase {
         public static final double maxAngle = Units.degreesToRadians(140); // (radians) soft upper limit (~140°)
         public static final double startAngle = Units.degreesToRadians(90); // (radians) start angle in sim (~90°)
 
-        // Angle bounds for SysId tests (radians). If the arm hits a hard stop during SysId, the test fails.
-        // Keep these slightly inside the real mechanical limits to leave a few degrees of safety.
-        public static final double minSysIdAngle = Units.degreesToRadians(-30);
-        public static final double maxSysIdAngle = Units.degreesToRadians(120);
-
         public static final double rotorToSensorRatio =
                 gearRatio / encoderRatio; // Ratio of motor rotations to encoder rotations (unitless)
 
