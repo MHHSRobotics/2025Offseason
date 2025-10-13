@@ -12,6 +12,7 @@ import frc.robot.commands.ArmCommands;
 import frc.robot.commands.ElevatorCommands;
 import frc.robot.commands.HangCommands;
 import frc.robot.commands.IntakeCommands;
+import frc.robot.commands.SuperstructureCommands;
 import frc.robot.commands.SwerveCommands;
 import frc.robot.commands.WristCommands;
 import frc.robot.io.CameraIO;
@@ -52,6 +53,8 @@ public class RobotContainer {
     private HangCommands hangCommands;
     private IntakeCommands intakeCommands;
     private SwerveCommands swerveCommands;
+
+    private SuperstructureCommands ssCommands;
 
     // Main drive controller
     private final CommandPS5Controller controller = new CommandPS5Controller(0);
@@ -345,17 +348,27 @@ public class RobotContainer {
         hangCommands = new HangCommands(hang);
         intakeCommands = new IntakeCommands(intake);
         swerveCommands = new SwerveCommands(swerve);
+        ssCommands = new SuperstructureCommands(armCommands, elevatorCommands, wristCommands);
     }
 
     private void configureBindings() {
         /* ---- Main controller bindings ---- */
+        controller.triangle().onTrue(ssCommands.L4Position());
+        controller.square().onTrue(ssCommands.L3Position());
+        controller.circle().onTrue(ssCommands.L2Position());
+        controller.cross().onTrue(ssCommands.L1Position());
+        controller.options().onTrue(ssCommands.L1Position());
+
+        controller.R2().onTrue(ssCommands.lowAlgaePosition());
+        controller.R1().onTrue(ssCommands.highAlgaePosition());
+
         controller.L1().onTrue(intakeCommands.intake()).onFalse(intakeCommands.stop());
         controller.L2().onTrue(intakeCommands.outtake()).onFalse(intakeCommands.stop());
 
         controller.povUp().onTrue(hangCommands.extendUp()).onFalse(hangCommands.stop());
         controller.povDown().onTrue(hangCommands.retractDown()).onFalse(hangCommands.stop());
 
-        controller.options().onTrue(swerveCommands.resetGyro());
+        controller.create().onTrue(swerveCommands.resetGyro());
 
         swerve.setDefaultCommand(swerveCommands.drive(
                 () -> -controller.getLeftY(),
@@ -364,7 +377,7 @@ public class RobotContainer {
                 () -> Swerve.Constants.swerveFieldCentric.get()));
 
         // Cancel all commands
-        controller.touchpad().onTrue(Commands.runOnce(() -> CommandScheduler.getInstance()
+        controller.PS().onTrue(Commands.runOnce(() -> CommandScheduler.getInstance()
                 .cancelAll()));
     }
 
