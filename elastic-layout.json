@@ -88,253 +88,6 @@
                 }
               }
             ]
-          },
-          {
-            "title": "Arm",
-            "x": 256.0,
-            "y": 0.0,
-            "width": 256.0,
-            "height": 256.0,
-            "type": "List Layout",
-            "properties": {
-              "label_position": "TOP"
-            },
-            "children": [
-              {
-                "title": "Disabled",
-                "x": 0.0,
-                "y": 0.0,
-                "width": 128.0,
-                "height": 128.0,
-                "type": "Toggle Switch",
-                "properties": {
-                  "topic": "Arm/Disabled",
-                  "period": 0.06,
-                  "data_type": "boolean"
-                }
-              },
-              {
-                "title": "Locked",
-                "x": 0.0,
-                "y": 0.0,
-                "width": 128.0,
-                "height": 128.0,
-                "type": "Toggle Switch",
-                "properties": {
-                  "topic": "Arm/Locked",
-                  "period": 0.06,
-                  "data_type": "boolean"
-                }
-              }
-            ]
-          },
-          {
-            "title": "Elevator",
-            "x": 512.0,
-            "y": 0.0,
-            "width": 256.0,
-            "height": 256.0,
-            "type": "List Layout",
-            "properties": {
-              "label_position": "TOP"
-            },
-            "children": [
-              {
-                "title": "Disabled",
-                "x": 0.0,
-                "y": 0.0,
-                "width": 128.0,
-                "height": 128.0,
-                "type": "Toggle Switch",
-                "properties": {
-                  "topic": "Elevator/Disabled",
-                  "period": 0.06,
-                  "data_type": "boolean"
-                }
-              },
-              {
-                "title": "Locked",
-                "x": 0.0,
-                "y": 0.0,
-                "width": 128.0,
-                "height": 128.0,
-                "type": "Toggle Switch",
-                "properties": {
-                  "topic": "Elevator/Locked",
-                  "period": 0.06,
-                  "data_type": "boolean"
-                }
-              }
-            ]
-          },
-          {
-            "title": "Wrist",
-            "x": 768.0,
-            "y": 0.0,
-            "width": 256.0,
-            "height": 256.0,
-            "type": "List Layout",
-            "properties": {
-              "label_position": "TOP"
-            },
-            "children": [
-              {
-                "title": "Disabled",
-                "x": 0.0,
-                "y": 0.0,
-                "width": 128.0,
-                "height": 128.0,
-                "type": "Toggle Switch",
-                "properties": {
-                  "topic": "Wrist/Disabled",
-                  "period": 0.06,
-                  "data_type": "boolean"
-                }
-              },
-              {
-                "title": "Locked",
-                "x": 0.0,
-                "y": 0.0,
-                "width": 128.0,
-                "height": 128.0,
-                "type": "Toggle Switch",
-                "properties": {
-                  "topic": "Wrist/Locked",
-                  "period": 0.06,
-                  "data_type": "boolean"
-                }
-              }
-            ]
-          },
-          {
-            "title": "Swerve",
-            "x": 256.0,
-            "y": 256.0,
-            "width": 256.0,
-            "height": 256.0,
-            "type": "List Layout",
-            "properties": {
-              "label_position": "TOP"
-            },
-            "children": [
-              {
-                "title": "Disabled",
-                "x": 0.0,
-                "y": 0.0,
-                "width": 128.0,
-                "height": 128.0,
-                "type": "Toggle Switch",
-                "properties": {
-                  "topic": "Swerve/Disabled",
-                  "period": 0.06,
-                  "data_type": "boolean"
-                }
-              },
-              {
-                "title": "Locked",
-                "x": 0.0,
-                "y": 0.0,
-                "width": 128.0,
-                "height": 128.0,
-                "type": "Toggle Switch",
-                "properties": {
-                  "topic": "Swerve/Locked",
-                  "period": 0.06,
-                  "data_type": "boolean"
-                }
-              },
-              {
-                "title": "FieldCentric",
-                "x": 0.0,
-                "y": 0.0,
-                "width": 128.0,
-                "height": 128.0,
-                "type": "Toggle Switch",
-                "properties": {
-                  "topic": "Swerve/FieldCentric",
-                  "period": 0.06,
-                  "data_type": "boolean"
-                }
-              }
-            ]
-          },
-          {
-            "title": "Intake",
-            "x": 512.0,
-            "y": 256.0,
-            "width": 256.0,
-            "height": 256.0,
-            "type": "List Layout",
-            "properties": {
-              "label_position": "TOP"
-            },
-            "children": [
-              {
-                "title": "Disabled",
-                "x": 0.0,
-                "y": 0.0,
-                "width": 128.0,
-                "height": 128.0,
-                "type": "Toggle Switch",
-                "properties": {
-                  "topic": "Intake/Disabled",
-                  "period": 0.06,
-                  "data_type": "boolean"
-                }
-              },
-              {
-                "title": "Locked",
-                "x": 0.0,
-                "y": 0.0,
-                "width": 128.0,
-                "height": 128.0,
-                "type": "Toggle Switch",
-                "properties": {
-                  "topic": "Intake/Locked",
-                  "period": 0.06,
-                  "data_type": "boolean"
-                }
-              }
-            ]
-          },
-          {
-            "title": "Hang",
-            "x": 768.0,
-            "y": 256.0,
-            "width": 256.0,
-            "height": 256.0,
-            "type": "List Layout",
-            "properties": {
-              "label_position": "TOP"
-            },
-            "children": [
-              {
-                "title": "Disabled",
-                "x": 0.0,
-                "y": 0.0,
-                "width": 128.0,
-                "height": 128.0,
-                "type": "Toggle Switch",
-                "properties": {
-                  "topic": "Hang/Disabled",
-                  "period": 0.06,
-                  "data_type": "boolean"
-                }
-              },
-              {
-                "title": "Locked",
-                "x": 0.0,
-                "y": 0.0,
-                "width": 128.0,
-                "height": 128.0,
-                "type": "Toggle Switch",
-                "properties": {
-                  "topic": "Hang/Locked",
-                  "period": 0.06,
-                  "data_type": "boolean"
-                }
-              }
-            ]
           }
         ],
         "containers": [
@@ -363,113 +116,49 @@
             }
           },
           {
-            "title": "Autonomous",
-            "x": 512.0,
-            "y": 512.0,
-            "width": 128.0,
-            "height": 128.0,
-            "type": "Boolean Box",
-            "properties": {
-              "topic": "/AdvantageKit/DriverStation/Autonomous",
-              "period": 0.06,
-              "data_type": "boolean",
-              "true_color": 4283215696,
-              "false_color": 4294198070,
-              "true_icon": "None",
-              "false_icon": "None"
-            }
-          },
-          {
-            "title": "Emergency Stopped",
-            "x": 640.0,
-            "y": 512.0,
-            "width": 256.0,
-            "height": 128.0,
-            "type": "Boolean Box",
-            "properties": {
-              "topic": "/AdvantageKit/DriverStation/EmergencyStop",
-              "period": 0.06,
-              "data_type": "boolean",
-              "true_color": 4283215696,
-              "false_color": 4294198070,
-              "true_icon": "None",
-              "false_icon": "None"
-            }
-          },
-          {
-            "title": "Enabled",
-            "x": 896.0,
-            "y": 512.0,
-            "width": 128.0,
-            "height": 128.0,
-            "type": "Boolean Box",
-            "properties": {
-              "topic": "/AdvantageKit/DriverStation/Enabled",
-              "period": 0.06,
-              "data_type": "boolean",
-              "true_color": 4283215696,
-              "false_color": 4294198070,
-              "true_icon": "None",
-              "false_icon": "None"
-            }
-          },
-          {
-            "title": "Match Number",
-            "x": 1024.0,
-            "y": 512.0,
-            "width": 128.0,
-            "height": 128.0,
-            "type": "Text Display",
-            "properties": {
-              "topic": "/AdvantageKit/DriverStation/MatchNumber",
-              "period": 0.06,
-              "data_type": "int",
-              "show_submit_button": false
-            }
-          },
-          {
             "title": "Match Time",
-            "x": 1152.0,
-            "y": 512.0,
-            "width": 128.0,
-            "height": 128.0,
-            "type": "Text Display",
+            "x": 1280.0,
+            "y": 0.0,
+            "width": 384.0,
+            "height": 256.0,
+            "type": "Match Time",
             "properties": {
               "topic": "/AdvantageKit/DriverStation/MatchTime",
               "period": 0.06,
               "data_type": "double",
-              "show_submit_button": false
+              "time_display_mode": "Minutes and Seconds",
+              "red_start_time": 15,
+              "yellow_start_time": 30
             }
           },
           {
-            "title": "Station Number",
-            "x": 256.0,
-            "y": 640.0,
-            "width": 256.0,
-            "height": 128.0,
-            "type": "Text Display",
-            "properties": {
-              "topic": "/FMSInfo/StationNumber",
-              "period": 0.06,
-              "data_type": "int",
-              "show_submit_button": false
-            }
-          },
-          {
-            "title": "Alliance",
-            "x": 256.0,
+            "title": "BatteryVoltage",
+            "x": 640.0,
             "y": 512.0,
             "width": 256.0,
             "height": 128.0,
-            "type": "Boolean Box",
+            "type": "Voltage View",
             "properties": {
-              "topic": "/FMSInfo/IsRedAlliance",
+              "topic": "/AdvantageKit/SystemStats/BatteryVoltage",
               "period": 0.06,
-              "data_type": "boolean",
-              "true_color": 4294901760,
-              "false_color": 4278194943,
-              "true_icon": "None",
-              "false_icon": "None"
+              "data_type": "double",
+              "min_value": 4.0,
+              "max_value": 13.0,
+              "divisions": 5,
+              "inverted": false,
+              "orientation": "horizontal"
+            }
+          },
+          {
+            "title": "FMSInfo",
+            "x": 256.0,
+            "y": 512.0,
+            "width": 384.0,
+            "height": 128.0,
+            "type": "FMSInfo",
+            "properties": {
+              "topic": "/FMSInfo",
+              "period": 0.06
             }
           }
         ]
@@ -1029,7 +718,7 @@
           {
             "title": "Metadata",
             "x": 1536.0,
-            "y": 256.0,
+            "y": 512.0,
             "width": 256.0,
             "height": 512.0,
             "type": "List Layout",
@@ -1108,6 +797,84 @@
                 }
               }
             ]
+          },
+          {
+            "title": "Intake",
+            "x": 1280.0,
+            "y": 0.0,
+            "width": 256.0,
+            "height": 256.0,
+            "type": "List Layout",
+            "properties": {
+              "label_position": "TOP"
+            },
+            "children": [
+              {
+                "title": "Disabled",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Toggle Switch",
+                "properties": {
+                  "topic": "Intake/Disabled",
+                  "period": 0.06,
+                  "data_type": "boolean"
+                }
+              },
+              {
+                "title": "Locked",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Toggle Switch",
+                "properties": {
+                  "topic": "Intake/Locked",
+                  "period": 0.06,
+                  "data_type": "boolean"
+                }
+              }
+            ]
+          },
+          {
+            "title": "Hang",
+            "x": 1536.0,
+            "y": 0.0,
+            "width": 256.0,
+            "height": 256.0,
+            "type": "List Layout",
+            "properties": {
+              "label_position": "TOP"
+            },
+            "children": [
+              {
+                "title": "Disabled",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Toggle Switch",
+                "properties": {
+                  "topic": "Hang/Disabled",
+                  "period": 0.06,
+                  "data_type": "boolean"
+                }
+              },
+              {
+                "title": "Locked",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Toggle Switch",
+                "properties": {
+                  "topic": "Hang/Locked",
+                  "period": 0.06,
+                  "data_type": "boolean"
+                }
+              }
+            ]
           }
         ],
         "containers": [
@@ -1120,7 +887,7 @@
             "type": "Text Display",
             "properties": {
               "topic": "/AdvantageKit/Arm/Motor/Position",
-              "period": 0.06,
+              "period": 0.033,
               "data_type": "double",
               "show_submit_button": false
             }
@@ -1194,7 +961,7 @@
           {
             "title": "Subsystem Test",
             "x": 1280.0,
-            "y": 0.0,
+            "y": 256.0,
             "width": 256.0,
             "height": 128.0,
             "type": "ComboBox Chooser",
@@ -1207,7 +974,7 @@
           {
             "title": "Test Type",
             "x": 1280.0,
-            "y": 128.0,
+            "y": 384.0,
             "width": 256.0,
             "height": 128.0,
             "type": "ComboBox Chooser",
@@ -1218,7 +985,7 @@
             }
           },
           {
-            "title": "Red Alliance",
+            "title": "Alliance",
             "x": 0.0,
             "y": 768.0,
             "width": 256.0,
@@ -1228,8 +995,8 @@
               "topic": "/FMSInfo/IsRedAlliance",
               "period": 0.06,
               "data_type": "boolean",
-              "true_color": 4283215696,
-              "false_color": 4294198070,
+              "true_color": 4294901760,
+              "false_color": 4278205183,
               "true_icon": "None",
               "false_icon": "None"
             }
@@ -1307,15 +1074,19 @@
           {
             "title": "BatteryVoltage",
             "x": 1280.0,
-            "y": 256.0,
-            "width": 128.0,
+            "y": 512.0,
+            "width": 256.0,
             "height": 128.0,
-            "type": "Text Display",
+            "type": "Voltage View",
             "properties": {
               "topic": "/AdvantageKit/SystemStats/BatteryVoltage",
               "period": 0.06,
               "data_type": "double",
-              "show_submit_button": false
+              "min_value": 9.0,
+              "max_value": 13.0,
+              "divisions": 5,
+              "inverted": false,
+              "orientation": "horizontal"
             }
           },
           {
@@ -1335,7 +1106,7 @@
           {
             "title": "PDH Faults",
             "x": 1536.0,
-            "y": 0.0,
+            "y": 256.0,
             "width": 256.0,
             "height": 128.0,
             "type": "Text Display",
@@ -1349,7 +1120,7 @@
           {
             "title": "PDH Sticky Faults",
             "x": 1536.0,
-            "y": 128.0,
+            "y": 384.0,
             "width": 256.0,
             "height": 128.0,
             "type": "Text Display",
