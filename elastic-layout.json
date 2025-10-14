@@ -7,217 +7,83 @@
       "grid_layout": {
         "layouts": [
           {
-            "title": "Hang",
-            "x": 0.0,
+            "title": "Metadata",
+            "x": 1024.0,
             "y": 0.0,
             "width": 256.0,
-            "height": 256.0,
+            "height": 512.0,
             "type": "List Layout",
             "properties": {
               "label_position": "TOP"
             },
             "children": [
               {
-                "title": "Disabled",
-                "x": 0.0,
-                "y": 0.0,
-                "width": 128.0,
-                "height": 128.0,
-                "type": "Toggle Switch",
-                "properties": {
-                  "topic": "Hang/Disabled",
-                  "period": 0.06,
-                  "data_type": "boolean"
-                }
-              },
-              {
-                "title": "Locked",
-                "x": 0.0,
-                "y": 0.0,
-                "width": 128.0,
-                "height": 128.0,
-                "type": "Toggle Switch",
-                "properties": {
-                  "topic": "Hang/Locked",
-                  "period": 0.06,
-                  "data_type": "boolean"
-                }
-              }
-            ]
-          },
-          {
-            "title": "Elevator",
-            "x": 256.0,
-            "y": 0.0,
-            "width": 256.0,
-            "height": 256.0,
-            "type": "List Layout",
-            "properties": {
-              "label_position": "TOP"
-            },
-            "children": [
-              {
-                "title": "Disabled",
-                "x": 0.0,
-                "y": 0.0,
-                "width": 128.0,
-                "height": 128.0,
-                "type": "Toggle Switch",
-                "properties": {
-                  "topic": "Elevator/Disabled",
-                  "period": 0.06,
-                  "data_type": "boolean"
-                }
-              },
-              {
-                "title": "Locked",
-                "x": 0.0,
-                "y": 0.0,
-                "width": 128.0,
-                "height": 128.0,
-                "type": "Toggle Switch",
-                "properties": {
-                  "topic": "Elevator/Locked",
-                  "period": 0.06,
-                  "data_type": "boolean"
-                }
-              },
-              {
-                "title": "Manual",
-                "x": 0.0,
-                "y": 0.0,
-                "width": 128.0,
-                "height": 128.0,
-                "type": "Toggle Switch",
-                "properties": {
-                  "topic": "Elevator/Manual",
-                  "period": 0.06,
-                  "data_type": "boolean"
-                }
-              },
-              {
-                "title": "kA",
+                "title": "GitBranch",
                 "x": 0.0,
                 "y": 0.0,
                 "width": 128.0,
                 "height": 128.0,
                 "type": "Text Display",
                 "properties": {
-                  "topic": "Elevator/kA",
+                  "topic": "/AdvantageKit/RealMetadata/GitBranch",
                   "period": 0.06,
-                  "data_type": "double",
+                  "data_type": "string",
                   "show_submit_button": false
                 }
               },
               {
-                "title": "kD",
+                "title": "GitDirty",
                 "x": 0.0,
                 "y": 0.0,
                 "width": 128.0,
                 "height": 128.0,
                 "type": "Text Display",
                 "properties": {
-                  "topic": "Elevator/kD",
+                  "topic": "/AdvantageKit/RealMetadata/GitDirty",
                   "period": 0.06,
-                  "data_type": "double",
+                  "data_type": "string",
                   "show_submit_button": false
                 }
               },
               {
-                "title": "kG",
+                "title": "BuildDate",
                 "x": 0.0,
                 "y": 0.0,
                 "width": 128.0,
                 "height": 128.0,
                 "type": "Text Display",
                 "properties": {
-                  "topic": "Elevator/kG",
+                  "topic": "/AdvantageKit/RealMetadata/BuildDate",
                   "period": 0.06,
-                  "data_type": "double",
+                  "data_type": "string",
                   "show_submit_button": false
                 }
               },
               {
-                "title": "kI",
+                "title": "GitDate",
                 "x": 0.0,
                 "y": 0.0,
                 "width": 128.0,
                 "height": 128.0,
                 "type": "Text Display",
                 "properties": {
-                  "topic": "Elevator/kI",
+                  "topic": "/AdvantageKit/RealMetadata/GitDate",
                   "period": 0.06,
-                  "data_type": "double",
+                  "data_type": "string",
                   "show_submit_button": false
                 }
               },
               {
-                "title": "kP",
+                "title": "GitSHA",
                 "x": 0.0,
                 "y": 0.0,
                 "width": 128.0,
                 "height": 128.0,
                 "type": "Text Display",
                 "properties": {
-                  "topic": "Elevator/kP",
+                  "topic": "/AdvantageKit/RealMetadata/GitSHA",
                   "period": 0.06,
-                  "data_type": "double",
-                  "show_submit_button": false
-                }
-              },
-              {
-                "title": "kS",
-                "x": 0.0,
-                "y": 0.0,
-                "width": 128.0,
-                "height": 128.0,
-                "type": "Text Display",
-                "properties": {
-                  "topic": "Elevator/kS",
-                  "period": 0.06,
-                  "data_type": "double",
-                  "show_submit_button": false
-                }
-              },
-              {
-                "title": "kV",
-                "x": 0.0,
-                "y": 0.0,
-                "width": 128.0,
-                "height": 128.0,
-                "type": "Text Display",
-                "properties": {
-                  "topic": "Elevator/kV",
-                  "period": 0.06,
-                  "data_type": "double",
-                  "show_submit_button": false
-                }
-              },
-              {
-                "title": "maxAccel",
-                "x": 0.0,
-                "y": 0.0,
-                "width": 128.0,
-                "height": 128.0,
-                "type": "Text Display",
-                "properties": {
-                  "topic": "Elevator/maxAccel",
-                  "period": 0.06,
-                  "data_type": "double",
-                  "show_submit_button": false
-                }
-              },
-              {
-                "title": "maxVelocity",
-                "x": 0.0,
-                "y": 0.0,
-                "width": 128.0,
-                "height": 128.0,
-                "type": "Text Display",
-                "properties": {
-                  "topic": "Elevator/maxVelocity",
-                  "period": 0.06,
-                  "data_type": "double",
+                  "data_type": "string",
                   "show_submit_button": false
                 }
               }
@@ -225,7 +91,7 @@
           },
           {
             "title": "Arm",
-            "x": 512.0,
+            "x": 256.0,
             "y": 0.0,
             "width": 256.0,
             "height": 256.0,
@@ -259,137 +125,90 @@
                   "period": 0.06,
                   "data_type": "boolean"
                 }
-              },
+              }
+            ]
+          },
+          {
+            "title": "Elevator",
+            "x": 512.0,
+            "y": 0.0,
+            "width": 256.0,
+            "height": 256.0,
+            "type": "List Layout",
+            "properties": {
+              "label_position": "TOP"
+            },
+            "children": [
               {
-                "title": "Manual",
+                "title": "Disabled",
                 "x": 0.0,
                 "y": 0.0,
                 "width": 128.0,
                 "height": 128.0,
                 "type": "Toggle Switch",
                 "properties": {
-                  "topic": "Arm/Manual",
+                  "topic": "Elevator/Disabled",
                   "period": 0.06,
                   "data_type": "boolean"
                 }
               },
               {
-                "title": "kA",
+                "title": "Locked",
                 "x": 0.0,
                 "y": 0.0,
                 "width": 128.0,
                 "height": 128.0,
-                "type": "Text Display",
+                "type": "Toggle Switch",
                 "properties": {
-                  "topic": "Arm/kA",
+                  "topic": "Elevator/Locked",
                   "period": 0.06,
-                  "data_type": "double",
-                  "show_submit_button": false
+                  "data_type": "boolean"
+                }
+              }
+            ]
+          },
+          {
+            "title": "Wrist",
+            "x": 768.0,
+            "y": 0.0,
+            "width": 256.0,
+            "height": 256.0,
+            "type": "List Layout",
+            "properties": {
+              "label_position": "TOP"
+            },
+            "children": [
+              {
+                "title": "Disabled",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Toggle Switch",
+                "properties": {
+                  "topic": "Wrist/Disabled",
+                  "period": 0.06,
+                  "data_type": "boolean"
                 }
               },
               {
-                "title": "kD",
+                "title": "Locked",
                 "x": 0.0,
                 "y": 0.0,
                 "width": 128.0,
                 "height": 128.0,
-                "type": "Text Display",
+                "type": "Toggle Switch",
                 "properties": {
-                  "topic": "Arm/kD",
+                  "topic": "Wrist/Locked",
                   "period": 0.06,
-                  "data_type": "double",
-                  "show_submit_button": false
-                }
-              },
-              {
-                "title": "kG",
-                "x": 0.0,
-                "y": 0.0,
-                "width": 128.0,
-                "height": 128.0,
-                "type": "Text Display",
-                "properties": {
-                  "topic": "Arm/kG",
-                  "period": 0.06,
-                  "data_type": "double",
-                  "show_submit_button": false
-                }
-              },
-              {
-                "title": "kP",
-                "x": 0.0,
-                "y": 0.0,
-                "width": 128.0,
-                "height": 128.0,
-                "type": "Text Display",
-                "properties": {
-                  "topic": "Arm/kP",
-                  "period": 0.06,
-                  "data_type": "double",
-                  "show_submit_button": false
-                }
-              },
-              {
-                "title": "kS",
-                "x": 0.0,
-                "y": 0.0,
-                "width": 128.0,
-                "height": 128.0,
-                "type": "Text Display",
-                "properties": {
-                  "topic": "Arm/kS",
-                  "period": 0.06,
-                  "data_type": "double",
-                  "show_submit_button": false
-                }
-              },
-              {
-                "title": "kV",
-                "x": 0.0,
-                "y": 0.0,
-                "width": 128.0,
-                "height": 128.0,
-                "type": "Text Display",
-                "properties": {
-                  "topic": "Arm/kV",
-                  "period": 0.06,
-                  "data_type": "double",
-                  "show_submit_button": false
-                }
-              },
-              {
-                "title": "maxAccel",
-                "x": 0.0,
-                "y": 0.0,
-                "width": 128.0,
-                "height": 128.0,
-                "type": "Text Display",
-                "properties": {
-                  "topic": "Arm/maxAccel",
-                  "period": 0.06,
-                  "data_type": "double",
-                  "show_submit_button": false
-                }
-              },
-              {
-                "title": "maxVelocity",
-                "x": 0.0,
-                "y": 0.0,
-                "width": 128.0,
-                "height": 128.0,
-                "type": "Text Display",
-                "properties": {
-                  "topic": "Arm/maxVelocity",
-                  "period": 0.06,
-                  "data_type": "double",
-                  "show_submit_button": false
+                  "data_type": "boolean"
                 }
               }
             ]
           },
           {
             "title": "Swerve",
-            "x": 512.0,
+            "x": 256.0,
             "y": 256.0,
             "width": 256.0,
             "height": 256.0,
@@ -423,190 +242,25 @@
                   "period": 0.06,
                   "data_type": "boolean"
                 }
-              }
-            ]
-          },
-          {
-            "title": "Wrist",
-            "x": 256.0,
-            "y": 256.0,
-            "width": 256.0,
-            "height": 256.0,
-            "type": "List Layout",
-            "properties": {
-              "label_position": "TOP"
-            },
-            "children": [
+              },
               {
-                "title": "Disabled",
+                "title": "FieldCentric",
                 "x": 0.0,
                 "y": 0.0,
                 "width": 128.0,
                 "height": 128.0,
                 "type": "Toggle Switch",
                 "properties": {
-                  "topic": "Wrist/Disabled",
+                  "topic": "Swerve/FieldCentric",
                   "period": 0.06,
                   "data_type": "boolean"
-                }
-              },
-              {
-                "title": "Locked",
-                "x": 0.0,
-                "y": 0.0,
-                "width": 128.0,
-                "height": 128.0,
-                "type": "Toggle Switch",
-                "properties": {
-                  "topic": "Wrist/Locked",
-                  "period": 0.06,
-                  "data_type": "boolean"
-                }
-              },
-              {
-                "title": "Manual",
-                "x": 0.0,
-                "y": 0.0,
-                "width": 128.0,
-                "height": 128.0,
-                "type": "Toggle Switch",
-                "properties": {
-                  "topic": "Wrist/Manual",
-                  "period": 0.06,
-                  "data_type": "boolean"
-                }
-              },
-              {
-                "title": "kA",
-                "x": 0.0,
-                "y": 0.0,
-                "width": 128.0,
-                "height": 128.0,
-                "type": "Text Display",
-                "properties": {
-                  "topic": "Wrist/kA",
-                  "period": 0.06,
-                  "data_type": "double",
-                  "show_submit_button": false
-                }
-              },
-              {
-                "title": "kD",
-                "x": 0.0,
-                "y": 0.0,
-                "width": 128.0,
-                "height": 128.0,
-                "type": "Text Display",
-                "properties": {
-                  "topic": "Wrist/kD",
-                  "period": 0.06,
-                  "data_type": "double",
-                  "show_submit_button": false
-                }
-              },
-              {
-                "title": "kG",
-                "x": 0.0,
-                "y": 0.0,
-                "width": 128.0,
-                "height": 128.0,
-                "type": "Text Display",
-                "properties": {
-                  "topic": "Wrist/kG",
-                  "period": 0.06,
-                  "data_type": "double",
-                  "show_submit_button": false
-                }
-              },
-              {
-                "title": "kI",
-                "x": 0.0,
-                "y": 0.0,
-                "width": 128.0,
-                "height": 128.0,
-                "type": "Text Display",
-                "properties": {
-                  "topic": "Wrist/kI",
-                  "period": 0.06,
-                  "data_type": "double",
-                  "show_submit_button": false
-                }
-              },
-              {
-                "title": "kP",
-                "x": 0.0,
-                "y": 0.0,
-                "width": 128.0,
-                "height": 128.0,
-                "type": "Text Display",
-                "properties": {
-                  "topic": "Wrist/kP",
-                  "period": 0.06,
-                  "data_type": "double",
-                  "show_submit_button": false
-                }
-              },
-              {
-                "title": "kS",
-                "x": 0.0,
-                "y": 0.0,
-                "width": 128.0,
-                "height": 128.0,
-                "type": "Text Display",
-                "properties": {
-                  "topic": "Wrist/kS",
-                  "period": 0.06,
-                  "data_type": "double",
-                  "show_submit_button": false
-                }
-              },
-              {
-                "title": "kV",
-                "x": 0.0,
-                "y": 0.0,
-                "width": 128.0,
-                "height": 128.0,
-                "type": "Text Display",
-                "properties": {
-                  "topic": "Wrist/kV",
-                  "period": 0.06,
-                  "data_type": "double",
-                  "show_submit_button": false
-                }
-              },
-              {
-                "title": "maxAccel",
-                "x": 0.0,
-                "y": 0.0,
-                "width": 128.0,
-                "height": 128.0,
-                "type": "Text Display",
-                "properties": {
-                  "topic": "Wrist/maxAccel",
-                  "period": 0.06,
-                  "data_type": "double",
-                  "show_submit_button": false
-                }
-              },
-              {
-                "title": "maxVelocity",
-                "x": 0.0,
-                "y": 0.0,
-                "width": 128.0,
-                "height": 128.0,
-                "type": "Text Display",
-                "properties": {
-                  "topic": "Wrist/maxVelocity",
-                  "period": 0.06,
-                  "data_type": "double",
-                  "show_submit_button": false
                 }
               }
             ]
           },
           {
             "title": "Intake",
-            "x": 0.0,
+            "x": 512.0,
             "y": 256.0,
             "width": 256.0,
             "height": 256.0,
@@ -642,9 +296,1103 @@
                 }
               }
             ]
+          },
+          {
+            "title": "Hang",
+            "x": 768.0,
+            "y": 256.0,
+            "width": 256.0,
+            "height": 256.0,
+            "type": "List Layout",
+            "properties": {
+              "label_position": "TOP"
+            },
+            "children": [
+              {
+                "title": "Disabled",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Toggle Switch",
+                "properties": {
+                  "topic": "Hang/Disabled",
+                  "period": 0.06,
+                  "data_type": "boolean"
+                }
+              },
+              {
+                "title": "Locked",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Toggle Switch",
+                "properties": {
+                  "topic": "Hang/Locked",
+                  "period": 0.06,
+                  "data_type": "boolean"
+                }
+              }
+            ]
           }
         ],
-        "containers": []
+        "containers": [
+          {
+            "title": "Alerts",
+            "x": 0.0,
+            "y": 0.0,
+            "width": 256.0,
+            "height": 384.0,
+            "type": "Alerts",
+            "properties": {
+              "topic": "/SmartDashboard/Alerts",
+              "period": 0.06
+            }
+          },
+          {
+            "title": "PhotonAlerts",
+            "x": 0.0,
+            "y": 384.0,
+            "width": 256.0,
+            "height": 384.0,
+            "type": "Alerts",
+            "properties": {
+              "topic": "/SmartDashboard/PhotonAlerts",
+              "period": 0.06
+            }
+          },
+          {
+            "title": "Autonomous",
+            "x": 512.0,
+            "y": 512.0,
+            "width": 128.0,
+            "height": 128.0,
+            "type": "Boolean Box",
+            "properties": {
+              "topic": "/AdvantageKit/DriverStation/Autonomous",
+              "period": 0.06,
+              "data_type": "boolean",
+              "true_color": 4283215696,
+              "false_color": 4294198070,
+              "true_icon": "None",
+              "false_icon": "None"
+            }
+          },
+          {
+            "title": "Emergency Stopped",
+            "x": 640.0,
+            "y": 512.0,
+            "width": 256.0,
+            "height": 128.0,
+            "type": "Boolean Box",
+            "properties": {
+              "topic": "/AdvantageKit/DriverStation/EmergencyStop",
+              "period": 0.06,
+              "data_type": "boolean",
+              "true_color": 4283215696,
+              "false_color": 4294198070,
+              "true_icon": "None",
+              "false_icon": "None"
+            }
+          },
+          {
+            "title": "Enabled",
+            "x": 896.0,
+            "y": 512.0,
+            "width": 128.0,
+            "height": 128.0,
+            "type": "Boolean Box",
+            "properties": {
+              "topic": "/AdvantageKit/DriverStation/Enabled",
+              "period": 0.06,
+              "data_type": "boolean",
+              "true_color": 4283215696,
+              "false_color": 4294198070,
+              "true_icon": "None",
+              "false_icon": "None"
+            }
+          },
+          {
+            "title": "Match Number",
+            "x": 1024.0,
+            "y": 512.0,
+            "width": 128.0,
+            "height": 128.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "/AdvantageKit/DriverStation/MatchNumber",
+              "period": 0.06,
+              "data_type": "int",
+              "show_submit_button": false
+            }
+          },
+          {
+            "title": "Match Time",
+            "x": 1152.0,
+            "y": 512.0,
+            "width": 128.0,
+            "height": 128.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "/AdvantageKit/DriverStation/MatchTime",
+              "period": 0.06,
+              "data_type": "double",
+              "show_submit_button": false
+            }
+          },
+          {
+            "title": "Station Number",
+            "x": 256.0,
+            "y": 640.0,
+            "width": 256.0,
+            "height": 128.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "/FMSInfo/StationNumber",
+              "period": 0.06,
+              "data_type": "int",
+              "show_submit_button": false
+            }
+          },
+          {
+            "title": "Alliance",
+            "x": 256.0,
+            "y": 512.0,
+            "width": 256.0,
+            "height": 128.0,
+            "type": "Boolean Box",
+            "properties": {
+              "topic": "/FMSInfo/IsRedAlliance",
+              "period": 0.06,
+              "data_type": "boolean",
+              "true_color": 4294901760,
+              "false_color": 4278194943,
+              "true_icon": "None",
+              "false_icon": "None"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "Testing",
+      "grid_layout": {
+        "layouts": [
+          {
+            "title": "Arm Settings",
+            "x": 256.0,
+            "y": 0.0,
+            "width": 256.0,
+            "height": 384.0,
+            "type": "List Layout",
+            "properties": {
+              "label_position": "TOP"
+            },
+            "children": [
+              {
+                "title": "Disabled",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Toggle Switch",
+                "properties": {
+                  "topic": "/AdvantageKit/NetworkInputs/Arm/Disabled",
+                  "period": 0.06,
+                  "data_type": "boolean"
+                }
+              },
+              {
+                "title": "Locked",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Toggle Switch",
+                "properties": {
+                  "topic": "/AdvantageKit/NetworkInputs/Arm/Locked",
+                  "period": 0.06,
+                  "data_type": "boolean"
+                }
+              },
+              {
+                "title": "kP",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Text Display",
+                "properties": {
+                  "topic": "/AdvantageKit/NetworkInputs/Arm/kP",
+                  "period": 0.06,
+                  "data_type": "double",
+                  "show_submit_button": true
+                }
+              },
+              {
+                "title": "kI",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Text Display",
+                "properties": {
+                  "topic": "/AdvantageKit/NetworkInputs/Arm/kI",
+                  "period": 0.06,
+                  "data_type": "double",
+                  "show_submit_button": true
+                }
+              },
+              {
+                "title": "kD",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Text Display",
+                "properties": {
+                  "topic": "/AdvantageKit/NetworkInputs/Arm/kD",
+                  "period": 0.06,
+                  "data_type": "double",
+                  "show_submit_button": true
+                }
+              },
+              {
+                "title": "kG",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Text Display",
+                "properties": {
+                  "topic": "/AdvantageKit/NetworkInputs/Arm/kG",
+                  "period": 0.06,
+                  "data_type": "double",
+                  "show_submit_button": true
+                }
+              },
+              {
+                "title": "kS",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Text Display",
+                "properties": {
+                  "topic": "/AdvantageKit/NetworkInputs/Arm/kS",
+                  "period": 0.06,
+                  "data_type": "double",
+                  "show_submit_button": true
+                }
+              },
+              {
+                "title": "maxVelocity",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Text Display",
+                "properties": {
+                  "topic": "/AdvantageKit/NetworkInputs/Arm/maxVelocity",
+                  "period": 0.06,
+                  "data_type": "double",
+                  "show_submit_button": true
+                }
+              },
+              {
+                "title": "maxAccel",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Text Display",
+                "properties": {
+                  "topic": "/AdvantageKit/NetworkInputs/Arm/maxAccel",
+                  "period": 0.06,
+                  "data_type": "double",
+                  "show_submit_button": true
+                }
+              }
+            ]
+          },
+          {
+            "title": "Elevator Settings",
+            "x": 512.0,
+            "y": 0.0,
+            "width": 256.0,
+            "height": 384.0,
+            "type": "List Layout",
+            "properties": {
+              "label_position": "TOP"
+            },
+            "children": [
+              {
+                "title": "Disabled",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Toggle Switch",
+                "properties": {
+                  "topic": "/AdvantageKit/NetworkInputs/Elevator/Disabled",
+                  "period": 0.06,
+                  "data_type": "boolean"
+                }
+              },
+              {
+                "title": "Locked",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Toggle Switch",
+                "properties": {
+                  "topic": "/AdvantageKit/NetworkInputs/Elevator/Locked",
+                  "period": 0.06,
+                  "data_type": "boolean"
+                }
+              },
+              {
+                "title": "kP",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Text Display",
+                "properties": {
+                  "topic": "/AdvantageKit/NetworkInputs/Elevator/kP",
+                  "period": 0.06,
+                  "data_type": "double",
+                  "show_submit_button": true
+                }
+              },
+              {
+                "title": "kI",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Text Display",
+                "properties": {
+                  "topic": "/AdvantageKit/NetworkInputs/Elevator/kI",
+                  "period": 0.06,
+                  "data_type": "double",
+                  "show_submit_button": true
+                }
+              },
+              {
+                "title": "kD",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Text Display",
+                "properties": {
+                  "topic": "/AdvantageKit/NetworkInputs/Elevator/kD",
+                  "period": 0.06,
+                  "data_type": "double",
+                  "show_submit_button": true
+                }
+              },
+              {
+                "title": "kG",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Text Display",
+                "properties": {
+                  "topic": "/AdvantageKit/NetworkInputs/Elevator/kG",
+                  "period": 0.06,
+                  "data_type": "double",
+                  "show_submit_button": true
+                }
+              },
+              {
+                "title": "kS",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Text Display",
+                "properties": {
+                  "topic": "/AdvantageKit/NetworkInputs/Elevator/kS",
+                  "period": 0.06,
+                  "data_type": "double",
+                  "show_submit_button": true
+                }
+              },
+              {
+                "title": "maxVelocity",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Text Display",
+                "properties": {
+                  "topic": "/AdvantageKit/NetworkInputs/Elevator/maxVelocity",
+                  "period": 0.06,
+                  "data_type": "double",
+                  "show_submit_button": true
+                }
+              },
+              {
+                "title": "maxAccel",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Text Display",
+                "properties": {
+                  "topic": "/AdvantageKit/NetworkInputs/Elevator/maxAccel",
+                  "period": 0.06,
+                  "data_type": "double",
+                  "show_submit_button": true
+                }
+              }
+            ]
+          },
+          {
+            "title": "Wrist Settings",
+            "x": 768.0,
+            "y": 0.0,
+            "width": 256.0,
+            "height": 384.0,
+            "type": "List Layout",
+            "properties": {
+              "label_position": "TOP"
+            },
+            "children": [
+              {
+                "title": "Disabled",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Toggle Switch",
+                "properties": {
+                  "topic": "/AdvantageKit/NetworkInputs/Wrist/Disabled",
+                  "period": 0.06,
+                  "data_type": "boolean"
+                }
+              },
+              {
+                "title": "Locked",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Toggle Switch",
+                "properties": {
+                  "topic": "/AdvantageKit/NetworkInputs/Wrist/Locked",
+                  "period": 0.06,
+                  "data_type": "boolean"
+                }
+              },
+              {
+                "title": "kP",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Text Display",
+                "properties": {
+                  "topic": "/AdvantageKit/NetworkInputs/Wrist/kP",
+                  "period": 0.06,
+                  "data_type": "double",
+                  "show_submit_button": true
+                }
+              },
+              {
+                "title": "kI",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Text Display",
+                "properties": {
+                  "topic": "/AdvantageKit/NetworkInputs/Wrist/kI",
+                  "period": 0.06,
+                  "data_type": "double",
+                  "show_submit_button": true
+                }
+              },
+              {
+                "title": "kD",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Text Display",
+                "properties": {
+                  "topic": "/AdvantageKit/NetworkInputs/Wrist/kD",
+                  "period": 0.06,
+                  "data_type": "double",
+                  "show_submit_button": true
+                }
+              },
+              {
+                "title": "kG",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Text Display",
+                "properties": {
+                  "topic": "/AdvantageKit/NetworkInputs/Wrist/kG",
+                  "period": 0.06,
+                  "data_type": "double",
+                  "show_submit_button": true
+                }
+              },
+              {
+                "title": "kS",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Text Display",
+                "properties": {
+                  "topic": "/AdvantageKit/NetworkInputs/Wrist/kS",
+                  "period": 0.06,
+                  "data_type": "double",
+                  "show_submit_button": true
+                }
+              },
+              {
+                "title": "maxVelocity",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Text Display",
+                "properties": {
+                  "topic": "/AdvantageKit/NetworkInputs/Wrist/maxVelocity",
+                  "period": 0.06,
+                  "data_type": "double",
+                  "show_submit_button": true
+                }
+              },
+              {
+                "title": "maxAccel",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Text Display",
+                "properties": {
+                  "topic": "/AdvantageKit/NetworkInputs/Wrist/maxAccel",
+                  "period": 0.06,
+                  "data_type": "double",
+                  "show_submit_button": true
+                }
+              }
+            ]
+          },
+          {
+            "title": "Swerve Settings",
+            "x": 1024.0,
+            "y": 0.0,
+            "width": 256.0,
+            "height": 384.0,
+            "type": "List Layout",
+            "properties": {
+              "label_position": "TOP"
+            },
+            "children": [
+              {
+                "title": "Disabled",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Toggle Switch",
+                "properties": {
+                  "topic": "Swerve/Disabled",
+                  "period": 0.06,
+                  "data_type": "boolean"
+                }
+              },
+              {
+                "title": "Locked",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Toggle Switch",
+                "properties": {
+                  "topic": "Swerve/Locked",
+                  "period": 0.06,
+                  "data_type": "boolean"
+                }
+              },
+              {
+                "title": "FieldCentric",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Toggle Switch",
+                "properties": {
+                  "topic": "Swerve/FieldCentric",
+                  "period": 0.06,
+                  "data_type": "boolean"
+                }
+              },
+              {
+                "title": "TransKP",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Text Display",
+                "properties": {
+                  "topic": "Swerve/TransKP",
+                  "period": 0.06,
+                  "data_type": "double",
+                  "show_submit_button": true
+                }
+              },
+              {
+                "title": "TransKI",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Text Display",
+                "properties": {
+                  "topic": "Swerve/TransKI",
+                  "period": 0.06,
+                  "data_type": "double",
+                  "show_submit_button": true
+                }
+              },
+              {
+                "title": "TransKD",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Text Display",
+                "properties": {
+                  "topic": "Swerve/TransKD",
+                  "period": 0.06,
+                  "data_type": "double",
+                  "show_submit_button": true
+                }
+              },
+              {
+                "title": "RotKP",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Text Display",
+                "properties": {
+                  "topic": "Swerve/RotKP",
+                  "period": 0.06,
+                  "data_type": "double",
+                  "show_submit_button": true
+                }
+              },
+              {
+                "title": "RotKI",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Text Display",
+                "properties": {
+                  "topic": "Swerve/RotKI",
+                  "period": 0.06,
+                  "data_type": "double",
+                  "show_submit_button": true
+                }
+              },
+              {
+                "title": "RotKD",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Text Display",
+                "properties": {
+                  "topic": "Swerve/RotKD",
+                  "period": 0.06,
+                  "data_type": "double",
+                  "show_submit_button": true
+                }
+              }
+            ]
+          },
+          {
+            "title": "Metadata",
+            "x": 1536.0,
+            "y": 256.0,
+            "width": 256.0,
+            "height": 512.0,
+            "type": "List Layout",
+            "properties": {
+              "label_position": "TOP"
+            },
+            "children": [
+              {
+                "title": "GitBranch",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Text Display",
+                "properties": {
+                  "topic": "/AdvantageKit/RealMetadata/GitBranch",
+                  "period": 0.06,
+                  "data_type": "string",
+                  "show_submit_button": false
+                }
+              },
+              {
+                "title": "GitDirty",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Text Display",
+                "properties": {
+                  "topic": "/AdvantageKit/RealMetadata/GitDirty",
+                  "period": 0.06,
+                  "data_type": "string",
+                  "show_submit_button": false
+                }
+              },
+              {
+                "title": "BuildDate",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Text Display",
+                "properties": {
+                  "topic": "/AdvantageKit/RealMetadata/BuildDate",
+                  "period": 0.06,
+                  "data_type": "string",
+                  "show_submit_button": false
+                }
+              },
+              {
+                "title": "GitDate",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Text Display",
+                "properties": {
+                  "topic": "/AdvantageKit/RealMetadata/GitDate",
+                  "period": 0.06,
+                  "data_type": "string",
+                  "show_submit_button": false
+                }
+              },
+              {
+                "title": "GitSHA",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Text Display",
+                "properties": {
+                  "topic": "/AdvantageKit/RealMetadata/GitSHA",
+                  "period": 0.06,
+                  "data_type": "string",
+                  "show_submit_button": false
+                }
+              }
+            ]
+          }
+        ],
+        "containers": [
+          {
+            "title": "Arm Position (Radians)",
+            "x": 256.0,
+            "y": 384.0,
+            "width": 256.0,
+            "height": 128.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "/AdvantageKit/Arm/Motor/Position",
+              "period": 0.06,
+              "data_type": "double",
+              "show_submit_button": false
+            }
+          },
+          {
+            "title": "Elevator Position (Meters)",
+            "x": 512.0,
+            "y": 384.0,
+            "width": 256.0,
+            "height": 128.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "/AdvantageKit/Elevator/LeftMotor/Position",
+              "period": 0.06,
+              "data_type": "double",
+              "show_submit_button": false
+            }
+          },
+          {
+            "title": "Wrist Position (Radians)",
+            "x": 768.0,
+            "y": 384.0,
+            "width": 256.0,
+            "height": 128.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "/AdvantageKit/Wrist/Motor/Position",
+              "period": 0.06,
+              "data_type": "double",
+              "show_submit_button": false
+            }
+          },
+          {
+            "title": "Alerts",
+            "x": 0.0,
+            "y": 0.0,
+            "width": 256.0,
+            "height": 384.0,
+            "type": "Alerts",
+            "properties": {
+              "topic": "/SmartDashboard/Alerts",
+              "period": 0.06
+            }
+          },
+          {
+            "title": "PhotonAlerts",
+            "x": 0.0,
+            "y": 384.0,
+            "width": 256.0,
+            "height": 384.0,
+            "type": "Alerts",
+            "properties": {
+              "topic": "/SmartDashboard/PhotonAlerts",
+              "period": 0.06
+            }
+          },
+          {
+            "title": "Arm Setpoint (Radians)",
+            "x": 256.0,
+            "y": 512.0,
+            "width": 256.0,
+            "height": 128.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "/AdvantageKit/Arm/Motor/Setpoint",
+              "period": 0.06,
+              "data_type": "double",
+              "show_submit_button": false
+            }
+          },
+          {
+            "title": "Subsystem Test",
+            "x": 1280.0,
+            "y": 0.0,
+            "width": 256.0,
+            "height": 128.0,
+            "type": "ComboBox Chooser",
+            "properties": {
+              "topic": "/SmartDashboard/Test/Subsystem",
+              "period": 0.06,
+              "sort_options": false
+            }
+          },
+          {
+            "title": "Test Type",
+            "x": 1280.0,
+            "y": 128.0,
+            "width": 256.0,
+            "height": 128.0,
+            "type": "ComboBox Chooser",
+            "properties": {
+              "topic": "/SmartDashboard/Test/Type",
+              "period": 0.06,
+              "sort_options": false
+            }
+          },
+          {
+            "title": "Red Alliance",
+            "x": 0.0,
+            "y": 768.0,
+            "width": 256.0,
+            "height": 128.0,
+            "type": "Boolean Box",
+            "properties": {
+              "topic": "/FMSInfo/IsRedAlliance",
+              "period": 0.06,
+              "data_type": "boolean",
+              "true_color": 4283215696,
+              "false_color": 4294198070,
+              "true_icon": "None",
+              "false_icon": "None"
+            }
+          },
+          {
+            "title": "Arm Error (Radians)",
+            "x": 256.0,
+            "y": 640.0,
+            "width": 256.0,
+            "height": 128.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "/AdvantageKit/Arm/Motor/Error",
+              "period": 0.06,
+              "data_type": "double",
+              "show_submit_button": false
+            }
+          },
+          {
+            "title": "Elevator Setpoint (Meters)",
+            "x": 512.0,
+            "y": 512.0,
+            "width": 256.0,
+            "height": 128.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "/AdvantageKit/Elevator/LeftMotor/Setpoint",
+              "period": 0.06,
+              "data_type": "double",
+              "show_submit_button": false
+            }
+          },
+          {
+            "title": "Elevator Error (Meters)",
+            "x": 512.0,
+            "y": 640.0,
+            "width": 256.0,
+            "height": 128.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "/AdvantageKit/Elevator/LeftMotor/Error",
+              "period": 0.06,
+              "data_type": "double",
+              "show_submit_button": false
+            }
+          },
+          {
+            "title": "Wrist Setpoint (Radians)",
+            "x": 768.0,
+            "y": 512.0,
+            "width": 256.0,
+            "height": 128.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "/AdvantageKit/Wrist/Motor/Setpoint",
+              "period": 0.06,
+              "data_type": "double",
+              "show_submit_button": false
+            }
+          },
+          {
+            "title": "Wrist Error (Radians)",
+            "x": 768.0,
+            "y": 640.0,
+            "width": 256.0,
+            "height": 128.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "/AdvantageKit/Wrist/Motor/Error",
+              "period": 0.06,
+              "data_type": "double",
+              "show_submit_button": false
+            }
+          },
+          {
+            "title": "BatteryVoltage",
+            "x": 1280.0,
+            "y": 256.0,
+            "width": 128.0,
+            "height": 128.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "/AdvantageKit/SystemStats/BatteryVoltage",
+              "period": 0.06,
+              "data_type": "double",
+              "show_submit_button": false
+            }
+          },
+          {
+            "title": "Gyro Position (Radians)",
+            "x": 1024.0,
+            "y": 384.0,
+            "width": 256.0,
+            "height": 128.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "/AdvantageKit/Swerve/Gyro/YawPositionRad",
+              "period": 0.06,
+              "data_type": "double",
+              "show_submit_button": false
+            }
+          },
+          {
+            "title": "PDH Faults",
+            "x": 1536.0,
+            "y": 0.0,
+            "width": 256.0,
+            "height": 128.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "/AdvantageKit/PowerDistribution/Faults",
+              "period": 0.06,
+              "data_type": "int",
+              "show_submit_button": false
+            }
+          },
+          {
+            "title": "PDH Sticky Faults",
+            "x": 1536.0,
+            "y": 128.0,
+            "width": 256.0,
+            "height": 128.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "/AdvantageKit/PowerDistribution/StickyFaults",
+              "period": 0.06,
+              "data_type": "int",
+              "show_submit_button": false
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "Camera Feeds",
+      "grid_layout": {
+        "layouts": [],
+        "containers": [
+          {
+            "title": "BackLeft_AT",
+            "x": 0.0,
+            "y": 0.0,
+            "width": 640.0,
+            "height": 512.0,
+            "type": "Camera Stream",
+            "properties": {
+              "topic": "/CameraPublisher/BackLeft_AT-processed",
+              "period": 0.06
+            }
+          },
+          {
+            "title": "BackRight_AT",
+            "x": 640.0,
+            "y": 0.0,
+            "width": 640.0,
+            "height": 512.0,
+            "type": "Camera Stream",
+            "properties": {
+              "topic": "/CameraPublisher/BackRight_AT-processed",
+              "period": 0.06
+            }
+          }
+        ]
       }
     }
   ]
