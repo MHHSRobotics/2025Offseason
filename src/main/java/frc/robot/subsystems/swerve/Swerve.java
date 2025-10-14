@@ -9,7 +9,6 @@ import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
@@ -110,13 +109,6 @@ public class Swerve extends SubsystemBase {
         public static final double visionThetaStdDevBase = 0.5;
         // Theta standard deviation multiplier based on distance
         public static final double visionThetaStdDevDistanceMultiplier = 0.2;
-
-        // The pose of the april tag in the test, relative to the robot
-        public static final Pose3d testAprilTagPose = new Pose3d(new Translation3d(-1.2, 0, 0.373), new Rotation3d());
-
-        // Whether the april tag test is enabled
-        public static final LoggedNetworkBoolean aprilTagTestEnabled =
-                new LoggedNetworkBoolean("Swerve/AprilTagTest", false);
 
         public static final Transform3d bratPose =
                 new Transform3d(new Translation3d(-0.18, -0.3, 0.27), new Rotation3d(0, 0, Math.PI));
