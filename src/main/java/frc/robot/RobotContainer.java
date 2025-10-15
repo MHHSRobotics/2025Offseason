@@ -382,7 +382,7 @@ public class RobotContainer {
     }
 
     // Run selected subsystem
-    private void runDutyCycleStartTest() {
+    private void runDutyCycleForwardTest() {
         if (testControllerChooser.get().equals("Arm")) {
             arm.setSpeed(0.2);
         } else if (testControllerChooser.get().equals("Elevator")) {
@@ -411,6 +411,22 @@ public class RobotContainer {
             intake.setSpeed(0);
         } else if (testControllerChooser.get().equals("Swerve")) {
             swerve.setPositionOutput(0, 0);
+        }
+    }
+
+    private void runDutyCycleBackwardTest() {
+        if (testControllerChooser.get().equals("Arm")) {
+            arm.setSpeed(-0.2);
+        } else if (testControllerChooser.get().equals("Elevator")) {
+            elevator.setSpeed(-0.2);
+        } else if (testControllerChooser.get().equals("Wrist")) {
+            wrist.setSpeed(-0.2);
+        } else if (testControllerChooser.get().equals("Hang")) {
+            hang.setSpeed(-0.2);
+        } else if (testControllerChooser.get().equals("Intake")) {
+            intake.setSpeed(-0.2);
+        } else if (testControllerChooser.get().equals("Swerve")) {
+            swerve.setPositionOutput(-0.2, 0);
         }
     }
 
@@ -477,7 +493,13 @@ public class RobotContainer {
         testController
                 .cross()
                 .and(() -> testControllerManual.get().equals("Manual"))
-                .onTrue(Commands.runOnce(() -> runDutyCycleStartTest()))
+                .onTrue(Commands.runOnce(() -> runDutyCycleForwardTest()))
+                .onFalse(Commands.runOnce(() -> runDutyCycleStopTest()));
+
+        testController
+                .circle()
+                .and(() -> testControllerManual.get().equals("Manual"))
+                .onTrue(Commands.runOnce(() -> runDutyCycleBackwardTest()))
                 .onFalse(Commands.runOnce(() -> runDutyCycleStopTest()));
 
         testController
