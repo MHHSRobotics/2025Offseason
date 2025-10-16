@@ -44,4 +44,9 @@ public class IntakeCommands {
     public Command reversePulseBrief() {
         return setSpeed(() -> 0.5).withTimeout(0.1).andThen(stop()).withName("intake reverse pulse brief");
     }
+
+    // Command to manually control the intake at a fixed speed
+    public Command manualControl(double speed) {
+        return setSpeed(() -> speed).withName("intake manual control");
+    }
 }

@@ -24,6 +24,8 @@ import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.RobotController;
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -170,6 +172,9 @@ public class Swerve extends SubsystemBase {
     // Whether the bot is currently in the X position
     private boolean locked;
 
+    // For Elastic visualization
+    private Field2d field = new Field2d();
+
     public Swerve(GyroIO gyro, SwerveModule fl, SwerveModule fr, SwerveModule bl, SwerveModule br) {
         this.gyro = gyro;
         this.modules = new SwerveModule[] {fl, fr, bl, br};
@@ -196,6 +201,9 @@ public class Swerve extends SubsystemBase {
 
         // Set wraparound on theta controller
         thetaController.enableContinuousInput(-Math.PI, Math.PI);
+
+        // Send field visual to SmartDashboard
+        SmartDashboard.putData("Field", field);
 
         // Set up the on-screen visualization for the four modules
         initializeMechs();
@@ -331,11 +339,11 @@ public class Swerve extends SubsystemBase {
     }
 
     // Set the target pose (just position and rotation in one method)
-    public void setPoseTarget(FieldPose2d pose){
-        locked=false;
-        pidPosition=true;
-        pidRotation=true;
-        targetPose=pose;
+    public void setPoseTarget(FieldPose2d pose) {
+        locked = false;
+        pidPosition = true;
+        pidRotation = true;
+        targetPose = pose;
     }
 
     // Sets whether manual position control should be field-oriented
@@ -392,6 +400,19 @@ public class Swerve extends SubsystemBase {
             module.setDisabled(Constants.swerveDisabled.get());
             module.periodic();
         }
+
+        // Update PID controllers
+        xController.setP(Constants.translationkP.get());
+        yController.setP(Constants.translationkP.get());
+        thetaController.setP(Constants.rotationkP.get());
+
+        xController.setD(Constants.translationkD.get());
+        yController.setD(Constants.translationkD.get());
+        thetaController.setD(Constants.rotationkD.get());
+
+        xController.setI(Constants.translationkI.get());
+        yController.setI(Constants.translationkI.get());
+        thetaController.setI(Constants.rotationkI.get());
 
         // Set swerve module targets depending on current settings
         if (locked) {
@@ -463,18 +484,8 @@ public class Swerve extends SubsystemBase {
 
         Logger.recordOutput("Swerve/Visualization", mech);
 
-        // Update PID controllers
-        xController.setP(Constants.translationkP.get());
-        yController.setP(Constants.translationkP.get());
-        thetaController.setP(Constants.rotationkP.get());
-
-        xController.setD(Constants.translationkD.get());
-        yController.setD(Constants.translationkD.get());
-        thetaController.setD(Constants.rotationkD.get());
-
-        xController.setI(Constants.translationkI.get());
-        yController.setI(Constants.translationkI.get());
-        thetaController.setI(Constants.rotationkI.get());
+        // Update field pose
+        field.setRobotPose(getPose());
     }
 
     // Make a white line between two modules in the visualization so the robot outline is visible

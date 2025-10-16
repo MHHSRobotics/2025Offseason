@@ -73,4 +73,31 @@ public class SwerveCommands {
                         swerve)
                 .withName("swerve drive");
     }
+
+    // Command to manually control the swerve drivetrain
+    public Command manualControl(double dx, double dy, double dtheta) {
+        return Commands.run(
+                        () -> {
+                            swerve.setPositionOutput(dx, dy);
+                            swerve.setRotationOutput(dtheta);
+                        },
+                        swerve)
+                .withName("swerve manual control");
+    }
+
+    // Command to stop the swerve drivetrain
+    public Command stop() {
+        return Commands.runOnce(
+                        () -> {
+                            swerve.setPositionOutput(0, 0);
+                            swerve.setRotationOutput(0);
+                        },
+                        swerve)
+                .withName("swerve stop");
+    }
+
+    // Command to set position target
+    public Command setPositionTarget(double x, double y) {
+        return new InstantCommand(() -> swerve.setPositionTarget(x, y), swerve).withName("swerve set position target");
+    }
 }

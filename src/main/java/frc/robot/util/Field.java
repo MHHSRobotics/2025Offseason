@@ -6,6 +6,8 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 
+import org.littletonrobotics.junction.Logger;
+
 public class Field {
     // Field dimensions
     public static final double fieldLength = 17.55;
@@ -22,7 +24,7 @@ public class Field {
     // Get the april tag field layout for the current season
     public static final AprilTagFieldLayout layout = AprilTagFieldLayout.loadField(AprilTagFields.kDefaultField);
 
-    public static final FieldPose2d reefPose = new FieldPose2d(3.66, 4.03, Rotation2d.kZero);
+    public static final FieldPose2d reefPose = new FieldPose2d(4.4958, 4.03, Rotation2d.kZero);
 
     public static final double armToCenter = 0.1919; // Meters from center of bot to arm line
 
@@ -37,6 +39,8 @@ public class Field {
 
     // Calculate all scoring poses around the reef
     static {
+        Pose2d[] visualization = new Pose2d[12];
+
         // Calculate the robot's approach distance
         double approachDist = botRadius + reefRadius;
 
@@ -62,7 +66,10 @@ public class Field {
                         new Transform2d(approachDist, armToCenter + branchOffset, Rotation2d.kZero));
 
                 scoringPoses[side][branch] = new FieldPose2d(scoringPose);
+
+                visualization[side * 2 + branch] = scoringPose;
             }
         }
+        Logger.recordOutput("Field/ReefPoses", visualization);
     }
 }

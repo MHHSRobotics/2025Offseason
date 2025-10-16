@@ -51,4 +51,19 @@ public class WristCommands {
     public Command goToDown() {
         return setGoal(() -> Units.degreesToRadians(-90)).withName("wrist go to down");
     }
+
+    // Command to manually control the wrist at a fixed speed
+    public Command manualControl(double speed) {
+        return setSpeed(() -> speed).withName("wrist manual control");
+    }
+
+    // Command to set the goal of the wrist to a fixed value (radians)
+    public Command setGoal(double goal) {
+        return setGoal(() -> goal).withName("wrist set goal " + goal);
+    }
+
+    // Command to increment the goal by a fixed amount (radians)
+    public Command incrementGoal(double increment) {
+        return changeGoal(() -> increment).withName("wrist increment goal");
+    }
 }

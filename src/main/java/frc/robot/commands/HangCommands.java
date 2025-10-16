@@ -34,4 +34,9 @@ public class HangCommands {
     public Command retractDown() {
         return setSpeed(() -> -1.0).withName("hang retract down");
     }
+
+    // Command to manually control the hang at a fixed speed
+    public Command manualControl(double speed) {
+        return setSpeed(() -> speed).withName("hang manual control");
+    }
 }

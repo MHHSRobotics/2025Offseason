@@ -8,9 +8,9 @@
         "layouts": [
           {
             "title": "Metadata",
-            "x": 1024.0,
-            "y": 0.0,
-            "width": 256.0,
+            "x": 0.0,
+            "y": 256.0,
+            "width": 384.0,
             "height": 512.0,
             "type": "List Layout",
             "properties": {
@@ -93,10 +93,10 @@
         "containers": [
           {
             "title": "Alerts",
-            "x": 0.0,
+            "x": 1536.0,
             "y": 0.0,
             "width": 256.0,
-            "height": 384.0,
+            "height": 512.0,
             "type": "Alerts",
             "properties": {
               "topic": "/SmartDashboard/Alerts",
@@ -105,8 +105,8 @@
           },
           {
             "title": "PhotonAlerts",
-            "x": 0.0,
-            "y": 384.0,
+            "x": 1536.0,
+            "y": 512.0,
             "width": 256.0,
             "height": 384.0,
             "type": "Alerts",
@@ -117,7 +117,7 @@
           },
           {
             "title": "Match Time",
-            "x": 1280.0,
+            "x": 0.0,
             "y": 0.0,
             "width": 384.0,
             "height": 256.0,
@@ -133,9 +133,9 @@
           },
           {
             "title": "BatteryVoltage",
-            "x": 640.0,
+            "x": 1152.0,
             "y": 512.0,
-            "width": 256.0,
+            "width": 384.0,
             "height": 128.0,
             "type": "Voltage View",
             "properties": {
@@ -151,7 +151,7 @@
           },
           {
             "title": "FMSInfo",
-            "x": 256.0,
+            "x": 384.0,
             "y": 512.0,
             "width": 384.0,
             "height": 128.0,
@@ -159,6 +159,26 @@
             "properties": {
               "topic": "/FMSInfo",
               "period": 0.06
+            }
+          },
+          {
+            "title": "Field",
+            "x": 384.0,
+            "y": 0.0,
+            "width": 1152.0,
+            "height": 512.0,
+            "type": "Field",
+            "properties": {
+              "topic": "/SmartDashboard/Field",
+              "period": 0.06,
+              "field_game": "Reefscape",
+              "robot_width": 0.85,
+              "robot_length": 0.85,
+              "show_other_objects": true,
+              "show_trajectories": true,
+              "field_rotation": 0.0,
+              "robot_color": 4294198070,
+              "trajectory_color": 4294967295
             }
           }
         ]
@@ -171,7 +191,7 @@
           {
             "title": "Metadata",
             "x": 1536.0,
-            "y": 512.0,
+            "y": 256.0,
             "width": 256.0,
             "height": 512.0,
             "type": "List Layout",
@@ -1100,34 +1120,6 @@
               "topic": "/AdvantageKit/Swerve/Gyro/YawPositionRad",
               "period": 0.06,
               "data_type": "double",
-              "show_submit_button": false
-            }
-          },
-          {
-            "title": "PDH Faults",
-            "x": 1536.0,
-            "y": 256.0,
-            "width": 256.0,
-            "height": 128.0,
-            "type": "Text Display",
-            "properties": {
-              "topic": "/AdvantageKit/PowerDistribution/Faults",
-              "period": 0.06,
-              "data_type": "int",
-              "show_submit_button": false
-            }
-          },
-          {
-            "title": "PDH Sticky Faults",
-            "x": 1536.0,
-            "y": 384.0,
-            "width": 256.0,
-            "height": 128.0,
-            "type": "Text Display",
-            "properties": {
-              "topic": "/AdvantageKit/PowerDistribution/StickyFaults",
-              "period": 0.06,
-              "data_type": "int",
               "show_submit_button": false
             }
           }

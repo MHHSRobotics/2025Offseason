@@ -3,6 +3,7 @@ package frc.robot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.RepeatCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandPS5Controller;
 
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
@@ -381,99 +382,6 @@ public class RobotContainer {
                 .cancelAll()));
     }
 
-    // Run selected subsystem
-    private void runDutyCycleForwardTest() {
-        if (testControllerChooser.get().equals("Arm")) {
-            arm.setSpeed(0.2);
-        } else if (testControllerChooser.get().equals("Elevator")) {
-            elevator.setSpeed(0.2);
-        } else if (testControllerChooser.get().equals("Wrist")) {
-            wrist.setSpeed(0.2);
-        } else if (testControllerChooser.get().equals("Hang")) {
-            hang.setSpeed(0.2);
-        } else if (testControllerChooser.get().equals("Intake")) {
-            intake.setSpeed(0.2);
-        } else if (testControllerChooser.get().equals("Swerve")) {
-            swerve.setPositionOutput(0.2, 0);
-        }
-    }
-
-    private void runDutyCycleStopTest() {
-        if (testControllerChooser.get().equals("Arm")) {
-            arm.setSpeed(0);
-        } else if (testControllerChooser.get().equals("Elevator")) {
-            elevator.setSpeed(0);
-        } else if (testControllerChooser.get().equals("Wrist")) {
-            wrist.setSpeed(0);
-        } else if (testControllerChooser.get().equals("Hang")) {
-            hang.setSpeed(0);
-        } else if (testControllerChooser.get().equals("Intake")) {
-            intake.setSpeed(0);
-        } else if (testControllerChooser.get().equals("Swerve")) {
-            swerve.setPositionOutput(0, 0);
-        }
-    }
-
-    private void runDutyCycleBackwardTest() {
-        if (testControllerChooser.get().equals("Arm")) {
-            arm.setSpeed(-0.2);
-        } else if (testControllerChooser.get().equals("Elevator")) {
-            elevator.setSpeed(-0.2);
-        } else if (testControllerChooser.get().equals("Wrist")) {
-            wrist.setSpeed(-0.2);
-        } else if (testControllerChooser.get().equals("Hang")) {
-            hang.setSpeed(-0.2);
-        } else if (testControllerChooser.get().equals("Intake")) {
-            intake.setSpeed(-0.2);
-        } else if (testControllerChooser.get().equals("Swerve")) {
-            swerve.setPositionOutput(-0.2, 0);
-        }
-    }
-
-    private void runPIDDownTest() {
-        if (testControllerChooser.get().equals("Arm")) {
-            arm.setGoal(0);
-        } else if (testControllerChooser.get().equals("Elevator")) {
-            elevator.setGoal(0.1);
-        } else if (testControllerChooser.get().equals("Wrist")) {
-            wrist.setGoal(0);
-        } else if (testControllerChooser.get().equals("Swerve")) {
-            swerve.setPositionTarget(0, 0);
-        }
-    }
-
-    private void runPIDUpTest() {
-        if (testControllerChooser.get().equals("Arm")) {
-            arm.setGoal(1);
-        } else if (testControllerChooser.get().equals("Elevator")) {
-            elevator.setGoal(0.5);
-        } else if (testControllerChooser.get().equals("Wrist")) {
-            wrist.setGoal(1);
-        } else if (testControllerChooser.get().equals("Swerve")) {
-            swerve.setPositionTarget(1, 0);
-        }
-    }
-
-    private void runPIDChangeUpTest() {
-        if (testControllerChooser.get().equals("Arm")) {
-            arm.setGoal(arm.getGoal() + 0.02);
-        } else if (testControllerChooser.get().equals("Elevator")) {
-            elevator.setGoal(elevator.getGoal() + 0.002);
-        } else if (testControllerChooser.get().equals("Wrist")) {
-            wrist.setGoal(wrist.getGoal() + 0.002);
-        }
-    }
-
-    private void runPIDChangeDownTest() {
-        if (testControllerChooser.get().equals("Arm")) {
-            arm.setGoal(arm.getGoal() - 0.02);
-        } else if (testControllerChooser.get().equals("Elevator")) {
-            elevator.setGoal(elevator.getGoal() - 0.002);
-        } else if (testControllerChooser.get().equals("Wrist")) {
-            wrist.setGoal(wrist.getGoal() - 0.002);
-        }
-    }
-
     private void configureTestBindings() {
         /* ---- Test controller bindings ---- */
         testControllerChooser = new LoggedDashboardChooser<>("Test/Subsystem");
@@ -489,38 +397,159 @@ public class RobotContainer {
         testControllerManual.addOption("PID", "PID");
         testControllerManual.addOption("PIDChange", "PIDChange");
 
-        // In sim, this is the X key
+        // Manual duty cycle forward test
         testController
                 .cross()
                 .and(() -> testControllerManual.get().equals("Manual"))
-                .onTrue(Commands.runOnce(() -> runDutyCycleForwardTest()))
-                .onFalse(Commands.runOnce(() -> runDutyCycleStopTest()));
+                .and(() -> testControllerChooser.get().equals("Arm"))
+                .onTrue(armCommands.manualControl(0.2))
+                .onFalse(armCommands.stop());
+        testController
+                .cross()
+                .and(() -> testControllerManual.get().equals("Manual"))
+                .and(() -> testControllerChooser.get().equals("Elevator"))
+                .onTrue(elevatorCommands.manualControl(0.2))
+                .onFalse(elevatorCommands.stop());
+        testController
+                .cross()
+                .and(() -> testControllerManual.get().equals("Manual"))
+                .and(() -> testControllerChooser.get().equals("Wrist"))
+                .onTrue(wristCommands.manualControl(0.2))
+                .onFalse(wristCommands.stop());
+        testController
+                .cross()
+                .and(() -> testControllerManual.get().equals("Manual"))
+                .and(() -> testControllerChooser.get().equals("Hang"))
+                .onTrue(hangCommands.manualControl(0.2))
+                .onFalse(hangCommands.stop());
+        testController
+                .cross()
+                .and(() -> testControllerManual.get().equals("Manual"))
+                .and(() -> testControllerChooser.get().equals("Intake"))
+                .onTrue(intakeCommands.manualControl(0.2))
+                .onFalse(intakeCommands.stop());
+        testController
+                .cross()
+                .and(() -> testControllerManual.get().equals("Manual"))
+                .and(() -> testControllerChooser.get().equals("Swerve"))
+                .onTrue(swerveCommands.manualControl(0.2, 0, 0))
+                .onFalse(swerveCommands.stop());
 
+        // Manual duty cycle backward test
         testController
                 .circle()
                 .and(() -> testControllerManual.get().equals("Manual"))
-                .onTrue(Commands.runOnce(() -> runDutyCycleBackwardTest()))
-                .onFalse(Commands.runOnce(() -> runDutyCycleStopTest()));
+                .and(() -> testControllerChooser.get().equals("Arm"))
+                .onTrue(armCommands.manualControl(-0.2))
+                .onFalse(armCommands.stop());
+        testController
+                .circle()
+                .and(() -> testControllerManual.get().equals("Manual"))
+                .and(() -> testControllerChooser.get().equals("Elevator"))
+                .onTrue(elevatorCommands.manualControl(-0.2))
+                .onFalse(elevatorCommands.stop());
+        testController
+                .circle()
+                .and(() -> testControllerManual.get().equals("Manual"))
+                .and(() -> testControllerChooser.get().equals("Wrist"))
+                .onTrue(wristCommands.manualControl(-0.2))
+                .onFalse(wristCommands.stop());
+        testController
+                .circle()
+                .and(() -> testControllerManual.get().equals("Manual"))
+                .and(() -> testControllerChooser.get().equals("Hang"))
+                .onTrue(hangCommands.manualControl(-0.2))
+                .onFalse(hangCommands.stop());
+        testController
+                .circle()
+                .and(() -> testControllerManual.get().equals("Manual"))
+                .and(() -> testControllerChooser.get().equals("Intake"))
+                .onTrue(intakeCommands.manualControl(-0.2))
+                .onFalse(intakeCommands.stop());
+        testController
+                .circle()
+                .and(() -> testControllerManual.get().equals("Manual"))
+                .and(() -> testControllerChooser.get().equals("Swerve"))
+                .onTrue(swerveCommands.manualControl(-0.2, 0, 0))
+                .onFalse(swerveCommands.stop());
 
+        // PID down test
         testController
                 .cross()
                 .and(() -> testControllerManual.get().equals("PID"))
-                .onTrue(Commands.runOnce(() -> runPIDDownTest()));
+                .and(() -> testControllerChooser.get().equals("Arm"))
+                .onTrue(armCommands.setGoal(0));
+        testController
+                .cross()
+                .and(() -> testControllerManual.get().equals("PID"))
+                .and(() -> testControllerChooser.get().equals("Elevator"))
+                .onTrue(elevatorCommands.setGoal(0.1));
+        testController
+                .cross()
+                .and(() -> testControllerManual.get().equals("PID"))
+                .and(() -> testControllerChooser.get().equals("Wrist"))
+                .onTrue(wristCommands.setGoal(0));
+        testController
+                .cross()
+                .and(() -> testControllerManual.get().equals("PID"))
+                .and(() -> testControllerChooser.get().equals("Swerve"))
+                .onTrue(swerveCommands.setPositionTarget(0, 0));
 
+        // PID up test
         testController
                 .circle()
                 .and(() -> testControllerManual.get().equals("PID"))
-                .onTrue(Commands.runOnce(() -> runPIDUpTest()));
+                .and(() -> testControllerChooser.get().equals("Arm"))
+                .onTrue(armCommands.setGoal(1));
+        testController
+                .circle()
+                .and(() -> testControllerManual.get().equals("PID"))
+                .and(() -> testControllerChooser.get().equals("Elevator"))
+                .onTrue(elevatorCommands.setGoal(0.5));
+        testController
+                .circle()
+                .and(() -> testControllerManual.get().equals("PID"))
+                .and(() -> testControllerChooser.get().equals("Wrist"))
+                .onTrue(wristCommands.setGoal(1));
+        testController
+                .circle()
+                .and(() -> testControllerManual.get().equals("PID"))
+                .and(() -> testControllerChooser.get().equals("Swerve"))
+                .onTrue(swerveCommands.setPositionTarget(1, 0));
 
+        // PID change up test
         testController
                 .cross()
                 .and(() -> testControllerManual.get().equals("PIDChange"))
-                .whileTrue(Commands.run(() -> runPIDChangeUpTest()));
+                .and(() -> testControllerChooser.get().equals("Arm"))
+                .whileTrue(new RepeatCommand(armCommands.incrementGoal(0.02)));
+        testController
+                .cross()
+                .and(() -> testControllerManual.get().equals("PIDChange"))
+                .and(() -> testControllerChooser.get().equals("Elevator"))
+                .whileTrue(new RepeatCommand(elevatorCommands.incrementGoal(0.02)));
+        testController
+                .cross()
+                .and(() -> testControllerManual.get().equals("PIDChange"))
+                .and(() -> testControllerChooser.get().equals("Wrist"))
+                .whileTrue(new RepeatCommand(wristCommands.incrementGoal(0.02)));
 
+        // PID change down test
         testController
                 .circle()
                 .and(() -> testControllerManual.get().equals("PIDChange"))
-                .whileTrue(Commands.run(() -> runPIDChangeDownTest()));
+                .and(() -> testControllerChooser.get().equals("Arm"))
+                .whileTrue(new RepeatCommand(armCommands.incrementGoal(-0.02)));
+        testController
+                .circle()
+                .and(() -> testControllerManual.get().equals("PIDChange"))
+                .and(() -> testControllerChooser.get().equals("Elevator"))
+                .whileTrue(new RepeatCommand(elevatorCommands.incrementGoal(-0.02)));
+        testController
+                .circle()
+                .and(() -> testControllerManual.get().equals("PIDChange"))
+                .and(() -> testControllerChooser.get().equals("Wrist"))
+                .whileTrue(new RepeatCommand(wristCommands.incrementGoal(-0.02)));
     }
 
     public Command getAutonomousCommand() {
