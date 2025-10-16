@@ -330,6 +330,14 @@ public class Swerve extends SubsystemBase {
         targetPose = new FieldPose2d(new Pose2d(lastPose.getTranslation(), Rotation2d.fromRadians(theta)));
     }
 
+    // Set the target pose (just position and rotation in one method)
+    public void setPoseTarget(FieldPose2d pose){
+        locked=false;
+        pidPosition=true;
+        pidRotation=true;
+        targetPose=pose;
+    }
+
     // Sets whether manual position control should be field-oriented
     public void setFieldOriented(boolean fieldOriented) {
         this.fieldOriented = fieldOriented;
