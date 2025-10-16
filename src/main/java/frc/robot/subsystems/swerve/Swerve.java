@@ -40,6 +40,7 @@ import frc.robot.io.CameraIO;
 import frc.robot.io.CameraIO.CameraIOInputs;
 import frc.robot.io.GyroIO;
 import frc.robot.util.Field;
+import frc.robot.util.FieldPose2d;
 import frc.robot.util.RobotUtils;
 
 import static edu.wpi.first.units.Units.MetersPerSecond;
@@ -152,7 +153,7 @@ public class Swerve extends SubsystemBase {
     private final ProfiledPIDController thetaController;
 
     // Target pose for auto-align
-    private Pose2d targetPose = new Pose2d();
+    private FieldPose2d targetPose = new FieldPose2d();
 
     // Target dx, dy, dtheta for manual control
     private double dx, dy, dtheta;
@@ -317,14 +318,16 @@ public class Swerve extends SubsystemBase {
     public void setPositionTarget(double x, double y) {
         locked = false;
         pidPosition = true;
-        targetPose = new Pose2d(x, y, targetPose.getRotation());
+        Pose2d lastPose = targetPose.getOnBlue();
+        targetPose = new FieldPose2d(new Pose2d(x, y, lastPose.getRotation()));
     }
 
     // Set PID control for rotation
     public void setRotationTarget(double theta) {
         locked = false;
         pidRotation = true;
-        targetPose = new Pose2d(targetPose.getTranslation(), Rotation2d.fromRadians(theta));
+        Pose2d lastPose = targetPose.getOnBlue();
+        targetPose = new FieldPose2d(new Pose2d(lastPose.getTranslation(), Rotation2d.fromRadians(theta)));
     }
 
     // Sets whether manual position control should be field-oriented
@@ -393,8 +396,10 @@ public class Swerve extends SubsystemBase {
             double xSpeed, ySpeed;
             boolean positionFieldOriented = true;
             if (pidPosition) {
-                xSpeed = xController.calculate(getPose().getX(), targetPose.getX());
-                ySpeed = yController.calculate(getPose().getY(), targetPose.getY());
+                xSpeed =
+                        xController.calculate(getPose().getX(), targetPose.get().getX());
+                ySpeed =
+                        yController.calculate(getPose().getY(), targetPose.get().getY());
             } else {
                 xSpeed = dx;
                 ySpeed = dy;
@@ -406,7 +411,7 @@ public class Swerve extends SubsystemBase {
             if (pidRotation) {
                 thetaSpeed = thetaController.calculate(
                         getPose().getRotation().getRadians(),
-                        targetPose.getRotation().getRadians());
+                        targetPose.get().getRotation().getRadians());
             } else {
                 thetaSpeed = dtheta;
             }
@@ -417,7 +422,7 @@ public class Swerve extends SubsystemBase {
         Logger.recordOutput("Swerve/dx", dx);
         Logger.recordOutput("Swerve/dy", dy);
         Logger.recordOutput("Swerve/dtheta", dtheta);
-        Logger.recordOutput("Swerve/TargetPose", targetPose);
+        Logger.recordOutput("Swerve/TargetPose", targetPose.get());
 
         // Get measurements from all connected cameras and add them to the pose estimator
         for (CameraIO cam : cameras) {
