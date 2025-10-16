@@ -39,6 +39,7 @@ import frc.robot.subsystems.swerve.TunerConstants;
 import frc.robot.subsystems.swerve.VisionSim;
 import frc.robot.subsystems.wrist.Wrist;
 import frc.robot.subsystems.wrist.WristSim;
+import frc.robot.util.Field;
 
 public class RobotContainer {
     private Arm arm;
@@ -493,7 +494,7 @@ public class RobotContainer {
                 .cross()
                 .and(() -> testControllerManual.get().equals("PID"))
                 .and(() -> testControllerChooser.get().equals("Swerve"))
-                .onTrue(swerveCommands.setPositionTarget(0, 0));
+                .onTrue(swerveCommands.setPoseTarget(Field.scoringPoses[0][0]));
 
         // PID up test
         testController

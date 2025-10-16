@@ -9,6 +9,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 
 import frc.robot.subsystems.swerve.Swerve;
+import frc.robot.util.FieldPose2d;
 
 public class SwerveCommands {
     private Swerve swerve;
@@ -99,5 +100,16 @@ public class SwerveCommands {
     // Command to set position target
     public Command setPositionTarget(double x, double y) {
         return new InstantCommand(() -> swerve.setPositionTarget(x, y), swerve).withName("swerve set position target");
+    }
+
+    // Command to set rotation target
+    public Command setRotationTarget(double rotation) {
+        return new InstantCommand(() -> swerve.setRotationTarget(rotation), swerve)
+                .withName("swerve set rotation target");
+    }
+
+    // Command to set pose target
+    public Command setPoseTarget(FieldPose2d pose) {
+        return new InstantCommand(() -> swerve.setPoseTarget(pose), swerve).withName("swerve set pose target");
     }
 }
