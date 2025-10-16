@@ -446,7 +446,7 @@ public class RobotContainer {
         if (testControllerChooser.get().equals("Arm")) {
             arm.setGoal(1);
         } else if (testControllerChooser.get().equals("Elevator")) {
-            elevator.setGoal(1);
+            elevator.setGoal(0.5);
         } else if (testControllerChooser.get().equals("Wrist")) {
             wrist.setGoal(1);
         } else if (testControllerChooser.get().equals("Swerve")) {
@@ -456,7 +456,7 @@ public class RobotContainer {
 
     private void runPIDChangeUpTest() {
         if (testControllerChooser.get().equals("Arm")) {
-            arm.setGoal(arm.getGoal() + 0.002);
+            arm.setGoal(arm.getGoal() + 0.02);
         } else if (testControllerChooser.get().equals("Elevator")) {
             elevator.setGoal(elevator.getGoal() + 0.002);
         } else if (testControllerChooser.get().equals("Wrist")) {
@@ -466,7 +466,7 @@ public class RobotContainer {
 
     private void runPIDChangeDownTest() {
         if (testControllerChooser.get().equals("Arm")) {
-            arm.setGoal(arm.getGoal() - 0.002);
+            arm.setGoal(arm.getGoal() - 0.02);
         } else if (testControllerChooser.get().equals("Elevator")) {
             elevator.setGoal(elevator.getGoal() - 0.002);
         } else if (testControllerChooser.get().equals("Wrist")) {

@@ -54,7 +54,7 @@ public class Arm extends SubsystemBase {
                 "Arm/kV", 0); // (volts per rad/s) voltage that scales with speed to overcome friction
         public static final LoggedNetworkNumber kA =
                 new LoggedNetworkNumber("Arm/kA", 0); // (volts per rad/s^2) extra voltage to help with acceleration
-        public static final LoggedNetworkNumber kI = new LoggedNetworkNumber("Arm/kI", 0);
+        public static final LoggedNetworkNumber kI = new LoggedNetworkNumber("Arm/kI", 100);
 
         public static final LoggedNetworkNumber maxVelocity =
                 new LoggedNetworkNumber("Arm/maxVelocity", 10); // (rad/s) Motion Magic max speed for moving to a target
