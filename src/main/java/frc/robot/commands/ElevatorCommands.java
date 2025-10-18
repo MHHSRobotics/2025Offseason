@@ -51,4 +51,19 @@ public class ElevatorCommands {
     public Command goToMiddle() {
         return setGoal(() -> 0.6).withName("elevator go to middle");
     }
+
+    // Command to manually control the elevator at a fixed speed
+    public Command manualControl(double speed) {
+        return setSpeed(() -> speed).withName("elevator manual control");
+    }
+
+    // Command to set the goal of the elevator to a fixed value (meters)
+    public Command setGoal(double goal) {
+        return setGoal(() -> goal).withName("elevator set goal " + goal);
+    }
+
+    // Command to increment the goal by a fixed amount (meters)
+    public Command incrementGoal(double increment) {
+        return changeGoal(() -> increment).withName("elevator increment goal");
+    }
 }

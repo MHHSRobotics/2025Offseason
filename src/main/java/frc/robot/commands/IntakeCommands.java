@@ -22,17 +22,17 @@ public class IntakeCommands {
 
     // Tell the intake motor to stop all movement
     public Command stop() {
-        return new InstantCommand(() -> intake.stop(), intake).withName("intake stop");
+        return setSpeed(() -> 0.0).withName("intake stop");
     }
 
     // Tell the intake to run at full speed (for picking up game pieces)
-    public Command intakeFull() {
-        return setSpeed(() -> -1.0).withName("intake full");
+    public Command intake() {
+        return setSpeed(() -> -1.0).withName("intake");
     }
 
     // Tell the intake to run in reverse at full speed (for ejecting game pieces)
-    public Command outtakeFull() {
-        return setSpeed(() -> 1.0).withName("outtake full");
+    public Command outtake() {
+        return setSpeed(() -> 1.0).withName("outtake");
     }
 
     // Tell the intake to pulse briefly (for game piece adjustment)
@@ -43,5 +43,10 @@ public class IntakeCommands {
     // Tell the intake to reverse pulse briefly (for game piece adjustment)
     public Command reversePulseBrief() {
         return setSpeed(() -> 0.5).withTimeout(0.1).andThen(stop()).withName("intake reverse pulse brief");
+    }
+
+    // Command to manually control the intake at a fixed speed
+    public Command manualControl(double speed) {
+        return setSpeed(() -> speed).withName("intake manual control");
     }
 }

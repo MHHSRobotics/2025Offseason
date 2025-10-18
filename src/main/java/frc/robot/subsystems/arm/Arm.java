@@ -54,6 +54,7 @@ public class Arm extends SubsystemBase {
                 "Arm/kV", 0); // (volts per rad/s) voltage that scales with speed to overcome friction
         public static final LoggedNetworkNumber kA =
                 new LoggedNetworkNumber("Arm/kA", 0); // (volts per rad/s^2) extra voltage to help with acceleration
+        public static final LoggedNetworkNumber kI = new LoggedNetworkNumber("Arm/kI", 100);
 
         public static final LoggedNetworkNumber maxVelocity =
                 new LoggedNetworkNumber("Arm/maxVelocity", 10); // (rad/s) Motion Magic max speed for moving to a target
@@ -74,22 +75,17 @@ public class Arm extends SubsystemBase {
         public static final double maxAngle = Units.degreesToRadians(140); // (radians) soft upper limit (~140°)
         public static final double startAngle = Units.degreesToRadians(90); // (radians) start angle in sim (~90°)
 
-        // Angle bounds for SysId tests (radians). If the arm hits a hard stop during SysId, the test fails.
-        // Keep these slightly inside the real mechanical limits to leave a few degrees of safety.
-        public static final double minSysIdAngle = Units.degreesToRadians(-30);
-        public static final double maxSysIdAngle = Units.degreesToRadians(120);
-
         public static final double rotorToSensorRatio =
                 gearRatio / encoderRatio; // Ratio of motor rotations to encoder rotations (unitless)
-
-        public static final LoggedNetworkBoolean manualArm =
-                new LoggedNetworkBoolean("Arm/Manual", false); // Toggle to enable manual control mode
 
         public static final LoggedNetworkBoolean armLocked =
                 new LoggedNetworkBoolean("Arm/Locked", true); // Toggle to enable braking when stopped
 
         public static final LoggedNetworkBoolean armDisabled =
                 new LoggedNetworkBoolean("Arm/Disabled", false); // Toggle to completely disable the arm subsystem
+
+        // Angle constants
+        public static final double defaultAngle = Units.degreesToRadians(90);
     }
 
     // Arm motor interface; handles real robot and simulation for us
@@ -121,6 +117,9 @@ public class Arm extends SubsystemBase {
     // Base point for the feedforward (FF) bar visualization
     private final LoggedMechanismRoot2d fRoot = mech.getRoot("FRoot", 2.7, 2);
 
+    // Base point for the feedforward (FF) bar visualization
+    private final LoggedMechanismRoot2d iRoot = mech.getRoot("IRoot", 2.8, 2);
+
     // Proportional (P) amount bar
     private final LoggedMechanismLigament2d pAmount =
             pRoot.append(new LoggedMechanismLigament2d("PAmount", 1.0, 90, 6, new Color8Bit(Color.kBlue)));
@@ -132,6 +131,10 @@ public class Arm extends SubsystemBase {
     // Feedforward (FF) amount bar
     private final LoggedMechanismLigament2d fAmount =
             fRoot.append(new LoggedMechanismLigament2d("FAmount", 1.0, 90, 6, new Color8Bit(Color.kWhite)));
+
+    // Integral (FF) amount bar
+    private final LoggedMechanismLigament2d iAmount =
+            iRoot.append(new LoggedMechanismLigament2d("IAmount", 1.0, 90, 6, new Color8Bit(Color.kRed)));
 
     public Arm(MotorIO motorIO, EncoderIO encoderIO) {
         encoder = encoderIO;
@@ -206,18 +209,21 @@ public class Arm extends SubsystemBase {
             pAmount.setLineWeight(6);
             dAmount.setLineWeight(6);
             fAmount.setLineWeight(6);
+            iAmount.setLineWeight(6);
 
             // Set the target angle and how big each control term is (scaled down for drawing)
             goalArm.setAngle(Rotation2d.fromRadians(motor.getInputs().setpoint));
             pAmount.setLength(motor.getInputs().propOutput / 100);
             dAmount.setLength(motor.getInputs().derivOutput / 100);
             fAmount.setLength(motor.getInputs().feedforward / 100);
+            iAmount.setLength(motor.getInputs().intOutput / 100);
         } else {
             // Hide the target and P/D/FF bars when not using Motion Magic
             goalArm.setLineWeight(0);
             pAmount.setLineWeight(0);
             dAmount.setLineWeight(0);
             fAmount.setLineWeight(0);
+            iAmount.setLineWeight(0);
         }
 
         // 3) Send the mechanism drawing to the logs/dashboard
@@ -230,6 +236,7 @@ public class Arm extends SubsystemBase {
         motor.setkS(Constants.kS.get());
         motor.setkV(Constants.kV.get());
         motor.setkA(Constants.kA.get());
+        motor.setkI(Constants.kI.get());
         motor.setMaxVelocity(Constants.maxVelocity.get());
         motor.setMaxAccel(Constants.maxAccel.get());
     }

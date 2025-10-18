@@ -47,6 +47,8 @@ public class Wrist extends SubsystemBase {
                 new LoggedNetworkNumber("Wrist/kP", 60); // (volts per radian) more voltage when farther from target
         public static final LoggedNetworkNumber kD =
                 new LoggedNetworkNumber("Wrist/kD", 30); // (volts per rad/s) reacts to how fast error is changing
+        public static final LoggedNetworkNumber kI =
+                new LoggedNetworkNumber("Wrist/kI", 20); // (volts per rad) removes steady state error
 
         public static final LoggedNetworkNumber kS = new LoggedNetworkNumber(
                 "Wrist/kS", 0.0); // (volts) voltage to get wrist moving (overcome static friction)
@@ -78,16 +80,8 @@ public class Wrist extends SubsystemBase {
         public static final double wristTolerance =
                 Units.degreesToRadians(1); // (radians) how close we need to be to target (~1°)
 
-        // Angle bounds for SysId tests (radians). If the wrist hits a hard stop during SysId, the test fails.
-        // Keep these slightly inside the real mechanical limits to leave a few degrees of safety.
-        public static final double minSysIdAngle = Units.degreesToRadians(-120);
-        public static final double maxSysIdAngle = Units.degreesToRadians(75);
-
         public static final double rotorToSensorRatio =
                 gearRatio / encoderRatio; // Ratio of motor rotations to encoder rotations (unitless)
-
-        public static final LoggedNetworkBoolean manualWrist =
-                new LoggedNetworkBoolean("Wrist/Manual", false); // Toggle to enable manual control mode
 
         public static final LoggedNetworkBoolean wristLocked =
                 new LoggedNetworkBoolean("Wrist/Locked", true); // Toggle to enable braking when stopped
@@ -134,6 +128,9 @@ public class Wrist extends SubsystemBase {
     // Base point for the feedforward (FF) bar visualization
     private final LoggedMechanismRoot2d fRoot = mech.getRoot("FRoot", 2.7, 2);
 
+    // Base point for the integral bar visualization
+    private final LoggedMechanismRoot2d iRoot = mech.getRoot("IRoot", 2.8, 2);
+
     // Proportional (P) amount bar
     private final LoggedMechanismLigament2d pAmount =
             pRoot.append(new LoggedMechanismLigament2d("PAmount", 1.0, 90, 6, new Color8Bit(Color.kBlue)));
@@ -145,6 +142,10 @@ public class Wrist extends SubsystemBase {
     // Feedforward (FF) amount bar
     private final LoggedMechanismLigament2d fAmount =
             fRoot.append(new LoggedMechanismLigament2d("FAmount", 1.0, 90, 6, new Color8Bit(Color.kWhite)));
+
+    // Integral amount bar
+    private final LoggedMechanismLigament2d iAmount =
+            iRoot.append(new LoggedMechanismLigament2d("IAmount", 1.0, 90, 6, new Color8Bit(Color.kRed)));
 
     public Wrist(MotorIO motorIO, EncoderIO encoderIO, MotorIO armMotor) {
         encoder = encoderIO;
@@ -230,18 +231,21 @@ public class Wrist extends SubsystemBase {
             pAmount.setLineWeight(6);
             dAmount.setLineWeight(6);
             fAmount.setLineWeight(6);
+            iAmount.setLineWeight(6);
 
             // Set the target angle and how big each control term is (scaled down for drawing)
             goalWrist.setAngle(Rotation2d.fromRadians(motor.getInputs().setpoint));
             pAmount.setLength(motor.getInputs().propOutput / 100);
             dAmount.setLength(motor.getInputs().derivOutput / 100);
             fAmount.setLength(motor.getInputs().feedforward / 100);
+            iAmount.setLength(motor.getInputs().intOutput / 100);
         } else {
             // Hide the target and P/I/D/FF bars when not using Motion Magic
             goalWrist.setLineWeight(0);
             pAmount.setLineWeight(0);
             dAmount.setLineWeight(0);
             fAmount.setLineWeight(0);
+            iAmount.setLineWeight(0);
         }
 
         // 3) Send the mechanism drawing to the logs/dashboard
@@ -253,6 +257,7 @@ public class Wrist extends SubsystemBase {
         motor.setkS(Constants.kS.get());
         motor.setkV(Constants.kV.get());
         motor.setkA(Constants.kA.get());
+        motor.setkI(Constants.kI.get());
         motor.setMaxVelocity(Constants.maxVelocity.get());
         motor.setMaxAccel(Constants.maxAccel.get());
     }

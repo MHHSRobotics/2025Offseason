@@ -71,6 +71,9 @@ public class CameraIOPhotonCamera extends CameraIO {
             }
         }
 
+        for (int i = inputs.measurements; i < Swerve.VisionConstants.maxMeasurements; i++) {
+            inputs.poses[i] = new Pose3d();
+        }
         super.update();
     }
 

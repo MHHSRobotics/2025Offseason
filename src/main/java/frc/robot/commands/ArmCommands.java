@@ -35,4 +35,19 @@ public class ArmCommands {
     public Command stop() {
         return setSpeed(() -> 0).withName("arm stop");
     }
+
+    // Command to manually control the arm at a fixed speed
+    public Command manualControl(double speed) {
+        return setSpeed(() -> speed).withName("arm manual control");
+    }
+
+    // Command to set the goal of the arm to a fixed value (in radians)
+    public Command setGoal(double goal) {
+        return setGoal(() -> goal).withName("arm set goal " + goal);
+    }
+
+    // Command to increment the goal by a fixed amount (in radians)
+    public Command incrementGoal(double increment) {
+        return changeGoal(() -> increment).withName("arm increment goal");
+    }
 }
