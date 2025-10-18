@@ -93,11 +93,11 @@ public class Swerve extends SubsystemBase {
         public static final LoggedNetworkBoolean swerveFieldCentric =
                 new LoggedNetworkBoolean("Swerve/FieldCentric", true); // Toggle for field centric controls
 
-        public static final LoggedNetworkNumber translationkP = new LoggedNetworkNumber("Swerve/TransKP", 5);
+        public static final LoggedNetworkNumber translationkP = new LoggedNetworkNumber("Swerve/TransKP", 4);
         public static final LoggedNetworkNumber translationkD = new LoggedNetworkNumber("Swerve/TransKD", 0);
         public static final LoggedNetworkNumber translationkI = new LoggedNetworkNumber("Swerve/TransKI", 0);
 
-        public static final LoggedNetworkNumber rotationkP = new LoggedNetworkNumber("Swerve/RotKP", 5);
+        public static final LoggedNetworkNumber rotationkP = new LoggedNetworkNumber("Swerve/RotKP", 1);
         public static final LoggedNetworkNumber rotationkD = new LoggedNetworkNumber("Swerve/RotKD", 0);
         public static final LoggedNetworkNumber rotationkI = new LoggedNetworkNumber("Swerve/RotKI", 0);
     }
@@ -279,7 +279,7 @@ public class Swerve extends SubsystemBase {
     private void setSpeeds(double dx, double dy, double omega, boolean fieldRelative) {
         ChassisSpeeds speeds = new ChassisSpeeds(dx, dy, omega);
         if (fieldRelative) {
-            speeds = ChassisSpeeds.fromFieldRelativeSpeeds(speeds, RobotUtils.invertToAlliance(getRotation()));
+            speeds = ChassisSpeeds.fromFieldRelativeSpeeds(speeds, getRotation());
         }
         setChassisSpeeds(speeds);
     }
@@ -414,6 +414,8 @@ public class Swerve extends SubsystemBase {
         yController.setI(Constants.translationkI.get());
         thetaController.setI(Constants.rotationkI.get());
 
+        double xSpeed = 0, ySpeed = 0;
+
         // Set swerve module targets depending on current settings
         if (locked) {
             Rotation2d[] headings = new Rotation2d[4];
@@ -422,7 +424,7 @@ public class Swerve extends SubsystemBase {
             }
             kinematics.resetHeadings(headings);
         } else {
-            double xSpeed, ySpeed;
+
             boolean positionFieldOriented = true;
             if (pidPosition) {
                 xSpeed =
@@ -434,6 +436,9 @@ public class Swerve extends SubsystemBase {
                 ySpeed = dy;
                 if (!fieldOriented) {
                     positionFieldOriented = false;
+                } else if (RobotUtils.onRedAlliance()) {
+                    xSpeed *= -1;
+                    ySpeed *= -1;
                 }
             }
             double thetaSpeed;
@@ -448,10 +453,12 @@ public class Swerve extends SubsystemBase {
         }
 
         Logger.recordOutput("Swerve/Locked", locked);
-        Logger.recordOutput("Swerve/dx", dx);
-        Logger.recordOutput("Swerve/dy", dy);
+        Logger.recordOutput("Swerve/dx", xSpeed);
+        Logger.recordOutput("Swerve/dy", ySpeed);
         Logger.recordOutput("Swerve/dtheta", dtheta);
         Logger.recordOutput("Swerve/TargetPose", targetPose.get());
+        Logger.recordOutput("Swerve/PIDPosition", pidPosition);
+        Logger.recordOutput("Swerve/PIDRotation", pidRotation);
 
         // Get measurements from all connected cameras and add them to the pose estimator
         for (CameraIO cam : cameras) {

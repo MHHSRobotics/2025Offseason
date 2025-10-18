@@ -112,7 +112,10 @@ public class SwerveModule {
 
         // Convert robot speed (m/s) to wheel spin speed (rad/s) using wheel size
         setDriveVelocity(state.speedMetersPerSecond / constants.WheelRadius);
-        setAnglePosition(state.angle.getRadians());
+
+        if (state.speedMetersPerSecond > 0) {
+            setAnglePosition(state.angle.getRadians());
+        }
     }
 
     // Special test mode for measuring how the robot moves
