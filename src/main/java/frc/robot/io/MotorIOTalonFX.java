@@ -93,7 +93,7 @@ public class MotorIOTalonFX extends MotorIO {
     // Encoder connected to this motor
     private EncoderIOCANcoder connectedEncoder;
 
-    private double minLimit = Double.MIN_VALUE;
+    private double minLimit = -Double.MAX_VALUE;
     private double maxLimit = Double.MAX_VALUE;
 
     // Make a TalonFX on the given CAN bus
