@@ -16,6 +16,13 @@ public class SuperstructureCommands {
         this.wristCmds = wristCmds;
     }
 
+    public Command defaultPosition() {
+        return new SequentialCommandGroup(
+                armCmds.setGoal(() -> RobotPositions.armDefault),
+                elevatorCmds.setGoal(() -> RobotPositions.elevatorDefault),
+                wristCmds.setGoal(() -> RobotPositions.wristDefault));
+    }
+
     public Command sourcePosition() {
         return new SequentialCommandGroup(
                 armCmds.setGoal(() -> RobotPositions.armSource),

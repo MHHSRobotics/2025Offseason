@@ -59,7 +59,7 @@ public class Arm extends SubsystemBase {
         public static final LoggedNetworkNumber maxVelocity =
                 new LoggedNetworkNumber("Arm/maxVelocity", 10); // (rad/s) Motion Magic max speed for moving to a target
         public static final LoggedNetworkNumber maxAccel = new LoggedNetworkNumber(
-                "Arm/maxAccel", 10); // (rad/s^2) Motion Magic max acceleration for moving to a target
+                "Arm/maxAccel", 4); // (rad/s^2) Motion Magic max acceleration for moving to a target
 
         public static final double statorCurrentLimit = 70; // (amps) limit on motor torque output
         public static final double supplyCurrentLimit = 60; // (amps) normal current limit pulled from battery

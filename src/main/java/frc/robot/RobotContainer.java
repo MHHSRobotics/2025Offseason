@@ -359,10 +359,10 @@ public class RobotContainer {
         controller.square().onTrue(ssCommands.L3Position());
         controller.circle().onTrue(ssCommands.L2Position());
         controller.cross().onTrue(ssCommands.L1Position());
-        controller.options().onTrue(ssCommands.L1Position());
+        controller.options().onTrue(ssCommands.defaultPosition());
 
-        controller.R2().onTrue(ssCommands.lowAlgaePosition());
-        controller.R1().onTrue(ssCommands.highAlgaePosition());
+        // controller.R2().onTrue(ssCommands.lowAlgaePosition());
+        controller.R1().onTrue(ssCommands.sourcePosition());
 
         controller.L1().onTrue(intakeCommands.intake()).onFalse(intakeCommands.stop());
         controller.L2().onTrue(intakeCommands.outtake()).onFalse(intakeCommands.stop());
