@@ -494,7 +494,7 @@ public class RobotContainer {
                 .cross()
                 .and(() -> testControllerManual.get().equals("PID"))
                 .and(() -> testControllerChooser.get().equals("Swerve"))
-                .onTrue(swerveCommands.setPoseTarget(Field.scoringPoses[0][0]));
+                .onTrue(swerveCommands.setPoseTarget(Field.scoringPoses[4][0])); // ID 8
 
         // PID up test
         testController
