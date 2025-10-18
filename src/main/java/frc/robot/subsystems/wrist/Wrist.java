@@ -48,7 +48,7 @@ public class Wrist extends SubsystemBase {
         public static final LoggedNetworkNumber kD =
                 new LoggedNetworkNumber("Wrist/kD", 30); // (volts per rad/s) reacts to how fast error is changing
         public static final LoggedNetworkNumber kI =
-                new LoggedNetworkNumber("Wrist/kI", 0); // (volts per rad) removes steady state error
+                new LoggedNetworkNumber("Wrist/kI", 20); // (volts per rad) removes steady state error
 
         public static final LoggedNetworkNumber kS = new LoggedNetworkNumber(
                 "Wrist/kS", 0.0); // (volts) voltage to get wrist moving (overcome static friction)
@@ -129,7 +129,7 @@ public class Wrist extends SubsystemBase {
     private final LoggedMechanismRoot2d fRoot = mech.getRoot("FRoot", 2.7, 2);
 
     // Base point for the integral bar visualization
-    private final LoggedMechanismRoot2d iRoot = mech.getRoot("IRoot", 2.7, 2);
+    private final LoggedMechanismRoot2d iRoot = mech.getRoot("IRoot", 2.8, 2);
 
     // Proportional (P) amount bar
     private final LoggedMechanismLigament2d pAmount =
@@ -145,7 +145,7 @@ public class Wrist extends SubsystemBase {
 
     // Integral amount bar
     private final LoggedMechanismLigament2d iAmount =
-            iRoot.append(new LoggedMechanismLigament2d("IAmount", 1.0, 90, 6, new Color8Bit(Color.kWhite)));
+            iRoot.append(new LoggedMechanismLigament2d("IAmount", 1.0, 90, 6, new Color8Bit(Color.kRed)));
 
     public Wrist(MotorIO motorIO, EncoderIO encoderIO, MotorIO armMotor) {
         encoder = encoderIO;

@@ -134,7 +134,7 @@ public class Arm extends SubsystemBase {
 
     // Integral (FF) amount bar
     private final LoggedMechanismLigament2d iAmount =
-            iRoot.append(new LoggedMechanismLigament2d("IAmount", 1.0, 90, 6, new Color8Bit(Color.kWhite)));
+            iRoot.append(new LoggedMechanismLigament2d("IAmount", 1.0, 90, 6, new Color8Bit(Color.kRed)));
 
     public Arm(MotorIO motorIO, EncoderIO encoderIO) {
         encoder = encoderIO;

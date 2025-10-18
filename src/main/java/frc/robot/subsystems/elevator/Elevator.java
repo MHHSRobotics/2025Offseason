@@ -48,7 +48,7 @@ public class Elevator extends SubsystemBase {
         public static final LoggedNetworkNumber kP =
                 new LoggedNetworkNumber("Elevator/kP", 80); // (volts per meter) more voltage when farther from target
         public static final LoggedNetworkNumber kI = new LoggedNetworkNumber(
-                "Elevator/kI", 0); // (volts per meter-second) helps eliminate steady-state error
+                "Elevator/kI", 60); // (volts per meter-second) helps eliminate steady-state error
         public static final LoggedNetworkNumber kD =
                 new LoggedNetworkNumber("Elevator/kD", 70); // (volts per m/s) reacts to how fast error is changing
 
@@ -142,7 +142,7 @@ public class Elevator extends SubsystemBase {
 
     // Integral amount bar
     private final LoggedMechanismLigament2d iAmount =
-            iRoot.append(new LoggedMechanismLigament2d("IAmount", 1.0, 90, 6, new Color8Bit(Color.kWhite)));
+            iRoot.append(new LoggedMechanismLigament2d("IAmount", 1.0, 90, 6, new Color8Bit(Color.kRed)));
 
     public Elevator(MotorIO leftMotorIO, MotorIO rightMotorIO, EncoderIO encoderIO) {
         encoder = encoderIO;
@@ -219,7 +219,7 @@ public class Elevator extends SubsystemBase {
 
         // Set braking based on user input
         leftMotor.setBraking(Constants.elevatorLocked.get());
-        rightMotor.setBraking(Constants.elevatorLocked.get());
+        rightMotor.setBraking(false);
 
         // Disable the motors based on user input
         leftMotor.setDisabled(Constants.elevatorDisabled.get());
