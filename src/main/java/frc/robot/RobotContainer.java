@@ -577,11 +577,17 @@ public class RobotContainer {
                 .whileTrue(new RepeatCommand(wristCommands.changeGoal(-0.02)));
     }
 
+    // Bindings for manual control of each of the subsystems
     public void configureManualBindings() {
+        // Square + circle control arm
         manualController.square().whileTrue(new RepeatCommand(armCommands.changeGoal(0.05)));
-        manualController.triangle().whileTrue(new RepeatCommand(armCommands.changeGoal(-0.05)));
-        manualController.circle().whileTrue(new RepeatCommand(elevatorCommands.changeGoal(0.05)));
+        manualController.circle().whileTrue(new RepeatCommand(armCommands.changeGoal(-0.05)));
+
+        // Triangle + cross control elevator
+        manualController.triangle().whileTrue(new RepeatCommand(elevatorCommands.changeGoal(0.05)));
         manualController.cross().whileTrue(new RepeatCommand(elevatorCommands.changeGoal(-0.05)));
+
+        // POV up + down control wrist
         manualController.povUp().whileTrue(new RepeatCommand(wristCommands.changeGoal(0.05)));
         manualController.povDown().whileTrue(new RepeatCommand(wristCommands.changeGoal(-0.05)));
     }
