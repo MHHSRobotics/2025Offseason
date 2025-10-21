@@ -85,6 +85,9 @@ public class RobotContainer {
         // Configure bindings for test controller
         configureTestBindings();
 
+        // Configure bindings for manual controller
+        configureManualBindings();
+
         // Initialize the publisher
         publisher = new RobotPublisher(arm, wrist, intake, elevator, hang, swerve);
     }
@@ -560,7 +563,7 @@ public class RobotContainer {
                 .whileTrue(new RepeatCommand(wristCommands.incrementGoal(-0.02)));
     }
 
-    public void manualBindings() {
+    public void configureManualBindings() {
         manualController.square().onTrue(armCommands.setSpeed(() -> 0.5)).onFalse(armCommands.stop());
         manualController.triangle().onTrue(armCommands.setSpeed(() -> -0.5)).onFalse(armCommands.stop());
         manualController.circle().onTrue(elevatorCommands.setSpeed(() -> 0.5)).onFalse(elevatorCommands.stop());
