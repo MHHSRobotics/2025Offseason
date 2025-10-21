@@ -78,7 +78,7 @@ public class Wrist extends SubsystemBase {
 
         // Wrist tolerance for considering target reached
         public static final double wristTolerance =
-                Units.degreesToRadians(1); // (radians) how close we need to be to target (~1°)
+                Units.degreesToRadians(10); // (radians) how close we need to be to target
 
         public static final double rotorToSensorRatio =
                 gearRatio / encoderRatio; // Ratio of motor rotations to encoder rotations (unitless)
