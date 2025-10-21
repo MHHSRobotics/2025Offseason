@@ -378,9 +378,9 @@ public class RobotContainer {
 
         controller.create().onTrue(swerveCommands.resetGyro());
 
-        controller.povLeft().onTrue(swerveCommands.alignToLeft());
+        controller.povLeft().onTrue(swerveCommands.alignToSide(0));
 
-        controller.povRight().onTrue(swerveCommands.alignToRight());
+        controller.povRight().onTrue(swerveCommands.alignToSide(1));
 
         swerve.setDefaultCommand(swerveCommands.drive(
                 () -> -controller.getLeftY(),

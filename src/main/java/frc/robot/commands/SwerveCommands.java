@@ -115,39 +115,26 @@ public class SwerveCommands {
         return new InstantCommand(() -> swerve.setPoseTarget(pose), swerve).withName("swerve set pose target");
     }
 
-    public Command alignToLeft() {
+    // side = 0 aligns to left, side = 1 aligns to right
+    public Command alignToSide(int side) {
         return new InstantCommand(() -> {
             Pose2d pose = swerve.getPose();
-            Pose2d closest = null;
+            FieldPose2d closest = null;
             double closestDist = Double.MAX_VALUE;
             for (int i = 0; i < Field.scoringPoses.length; i++) {
-                Pose2d otherPose = Field.scoringPoses[i][0].get();
+                // Get field pose scoring at the given branch
+                FieldPose2d scoringPose = Field.scoringPoses[i][side];
+                // Get the Pose2d that's flipped if on red alliance
+                Pose2d otherPose=scoringPose.get();
+                // Get the distance between bot position and the physical Pose2d
                 double dist = otherPose.getTranslation().getDistance(pose.getTranslation());
+                // If dist is the new closest set the closest pose to scoringPose
                 if (dist < closestDist) {
                     closestDist = dist;
-                    closest = otherPose;
+                    closest = scoringPose;
                 }
             }
-            swerve.setRotationTarget(closest.getRotation().getRadians());
-            swerve.setPositionTarget(closest.getX(), closest.getY());
-        });
-    }
-
-    public Command alignToRight() {
-        return new InstantCommand(() -> {
-            Pose2d pose = swerve.getPose();
-            Pose2d closest = null;
-            double closestDist = Double.MAX_VALUE;
-            for (int i = 0; i < Field.scoringPoses.length; i++) {
-                Pose2d otherPose = Field.scoringPoses[i][1].get();
-                double dist = otherPose.getTranslation().getDistance(pose.getTranslation());
-                if (dist < closestDist) {
-                    closestDist = dist;
-                    closest = otherPose;
-                }
-            }
-            swerve.setRotationTarget(closest.getRotation().getRadians());
-            swerve.setPositionTarget(closest.getX(), closest.getY());
+            swerve.setPoseTarget(closest);
         });
     }
 }
