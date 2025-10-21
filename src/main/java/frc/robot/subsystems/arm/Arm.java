@@ -41,7 +41,7 @@ public class Arm extends SubsystemBase {
         public static final double gearRatio = 175 / 2.; // Ratio of motor rotations to arm rotations (unitless)
         public static final double encoderRatio = 1; // Ratio of encoder rotations to arm rotations (unitless)
 
-        public static final double armTolerance=Units.degreesToRadians(5);
+        public static final double armTolerance = Units.degreesToRadians(5);
 
         public static final LoggedNetworkNumber kP =
                 new LoggedNetworkNumber("Arm/kP", 50); // (volts per radian) more voltage when farther from target
@@ -188,7 +188,7 @@ public class Arm extends SubsystemBase {
     }
 
     // Whether the error is within tolerance
-    public boolean atGoal(){
+    public boolean atGoal() {
         return Math.abs(getPosition() - getGoal()) < Constants.armTolerance;
     }
 
