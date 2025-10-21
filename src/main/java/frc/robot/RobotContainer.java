@@ -439,7 +439,7 @@ public class RobotContainer {
                 .cross()
                 .and(() -> testControllerManual.get().equals("Manual"))
                 .and(() -> testControllerChooser.get().equals("Wrist"))
-                .onTrue(wristCommands.manualControl(0.2))
+                .onTrue(wristCommands.setSpeed(0.2))
                 .onFalse(wristCommands.stop());
         testController
                 .cross()
@@ -477,7 +477,7 @@ public class RobotContainer {
                 .circle()
                 .and(() -> testControllerManual.get().equals("Manual"))
                 .and(() -> testControllerChooser.get().equals("Wrist"))
-                .onTrue(wristCommands.manualControl(-0.2))
+                .onTrue(wristCommands.setSpeed(-0.2))
                 .onFalse(wristCommands.stop());
         testController
                 .circle()
@@ -557,7 +557,7 @@ public class RobotContainer {
                 .cross()
                 .and(() -> testControllerManual.get().equals("PIDChange"))
                 .and(() -> testControllerChooser.get().equals("Wrist"))
-                .whileTrue(new RepeatCommand(wristCommands.incrementGoal(0.02)));
+                .whileTrue(new RepeatCommand(wristCommands.changeGoal(0.02)));
 
         // PID change down test
         testController
@@ -574,7 +574,7 @@ public class RobotContainer {
                 .circle()
                 .and(() -> testControllerManual.get().equals("PIDChange"))
                 .and(() -> testControllerChooser.get().equals("Wrist"))
-                .whileTrue(new RepeatCommand(wristCommands.incrementGoal(-0.02)));
+                .whileTrue(new RepeatCommand(wristCommands.changeGoal(-0.02)));
     }
 
     public void configureManualBindings() {
@@ -582,8 +582,8 @@ public class RobotContainer {
         manualController.triangle().whileTrue(new RepeatCommand(armCommands.changeGoal(-0.05)));
         manualController.circle().whileTrue(new RepeatCommand(elevatorCommands.changeGoal(0.05)));
         manualController.cross().whileTrue(new RepeatCommand(elevatorCommands.changeGoal(-0.05)));
-        manualController.povUp().whileTrue(new RepeatCommand(wristCommands.incrementGoal(0.05)));
-        manualController.povDown().whileTrue(new RepeatCommand(wristCommands.incrementGoal(-0.05)));
+        manualController.povUp().whileTrue(new RepeatCommand(wristCommands.changeGoal(0.05)));
+        manualController.povDown().whileTrue(new RepeatCommand(wristCommands.changeGoal(-0.05)));
     }
 
     public Command getAutonomousCommand() {
