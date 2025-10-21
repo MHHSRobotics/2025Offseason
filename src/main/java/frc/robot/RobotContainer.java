@@ -504,7 +504,7 @@ public class RobotContainer {
                 .cross()
                 .and(() -> testControllerManual.get().equals("PID"))
                 .and(() -> testControllerChooser.get().equals("Swerve"))
-                .onTrue(swerveCommands.setPoseTarget(Field.scoringPoses[4][0])); // ID 8
+                .onTrue(swerveCommands.alignToSide(0)); // Align to nearest left reef
 
         // PID up test
         testController
@@ -526,7 +526,7 @@ public class RobotContainer {
                 .circle()
                 .and(() -> testControllerManual.get().equals("PID"))
                 .and(() -> testControllerChooser.get().equals("Swerve"))
-                .onTrue(swerveCommands.setPositionTarget(1, 0));
+                .onTrue(swerveCommands.alignToSide(1)); // Align to nearest right reef
 
         // PID change up test
         testController
