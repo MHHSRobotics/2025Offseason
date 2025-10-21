@@ -21,9 +21,24 @@ public class ElevatorCommands {
                 .withName("elevator set speed");
     }
 
-    // Tell the elevator to go to a target height (meters, like 0.5 = half meter up)
+    // Command to manually control the elevator at a fixed speed
+    public Command setSpeed(double speed) {
+        return setSpeed(() -> speed).withName("elevator set speed "+speed);
+    }
+
+    // Tell the elevator to stop all motor output
+    public Command stop() {
+        return setSpeed(0).withName("elevator stop");
+    }
+
+    // Tell the elevator to go to a target height (meters)
     public Command setGoal(DoubleSupplier goal) {
         return new InstantCommand(() -> elevator.setGoal(goal.getAsDouble()), elevator).withName("elevator set goal");
+    }
+
+    // Command to set the goal of the elevator to a fixed value (meters)
+    public Command setGoal(double goal) {
+        return setGoal(() -> goal).withName("elevator set goal " + goal);
     }
 
     // Tell the elevator to change its height by the given amount (meters, positive = up, negative = down)
@@ -32,38 +47,8 @@ public class ElevatorCommands {
                 .withName("elevator change goal");
     }
 
-    // Tell the elevator to stop all motor output
-    public Command stop() {
-        return setSpeed(() -> 0).withName("elevator stop");
-    }
-
-    // Tell the elevator to go to the bottom position (0 meters)
-    public Command goToBottom() {
-        return setGoal(() -> 0.1).withName("elevator go to bottom");
-    }
-
-    // Tell the elevator to go to the top position (1.2 meters)
-    public Command goToTop() {
-        return setGoal(() -> 1.1).withName("elevator go to top");
-    }
-
-    // Tell the elevator to go to the middle position (0.6 meters)
-    public Command goToMiddle() {
-        return setGoal(() -> 0.6).withName("elevator go to middle");
-    }
-
-    // Command to manually control the elevator at a fixed speed
-    public Command manualControl(double speed) {
-        return setSpeed(() -> speed).withName("elevator manual control");
-    }
-
-    // Command to set the goal of the elevator to a fixed value (meters)
-    public Command setGoal(double goal) {
-        return setGoal(() -> goal).withName("elevator set goal " + goal);
-    }
-
     // Command to increment the goal by a fixed amount (meters)
-    public Command incrementGoal(double increment) {
-        return changeGoal(() -> increment).withName("elevator increment goal");
+    public Command changeGoal(double increment) {
+        return changeGoal(() -> increment).withName("elevator change goal "+increment);
     }
 }
