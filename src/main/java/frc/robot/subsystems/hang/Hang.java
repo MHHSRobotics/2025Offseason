@@ -49,26 +49,6 @@ public class Hang extends SubsystemBase {
         motor.setDutyCycle(speed);
     }
 
-    // Tell the hang motor to stop
-    public void stop() {
-        motor.setDutyCycle(0);
-    }
-
-    // Find out how much current the motor is drawing (amps) - useful for detecting when we're lifting the robot
-    public double getSupplyCurrent() {
-        return motor.getInputs().supplyCurrent;
-    }
-
-    // Find out how much torque current the motor is producing (amps) - useful for detecting load
-    public double getTorqueCurrent() {
-        return motor.getInputs().torqueCurrent;
-    }
-
-    // Find out the motor voltage being applied (volts)
-    public double getAppliedVoltage() {
-        return motor.getInputs().appliedVoltage;
-    }
-
     @Override
     public void periodic() {
         // This runs every robot loop (about 50 times per second) to update sensors and check for problems
