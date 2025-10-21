@@ -63,6 +63,9 @@ public class RobotContainer {
 
     // Test controller for controlling one subsystem at a time
     private final CommandPS5Controller testController = new CommandPS5Controller(1);
+
+    // Manual controller for subsystems
+    private final CommandPS5Controller manualController = new CommandPS5Controller(2);
     private LoggedDashboardChooser<String> testControllerChooser;
     private LoggedDashboardChooser<String> testControllerManual;
 
@@ -555,6 +558,15 @@ public class RobotContainer {
                 .and(() -> testControllerManual.get().equals("PIDChange"))
                 .and(() -> testControllerChooser.get().equals("Wrist"))
                 .whileTrue(new RepeatCommand(wristCommands.incrementGoal(-0.02)));
+    }
+
+    public void manualBindings() {
+        manualController.square().onTrue(armCommands.setSpeed(() -> 0.5)).onFalse(armCommands.stop());
+        manualController.triangle().onTrue(armCommands.setSpeed(() -> -0.5)).onFalse(armCommands.stop());
+        manualController.circle().onTrue(elevatorCommands.setSpeed(() -> 0.5)).onFalse(elevatorCommands.stop());
+        manualController.cross().onTrue(elevatorCommands.setSpeed(() -> -0.5)).onFalse(elevatorCommands.stop());
+        manualController.povUp().onTrue(wristCommands.setSpeed(() -> 0.5)).onFalse(wristCommands.stop());
+        manualController.povDown().onTrue(wristCommands.setSpeed(() -> -0.5)).onFalse(wristCommands.stop());
     }
 
     public Command getAutonomousCommand() {

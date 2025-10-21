@@ -32,6 +32,6 @@ public class RobotPositions {
     public static final double wristHighAlgae = Units.degreesToRadians(0);
 
     public static final double armSource = Units.degreesToRadians(45);
-    public static final double elevatorSource = 0.35;
+    public static final double elevatorSource = 0.3;
     public static final double wristSource = Units.degreesToRadians(-90);
 }

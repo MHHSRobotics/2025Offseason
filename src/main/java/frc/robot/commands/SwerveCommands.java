@@ -115,17 +115,17 @@ public class SwerveCommands {
         return new InstantCommand(() -> swerve.setPoseTarget(pose), swerve).withName("swerve set pose target");
     }
 
-    public Command alignToLeft(){
-        return new InstantCommand(()->{
-            Pose2d pose=swerve.getPose();
-            Pose2d closest=null;
-            double closestDist=Double.MAX_VALUE;
-            for(int i=0;i<Field.scoringPoses.length;i++){
-                Pose2d otherPose=Field.scoringPoses[i][0].get();
-                double dist=otherPose.getTranslation().getDistance(pose.getTranslation());
-                if(dist<closestDist){
-                    closestDist=dist;
-                    closest=otherPose;
+    public Command alignToLeft() {
+        return new InstantCommand(() -> {
+            Pose2d pose = swerve.getPose();
+            Pose2d closest = null;
+            double closestDist = Double.MAX_VALUE;
+            for (int i = 0; i < Field.scoringPoses.length; i++) {
+                Pose2d otherPose = Field.scoringPoses[i][0].get();
+                double dist = otherPose.getTranslation().getDistance(pose.getTranslation());
+                if (dist < closestDist) {
+                    closestDist = dist;
+                    closest = otherPose;
                 }
             }
             swerve.setRotationTarget(closest.getRotation().getRadians());
@@ -133,17 +133,17 @@ public class SwerveCommands {
         });
     }
 
-    public Command alignToRight(){
-        return new InstantCommand(()->{
-            Pose2d pose=swerve.getPose();
-            Pose2d closest=null;
-            double closestDist=Double.MAX_VALUE;
-            for(int i=0;i<Field.scoringPoses.length;i++){
-                Pose2d otherPose=Field.scoringPoses[i][1].get();
-                double dist=otherPose.getTranslation().getDistance(pose.getTranslation());
-                if(dist<closestDist){
-                    closestDist=dist;
-                    closest=otherPose;
+    public Command alignToRight() {
+        return new InstantCommand(() -> {
+            Pose2d pose = swerve.getPose();
+            Pose2d closest = null;
+            double closestDist = Double.MAX_VALUE;
+            for (int i = 0; i < Field.scoringPoses.length; i++) {
+                Pose2d otherPose = Field.scoringPoses[i][1].get();
+                double dist = otherPose.getTranslation().getDistance(pose.getTranslation());
+                if (dist < closestDist) {
+                    closestDist = dist;
+                    closest = otherPose;
                 }
             }
             swerve.setRotationTarget(closest.getRotation().getRadians());
