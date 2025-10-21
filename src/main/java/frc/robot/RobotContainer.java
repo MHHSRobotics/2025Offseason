@@ -457,7 +457,7 @@ public class RobotContainer {
                 .cross()
                 .and(() -> testControllerManual.get().equals("Manual"))
                 .and(() -> testControllerChooser.get().equals("Swerve"))
-                .onTrue(swerveCommands.manualControl(0.2, 0, 0))
+                .onTrue(swerveCommands.setSpeed(0.2, 0, 0))
                 .onFalse(swerveCommands.stop());
 
         // Manual duty cycle backward test
@@ -495,7 +495,7 @@ public class RobotContainer {
                 .circle()
                 .and(() -> testControllerManual.get().equals("Manual"))
                 .and(() -> testControllerChooser.get().equals("Swerve"))
-                .onTrue(swerveCommands.manualControl(-0.2, 0, 0))
+                .onTrue(swerveCommands.setSpeed(-0.2, 0, 0))
                 .onFalse(swerveCommands.stop());
 
         // PID down test

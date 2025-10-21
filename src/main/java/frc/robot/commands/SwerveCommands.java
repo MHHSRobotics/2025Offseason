@@ -25,6 +25,7 @@ public class SwerveCommands {
         return new InstantCommand(() -> swerve.lock(), swerve).withName("swerve lock");
     }
 
+    // Reset swerve gyro to 0
     public Command resetGyro() {
         return new InstantCommand(() -> swerve.resetGyro());
     }
@@ -77,26 +78,24 @@ public class SwerveCommands {
                 .withName("swerve drive");
     }
 
-    // Command to manually control the swerve drivetrain
-    public Command manualControl(double dx, double dy, double dtheta) {
-        return Commands.run(
-                        () -> {
-                            swerve.setPositionOutput(dx, dy);
-                            swerve.setRotationOutput(dtheta);
-                        },
-                        swerve)
-                .withName("swerve manual control");
+    // Command to set x and y speed
+    public Command setPositionOutput(double dx,double dy){
+        return new InstantCommand(()->swerve.setPositionOutput(dx, dy),swerve).withName("swerve set position output");
     }
 
-    // Command to stop the swerve drivetrain
-    public Command stop() {
-        return Commands.runOnce(
-                        () -> {
-                            swerve.setPositionOutput(0, 0);
-                            swerve.setRotationOutput(0);
-                        },
-                        swerve)
-                .withName("swerve stop");
+    // Command to set rotational speed
+    public Command setRotationOutput(double omega){
+        return new InstantCommand(()->swerve.setRotationOutput(omega),swerve).withName("swerve set rotation output");
+    }
+
+    // Sets translational and rotational speed
+    public Command setSpeed(double dx,double dy,double omega){
+        return setPositionOutput(dx, dy).andThen(setRotationOutput(omega)).withName("swerve set speed");
+    }
+
+    // Stops all swerve output
+    public Command stop(){
+        return setSpeed(0,0,0);
     }
 
     // Command to set position target
