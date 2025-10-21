@@ -210,7 +210,6 @@ public class Swerve extends SubsystemBase {
                 Constants.rotationkI.get(),
                 Constants.rotationkD.get(),
                 new Constraints(10, 10));
-        xController.setIZone(1);
 
         // Set wraparound on theta controller
         thetaController.enableContinuousInput(-Math.PI, Math.PI);
