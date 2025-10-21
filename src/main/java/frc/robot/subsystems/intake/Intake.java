@@ -49,31 +49,6 @@ public class Intake extends SubsystemBase {
         motor.setDutyCycle(speed);
     }
 
-    // Tell the intake motor to stop
-    public void stop() {
-        motor.setDutyCycle(0);
-    }
-
-    // Find out how much current the motor is drawing (amps) - useful for detecting when we have a game piece
-    public double getSupplyCurrent() {
-        return motor.getInputs().supplyCurrent;
-    }
-
-    // Find out how much torque current the motor is producing (amps) - useful for detecting load
-    public double getTorqueCurrent() {
-        return motor.getInputs().torqueCurrent;
-    }
-
-    // Find out the motor voltage being applied (volts)
-    public double getAppliedVoltage() {
-        return motor.getInputs().appliedVoltage;
-    }
-
-    // Find out if we might have a game piece (high current draw indicates something is being processed)
-    public boolean hasGamePiece() {
-        return getSupplyCurrent() > 15; // (amps) threshold for detecting game piece load
-    }
-
     @Override
     public void periodic() {
         // This runs every robot loop (about 50 times per second) to update sensors and check for problems
