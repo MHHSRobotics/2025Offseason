@@ -427,7 +427,7 @@ public class RobotContainer {
                 .cross()
                 .and(() -> testControllerManual.get().equals("Manual"))
                 .and(() -> testControllerChooser.get().equals("Arm"))
-                .onTrue(armCommands.manualControl(0.2))
+                .onTrue(armCommands.setSpeed(0.2))
                 .onFalse(armCommands.stop());
         testController
                 .cross()
@@ -465,7 +465,7 @@ public class RobotContainer {
                 .circle()
                 .and(() -> testControllerManual.get().equals("Manual"))
                 .and(() -> testControllerChooser.get().equals("Arm"))
-                .onTrue(armCommands.manualControl(-0.2))
+                .onTrue(armCommands.setSpeed(-0.2))
                 .onFalse(armCommands.stop());
         testController
                 .circle()
@@ -547,7 +547,7 @@ public class RobotContainer {
                 .cross()
                 .and(() -> testControllerManual.get().equals("PIDChange"))
                 .and(() -> testControllerChooser.get().equals("Arm"))
-                .whileTrue(new RepeatCommand(armCommands.incrementGoal(0.02)));
+                .whileTrue(new RepeatCommand(armCommands.changeGoal(0.02)));
         testController
                 .cross()
                 .and(() -> testControllerManual.get().equals("PIDChange"))
@@ -564,7 +564,7 @@ public class RobotContainer {
                 .circle()
                 .and(() -> testControllerManual.get().equals("PIDChange"))
                 .and(() -> testControllerChooser.get().equals("Arm"))
-                .whileTrue(new RepeatCommand(armCommands.incrementGoal(-0.02)));
+                .whileTrue(new RepeatCommand(armCommands.changeGoal(-0.02)));
         testController
                 .circle()
                 .and(() -> testControllerManual.get().equals("PIDChange"))
@@ -578,8 +578,8 @@ public class RobotContainer {
     }
 
     public void configureManualBindings() {
-        manualController.square().whileTrue(new RepeatCommand(armCommands.incrementGoal(0.05)));
-        manualController.triangle().whileTrue(new RepeatCommand(armCommands.incrementGoal(-0.05)));
+        manualController.square().whileTrue(new RepeatCommand(armCommands.changeGoal(0.05)));
+        manualController.triangle().whileTrue(new RepeatCommand(armCommands.changeGoal(-0.05)));
         manualController.circle().whileTrue(new RepeatCommand(elevatorCommands.incrementGoal(0.05)));
         manualController.cross().whileTrue(new RepeatCommand(elevatorCommands.incrementGoal(-0.05)));
         manualController.povUp().whileTrue(new RepeatCommand(wristCommands.incrementGoal(0.05)));
