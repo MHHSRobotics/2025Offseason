@@ -40,8 +40,8 @@ public final class Constants {
     public static final double lowBatteryTime = 0.5;
 
     // Whether simulation should be on red alliance
-    public static final boolean simIsRedAlliance=false;
-    
+    public static final boolean simIsRedAlliance = false;
+
     public static final boolean armEnabled = true;
     public static final boolean elevatorEnabled = true;
     public static final boolean wristEnabled = true;

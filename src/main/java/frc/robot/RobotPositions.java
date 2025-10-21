@@ -2,6 +2,8 @@ package frc.robot;
 
 import edu.wpi.first.math.util.Units;
 
+// RobotPositions has arm, elevator, and wrist positions for each of the standard positions (default, L1, L2, L3, L4,
+// low algae, high algae, source)
 public class RobotPositions {
     public static final double armDefault = Units.degreesToRadians(90);
     public static final double elevatorDefault = 0.05;

@@ -86,8 +86,9 @@ public class Swerve extends SubsystemBase {
         public static final double maxAngularSpeedRadPerSec = maxLinearSpeedMetersPerSec / driveBaseRadius;
 
         // Initial pose of the bot in simulation
-        public static final FieldPose2d simInitialPose=new FieldPose2d(new Pose2d(2.5,Field.fieldWidth/2,Rotation2d.k180deg));
-        
+        public static final FieldPose2d simInitialPose =
+                new FieldPose2d(new Pose2d(2.5, Field.fieldWidth / 2, Rotation2d.k180deg));
+
         public static final LoggedNetworkBoolean swerveLocked =
                 new LoggedNetworkBoolean("Swerve/Locked", true); // Toggle to enable braking when stopped
 
@@ -184,12 +185,13 @@ public class Swerve extends SubsystemBase {
         this.modules = new SwerveModule[] {fl, fr, bl, br};
 
         Pose2d initialPose;
-        if(frc.robot.Constants.currentMode!=Mode.SIM){
-            // If we're on a physical robot, initial pose estimate will be in the center of the field, since alliance probably hasn't loaded yet
-            initialPose=new Pose2d(Field.fieldLength/2,Field.fieldWidth/2,Rotation2d.kZero);
-        }else{
+        if (frc.robot.Constants.currentMode != Mode.SIM) {
+            // If we're on a physical robot, initial pose estimate will be in the center of the field, since alliance
+            // probably hasn't loaded yet
+            initialPose = new Pose2d(Field.fieldLength / 2, Field.fieldWidth / 2, Rotation2d.kZero);
+        } else {
             // If in sim, get Constants.simInitialPose and flip it on red alliance
-            initialPose=Constants.simInitialPose.get();
+            initialPose = Constants.simInitialPose.get();
         }
 
         estimator = new SwerveDrivePoseEstimator(

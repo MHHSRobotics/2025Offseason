@@ -5,6 +5,7 @@ import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 
 import frc.robot.RobotPositions;
 
+// Commands for going to positions that require arm, elevator, and wrist to move
 public class SuperstructureCommands {
     private ArmCommands armCmds;
     private ElevatorCommands elevatorCmds;
