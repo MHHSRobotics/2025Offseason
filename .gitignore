@@ -192,6 +192,7 @@ src/main/java/frc/robot/BuildConstants.java
 
 # Instructions for Claude Code
 CLAUDE.md
+.claude
 
 # Cursor
 .cursor
