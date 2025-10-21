@@ -445,7 +445,7 @@ public class RobotContainer {
                 .cross()
                 .and(() -> testControllerManual.get().equals("Manual"))
                 .and(() -> testControllerChooser.get().equals("Hang"))
-                .onTrue(hangCommands.manualControl(0.2))
+                .onTrue(hangCommands.setSpeed(0.2))
                 .onFalse(hangCommands.stop());
         testController
                 .cross()
@@ -483,7 +483,7 @@ public class RobotContainer {
                 .circle()
                 .and(() -> testControllerManual.get().equals("Manual"))
                 .and(() -> testControllerChooser.get().equals("Hang"))
-                .onTrue(hangCommands.manualControl(-0.2))
+                .onTrue(hangCommands.setSpeed(-0.2))
                 .onFalse(hangCommands.stop());
         testController
                 .circle()
