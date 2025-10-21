@@ -409,7 +409,6 @@ public class RobotContainer {
         testControllerManual = new LoggedDashboardChooser<>("Test/Type");
         testControllerManual.addOption("Manual", "Manual");
         testControllerManual.addOption("PID", "PID");
-        testControllerManual.addOption("PIDChange", "PIDChange");
 
         // Test controller swerve control for convenience
         testController
@@ -541,40 +540,6 @@ public class RobotContainer {
                 .and(() -> testControllerManual.get().equals("PID"))
                 .and(() -> testControllerChooser.get().equals("Swerve"))
                 .onTrue(swerveCommands.alignToSide(1)); // Align to nearest right reef
-
-        // PID change up test
-        testController
-                .cross()
-                .and(() -> testControllerManual.get().equals("PIDChange"))
-                .and(() -> testControllerChooser.get().equals("Arm"))
-                .whileTrue(new RepeatCommand(armCommands.changeGoal(0.02)));
-        testController
-                .cross()
-                .and(() -> testControllerManual.get().equals("PIDChange"))
-                .and(() -> testControllerChooser.get().equals("Elevator"))
-                .whileTrue(new RepeatCommand(elevatorCommands.setSpeed(0.02)));
-        testController
-                .cross()
-                .and(() -> testControllerManual.get().equals("PIDChange"))
-                .and(() -> testControllerChooser.get().equals("Wrist"))
-                .whileTrue(new RepeatCommand(wristCommands.changeGoal(0.02)));
-
-        // PID change down test
-        testController
-                .circle()
-                .and(() -> testControllerManual.get().equals("PIDChange"))
-                .and(() -> testControllerChooser.get().equals("Arm"))
-                .whileTrue(new RepeatCommand(armCommands.changeGoal(-0.02)));
-        testController
-                .circle()
-                .and(() -> testControllerManual.get().equals("PIDChange"))
-                .and(() -> testControllerChooser.get().equals("Elevator"))
-                .whileTrue(new RepeatCommand(elevatorCommands.changeGoal(-0.02)));
-        testController
-                .circle()
-                .and(() -> testControllerManual.get().equals("PIDChange"))
-                .and(() -> testControllerChooser.get().equals("Wrist"))
-                .whileTrue(new RepeatCommand(wristCommands.changeGoal(-0.02)));
     }
 
     // Bindings for manual control of each of the subsystems
