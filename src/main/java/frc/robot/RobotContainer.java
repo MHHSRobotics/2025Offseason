@@ -333,7 +333,7 @@ public class RobotContainer {
                 case REAL:
                 case SIM:
                     brat = new CameraIOPhotonCamera("BackRight_AT", "Vision/BRAT", Swerve.VisionConstants.bratPose, 60);
-                    blat = new CameraIOPhotonCamera("BackLeft_AT", "Vision/BLAT", Swerve.VisionConstants.blatPose, 70);
+                    blat = new CameraIOPhotonCamera("BackLeft_AT", "Vision/BLAT", Swerve.VisionConstants.blatPose, 60);
                     break;
                 default:
                     brat = new CameraIO("BackRight_AT", "Vision/BRAT");
