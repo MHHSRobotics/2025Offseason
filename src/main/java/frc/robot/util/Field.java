@@ -30,7 +30,7 @@ public class Field {
 
     public static final double branchDist = 0.33; // Distance between two branches on the same side (meters)
 
-    public static final double reefRadius = 0.832; // Distance from center of the reef to center of an edge (meters)
+    public static final double reefRadius = 0.952; // Distance from center of the reef to center of an edge (meters)
 
     public static final double botRadius = 0.4318; // Distance from center of bot to edge of the bot (meters)
 

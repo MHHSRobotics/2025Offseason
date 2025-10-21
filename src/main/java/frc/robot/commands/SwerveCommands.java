@@ -4,11 +4,13 @@ import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 
 import frc.robot.subsystems.swerve.Swerve;
+import frc.robot.util.Field;
 import frc.robot.util.FieldPose2d;
 
 public class SwerveCommands {
@@ -111,5 +113,41 @@ public class SwerveCommands {
     // Command to set pose target
     public Command setPoseTarget(FieldPose2d pose) {
         return new InstantCommand(() -> swerve.setPoseTarget(pose), swerve).withName("swerve set pose target");
+    }
+
+    public Command alignToLeft() {
+        return new InstantCommand(() -> {
+            Pose2d pose = swerve.getPose();
+            Pose2d closest = null;
+            double closestDist = Double.MAX_VALUE;
+            for (int i = 0; i < Field.scoringPoses.length; i++) {
+                Pose2d otherPose = Field.scoringPoses[i][0].get();
+                double dist = otherPose.getTranslation().getDistance(pose.getTranslation());
+                if (dist < closestDist) {
+                    closestDist = dist;
+                    closest = otherPose;
+                }
+            }
+            swerve.setRotationTarget(closest.getRotation().getRadians());
+            swerve.setPositionTarget(closest.getX(), closest.getY());
+        });
+    }
+
+    public Command alignToRight() {
+        return new InstantCommand(() -> {
+            Pose2d pose = swerve.getPose();
+            Pose2d closest = null;
+            double closestDist = Double.MAX_VALUE;
+            for (int i = 0; i < Field.scoringPoses.length; i++) {
+                Pose2d otherPose = Field.scoringPoses[i][1].get();
+                double dist = otherPose.getTranslation().getDistance(pose.getTranslation());
+                if (dist < closestDist) {
+                    closestDist = dist;
+                    closest = otherPose;
+                }
+            }
+            swerve.setRotationTarget(closest.getRotation().getRadians());
+            swerve.setPositionTarget(closest.getX(), closest.getY());
+        });
     }
 }

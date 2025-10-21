@@ -427,10 +427,10 @@ public class Swerve extends SubsystemBase {
 
             boolean positionFieldOriented = true;
             if (pidPosition) {
-                xSpeed =
-                        xController.calculate(getPose().getX(), targetPose.get().getX());
-                ySpeed =
-                        yController.calculate(getPose().getY(), targetPose.get().getY());
+                xSpeed = xController.calculate(
+                        getPose().getX(), targetPose.getOnBlue().getX());
+                ySpeed = yController.calculate(
+                        getPose().getY(), targetPose.getOnBlue().getY());
             } else {
                 xSpeed = dx;
                 ySpeed = dy;
@@ -445,7 +445,7 @@ public class Swerve extends SubsystemBase {
             if (pidRotation) {
                 thetaSpeed = thetaController.calculate(
                         getPose().getRotation().getRadians(),
-                        targetPose.get().getRotation().getRadians());
+                        targetPose.getOnBlue().getRotation().getRadians());
             } else {
                 thetaSpeed = dtheta;
             }
