@@ -564,12 +564,12 @@ public class RobotContainer {
     }
 
     public void configureManualBindings() {
-        manualController.square().onTrue(armCommands.setSpeed(() -> 0.5)).onFalse(armCommands.stop());
-        manualController.triangle().onTrue(armCommands.setSpeed(() -> -0.5)).onFalse(armCommands.stop());
-        manualController.circle().onTrue(elevatorCommands.setSpeed(() -> 0.5)).onFalse(elevatorCommands.stop());
-        manualController.cross().onTrue(elevatorCommands.setSpeed(() -> -0.5)).onFalse(elevatorCommands.stop());
-        manualController.povUp().onTrue(wristCommands.setSpeed(() -> 0.5)).onFalse(wristCommands.stop());
-        manualController.povDown().onTrue(wristCommands.setSpeed(() -> -0.5)).onFalse(wristCommands.stop());
+        manualController.square().whileTrue(new RepeatCommand(armCommands.incrementGoal(0.05)));
+        manualController.triangle().whileTrue(new RepeatCommand(armCommands.incrementGoal(-0.05)));
+        manualController.circle().whileTrue(new RepeatCommand(elevatorCommands.incrementGoal(0.05)));
+        manualController.cross().whileTrue(new RepeatCommand(elevatorCommands.incrementGoal(-0.05)));
+        manualController.povUp().whileTrue(new RepeatCommand(wristCommands.incrementGoal(0.05)));
+        manualController.povDown().whileTrue(new RepeatCommand(wristCommands.incrementGoal(-0.05)));
     }
 
     public Command getAutonomousCommand() {
