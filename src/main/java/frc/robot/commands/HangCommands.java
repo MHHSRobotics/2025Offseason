@@ -22,7 +22,7 @@ public class HangCommands {
 
     // Command to manually control the hang at a fixed speed
     public Command setSpeed(double speed) {
-        return setSpeed(() -> speed).withName("hang set speed "+speed);
+        return setSpeed(() -> speed).withName("hang set speed " + speed);
     }
 
     // Tell the hang motor to stop all movement

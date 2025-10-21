@@ -22,7 +22,7 @@ public class WristCommands {
 
     // Command to manually control the wrist at a fixed speed
     public Command setSpeed(double speed) {
-        return setSpeed(() -> speed).withName("wrist set speed "+speed);
+        return setSpeed(() -> speed).withName("wrist set speed " + speed);
     }
 
     // Tell the wrist to stop all motor output
@@ -48,6 +48,6 @@ public class WristCommands {
 
     // Command to increment the goal by a fixed amount (radians)
     public Command changeGoal(double increment) {
-        return changeGoal(() -> increment).withName("wrist change goal "+increment);
+        return changeGoal(() -> increment).withName("wrist change goal " + increment);
     }
 }

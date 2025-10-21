@@ -22,7 +22,7 @@ public class ArmCommands {
 
     // Command to manually control the arm at a fixed speed
     public Command setSpeed(double speed) {
-        return setSpeed(() -> speed).withName("arm set speed "+speed);
+        return setSpeed(() -> speed).withName("arm set speed " + speed);
     }
 
     // Command to stop all motor output to the arm
@@ -48,6 +48,6 @@ public class ArmCommands {
 
     // Command to increment the goal by a fixed amount (in radians)
     public Command changeGoal(double increment) {
-        return changeGoal(() -> increment).withName("arm change goal "+increment);
+        return changeGoal(() -> increment).withName("arm change goal " + increment);
     }
 }

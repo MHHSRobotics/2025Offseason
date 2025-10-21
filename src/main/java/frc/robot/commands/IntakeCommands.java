@@ -22,7 +22,7 @@ public class IntakeCommands {
 
     // Command to manually control the intake at a fixed speed
     public Command setSpeed(double speed) {
-        return setSpeed(() -> speed).withName("intake set speed "+speed);
+        return setSpeed(() -> speed).withName("intake set speed " + speed);
     }
 
     // Tell the intake motor to stop all movement
@@ -39,6 +39,4 @@ public class IntakeCommands {
     public Command outtake() {
         return setSpeed(-1.0).withName("outtake");
     }
-
-    
 }

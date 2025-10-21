@@ -421,7 +421,7 @@ public class RobotContainer {
                         () -> -testController.getLeftX(),
                         () -> -testController.getRightX(),
                         () -> Swerve.Constants.swerveFieldCentric.get()));
-                    
+
         // Manual duty cycle forward test
         testController
                 .cross()

@@ -23,7 +23,7 @@ public class ElevatorCommands {
 
     // Command to manually control the elevator at a fixed speed
     public Command setSpeed(double speed) {
-        return setSpeed(() -> speed).withName("elevator set speed "+speed);
+        return setSpeed(() -> speed).withName("elevator set speed " + speed);
     }
 
     // Tell the elevator to stop all motor output
@@ -49,6 +49,6 @@ public class ElevatorCommands {
 
     // Command to increment the goal by a fixed amount (meters)
     public Command changeGoal(double increment) {
-        return changeGoal(() -> increment).withName("elevator change goal "+increment);
+        return changeGoal(() -> increment).withName("elevator change goal " + increment);
     }
 }
