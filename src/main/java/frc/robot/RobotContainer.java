@@ -39,7 +39,6 @@ import frc.robot.subsystems.swerve.TunerConstants;
 import frc.robot.subsystems.swerve.VisionSim;
 import frc.robot.subsystems.wrist.Wrist;
 import frc.robot.subsystems.wrist.WristSim;
-import frc.robot.util.Field;
 
 public class RobotContainer {
     private Arm arm;
@@ -382,11 +381,15 @@ public class RobotContainer {
 
         controller.povRight().onTrue(swerveCommands.alignToSide(1));
 
-        swerve.setDefaultCommand(swerveCommands.drive(
-                () -> -controller.getLeftY(),
-                () -> -controller.getLeftX(),
-                () -> -controller.getRightX(),
-                () -> Swerve.Constants.swerveFieldCentric.get()));
+        controller
+                .axisMagnitudeGreaterThan(0, Swerve.Constants.moveDeadband)
+                .or(controller.axisMagnitudeGreaterThan(1, Swerve.Constants.moveDeadband))
+                .or(controller.axisMagnitudeGreaterThan(2, Swerve.Constants.turnDeadband))
+                .onTrue(swerveCommands.drive(
+                        () -> -controller.getLeftY(),
+                        () -> -controller.getLeftX(),
+                        () -> -controller.getRightX(),
+                        () -> Swerve.Constants.swerveFieldCentric.get()));
 
         // Cancel all commands
         controller.PS().onTrue(Commands.runOnce(() -> CommandScheduler.getInstance()
@@ -408,6 +411,17 @@ public class RobotContainer {
         testControllerManual.addOption("PID", "PID");
         testControllerManual.addOption("PIDChange", "PIDChange");
 
+        // Test controller swerve control for convenience
+        testController
+                .axisMagnitudeGreaterThan(0, Swerve.Constants.moveDeadband)
+                .or(testController.axisMagnitudeGreaterThan(1, Swerve.Constants.moveDeadband))
+                .or(testController.axisMagnitudeGreaterThan(2, Swerve.Constants.turnDeadband))
+                .onTrue(swerveCommands.drive(
+                        () -> -testController.getLeftY(),
+                        () -> -testController.getLeftX(),
+                        () -> -testController.getRightX(),
+                        () -> Swerve.Constants.swerveFieldCentric.get()));
+                    
         // Manual duty cycle forward test
         testController
                 .cross()

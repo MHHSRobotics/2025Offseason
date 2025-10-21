@@ -125,7 +125,7 @@ public class SwerveCommands {
                 // Get field pose scoring at the given branch
                 FieldPose2d scoringPose = Field.scoringPoses[i][side];
                 // Get the Pose2d that's flipped if on red alliance
-                Pose2d otherPose=scoringPose.get();
+                Pose2d otherPose = scoringPose.get();
                 // Get the distance between bot position and the physical Pose2d
                 double dist = otherPose.getTranslation().getDistance(pose.getTranslation());
                 // If dist is the new closest set the closest pose to scoringPose
