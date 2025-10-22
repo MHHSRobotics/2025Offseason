@@ -98,11 +98,11 @@ public class Swerve extends SubsystemBase {
         public static final LoggedNetworkBoolean swerveFieldCentric =
                 new LoggedNetworkBoolean("Swerve/FieldCentric", true); // Toggle for field centric controls
 
-        public static final LoggedNetworkNumber translationkP = new LoggedNetworkNumber("Swerve/TransKP", 4);
+        public static final LoggedNetworkNumber translationkP = new LoggedNetworkNumber("Swerve/TransKP", 1);
         public static final LoggedNetworkNumber translationkD = new LoggedNetworkNumber("Swerve/TransKD", 0);
         public static final LoggedNetworkNumber translationkI = new LoggedNetworkNumber("Swerve/TransKI", 0);
 
-        public static final LoggedNetworkNumber rotationkP = new LoggedNetworkNumber("Swerve/RotKP", 1);
+        public static final LoggedNetworkNumber rotationkP = new LoggedNetworkNumber("Swerve/RotKP", 0.2);
         public static final LoggedNetworkNumber rotationkD = new LoggedNetworkNumber("Swerve/RotKD", 0);
         public static final LoggedNetworkNumber rotationkI = new LoggedNetworkNumber("Swerve/RotKI", 0);
     }
