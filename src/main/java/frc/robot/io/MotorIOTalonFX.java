@@ -391,6 +391,9 @@ public class MotorIOTalonFX extends MotorIO {
     @Override
     public void setkV(double kV) {
         double newkV = Units.rotationsToRadians(kV);
+        if (getName().equals("front left drive motor")) {
+            System.out.println(newkV);
+        }
         if (newkV != config.Slot0.kV) {
             config.Slot0.kV = newkV;
             configChanged = true;
@@ -406,10 +409,17 @@ public class MotorIOTalonFX extends MotorIO {
         }
     }
 
+    // Modifies gains for unit scaling
     @Override
     public void setGains(Slot0Configs gains) {
-        config.Slot0 = gains;
-        configChanged = true;
+        setkP(gains.kP);
+        setkI(gains.kI);
+        setkD(gains.kD);
+        setkG(gains.kG);
+        setkS(gains.kS);
+        setkV(gains.kV);
+        setkA(gains.kA);
+        setFeedforwardType(gains.GravityType);
     }
 
     @Override
