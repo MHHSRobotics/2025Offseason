@@ -545,7 +545,7 @@ public class Swerve extends SubsystemBase {
         SwerveModuleState[] states = getModuleStates();
         for (int i = 0; i < 4; i++) {
             // Scale length down so it fits nicely on screen
-            speeds[i].setLength(states[i].speedMetersPerSecond / 3);
+            speeds[i].setLength(states[i].speedMetersPerSecond / 12);
             speeds[i].setAngle(states[i].angle);
         }
     }
