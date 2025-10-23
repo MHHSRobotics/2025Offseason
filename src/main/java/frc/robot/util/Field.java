@@ -34,7 +34,7 @@ public class Field {
 
     public static final double botRadius = 0.4318; // Distance from center of bot to edge of the bot (meters)
 
-    public static final double alignGap = 0.05; // Extra gap between the bot and reef
+    public static final double alignGap = 0.3; // Extra gap between the bot and reef
 
     public static FieldPose2d[][] scoringPoses =
             new FieldPose2d[6][2]; // Scoring poses as a 2D array, first reef side, then branch

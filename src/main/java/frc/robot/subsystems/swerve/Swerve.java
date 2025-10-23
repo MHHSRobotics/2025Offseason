@@ -98,11 +98,11 @@ public class Swerve extends SubsystemBase {
         public static final LoggedNetworkBoolean swerveFieldCentric =
                 new LoggedNetworkBoolean("Swerve/FieldCentric", true); // Toggle for field centric controls
 
-        public static final LoggedNetworkNumber translationkP = new LoggedNetworkNumber("Swerve/TransKP", 1);
+        public static final LoggedNetworkNumber translationkP = new LoggedNetworkNumber("Swerve/TransKP", 2);
         public static final LoggedNetworkNumber translationkD = new LoggedNetworkNumber("Swerve/TransKD", 0);
         public static final LoggedNetworkNumber translationkI = new LoggedNetworkNumber("Swerve/TransKI", 0);
 
-        public static final LoggedNetworkNumber rotationkP = new LoggedNetworkNumber("Swerve/RotKP", 0.2);
+        public static final LoggedNetworkNumber rotationkP = new LoggedNetworkNumber("Swerve/RotKP", 0.4);
         public static final LoggedNetworkNumber rotationkD = new LoggedNetworkNumber("Swerve/RotKD", 0);
         public static final LoggedNetworkNumber rotationkI = new LoggedNetworkNumber("Swerve/RotKI", 0);
     }
@@ -118,11 +118,14 @@ public class Swerve extends SubsystemBase {
         // Theta standard deviation multiplier based on distance
         public static final double visionThetaStdDevDistanceMultiplier = 0.2;
 
-        public static final Transform3d bratPose = new Transform3d(
-                new Translation3d(-0.19, -0.308, 0.318), new Rotation3d(0, 0, Units.degreesToRadians(200)));
+        // public static final Transform3d bratPose = new Transform3d(
+        //         new Translation3d(-0.193, -0.288, 0.31), new Rotation3d(0, 0, Units.degreesToRadians(210)));
+
+        // public static final Transform3d blatPose = new Transform3d(
+        //         new Translation3d(-0.208, 0.063, 0.33), new Rotation3d(0, 0, Units.degreesToRadians(210)));
 
         public static final Transform3d blatPose = new Transform3d(
-                new Translation3d(-0.178, 0.09, 0.33), new Rotation3d(0, 0, Units.degreesToRadians(203)));
+                new Translation3d(-0.208, 0.13, 0.33), new Rotation3d(0, 0, Units.degreesToRadians(210)));
 
         // How many robot pose measurements to store per camera
         public static final int maxMeasurements = 8;

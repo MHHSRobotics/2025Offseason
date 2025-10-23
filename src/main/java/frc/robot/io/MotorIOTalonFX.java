@@ -391,9 +391,6 @@ public class MotorIOTalonFX extends MotorIO {
     @Override
     public void setkV(double kV) {
         double newkV = Units.rotationsToRadians(kV);
-        if (getName().equals("front left drive motor")) {
-            System.out.println(newkV);
-        }
         if (newkV != config.Slot0.kV) {
             config.Slot0.kV = newkV;
             configChanged = true;

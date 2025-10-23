@@ -22,7 +22,7 @@ public class RobotPositions {
     public static final double wristL3 = 0.23;
 
     public static final double armL4 = 2.3;
-    public static final double elevatorL4 = 1.1;
+    public static final double elevatorL4 = 1.12;
     public static final double wristL4 = -0.44;
 
     public static final double armLowAlgae = Units.degreesToRadians(0);
@@ -33,7 +33,7 @@ public class RobotPositions {
     public static final double elevatorHighAlgae = 0;
     public static final double wristHighAlgae = Units.degreesToRadians(0);
 
-    public static final double armSource = Units.degreesToRadians(45);
+    public static final double armSource = Units.degreesToRadians(40);
     public static final double elevatorSource = 0.3;
     public static final double wristSource = Units.degreesToRadians(-90);
 }

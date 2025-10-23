@@ -327,20 +327,21 @@ public class RobotContainer {
         }
 
         if (Constants.visionEnabled) {
-            CameraIO brat;
+            // CameraIO brat;
             CameraIO blat;
             switch (Constants.currentMode) {
                 case REAL:
                 case SIM:
-                    brat = new CameraIOPhotonCamera("BackRight_AT", "Vision/BRAT", Swerve.VisionConstants.bratPose, 60);
+                    // brat = new CameraIOPhotonCamera("BackRight_AT", "Vision/BRAT", Swerve.VisionConstants.bratPose,
+                    // 60);
                     blat = new CameraIOPhotonCamera("BackLeft_AT", "Vision/BLAT", Swerve.VisionConstants.blatPose, 60);
                     break;
                 default:
-                    brat = new CameraIO("BackRight_AT", "Vision/BRAT");
+                    // brat = new CameraIO("BackRight_AT", "Vision/BRAT");
                     blat = new CameraIO("BackLeft_AT", "Vision/BLAT");
                     break;
             }
-            swerve.addCameraSource(brat);
+            // swerve.addCameraSource(brat);
             swerve.addCameraSource(blat);
             if (Constants.currentMode == Mode.SIM) {
                 new VisionSim(swerve.getCameras(), swerve);
