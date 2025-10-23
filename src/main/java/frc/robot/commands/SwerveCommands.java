@@ -25,6 +25,7 @@ public class SwerveCommands {
         return new InstantCommand(() -> swerve.lock(), swerve).withName("swerve lock");
     }
 
+    // Reset swerve gyro to 0
     public Command resetGyro() {
         return new InstantCommand(() -> swerve.resetGyro());
     }
@@ -63,40 +64,35 @@ public class SwerveCommands {
                             rotation = Math.copySign(rotationScale, rotation);
 
                             // Run the swerve drive with the given values of x, y, and rotation
-                            if (x != 0 || y != 0 || !swerve.getPositionPIDSetting()) {
-                                swerve.setPositionOutput(
-                                        x * Swerve.Constants.maxLinearSpeedMetersPerSec,
-                                        y * Swerve.Constants.maxLinearSpeedMetersPerSec);
-                            }
-                            if (rotation != 0 || !swerve.getRotationPIDSetting()) {
-                                swerve.setRotationOutput(rotation * Swerve.Constants.maxAngularSpeedRadPerSec);
-                            }
+                            swerve.setPositionOutput(
+                                    x * Swerve.Constants.maxLinearSpeedMetersPerSec,
+                                    y * Swerve.Constants.maxLinearSpeedMetersPerSec);
+                            swerve.setRotationOutput(rotation * Swerve.Constants.maxAngularSpeedRadPerSec);
                             swerve.setFieldOriented(fieldRelative.getAsBoolean());
                         },
                         swerve)
                 .withName("swerve drive");
     }
 
-    // Command to manually control the swerve drivetrain
-    public Command manualControl(double dx, double dy, double dtheta) {
-        return Commands.run(
-                        () -> {
-                            swerve.setPositionOutput(dx, dy);
-                            swerve.setRotationOutput(dtheta);
-                        },
-                        swerve)
-                .withName("swerve manual control");
+    // Command to set x and y speed
+    public Command setPositionOutput(double dx, double dy) {
+        return new InstantCommand(() -> swerve.setPositionOutput(dx, dy), swerve)
+                .withName("swerve set position output");
     }
 
-    // Command to stop the swerve drivetrain
+    // Command to set rotational speed
+    public Command setRotationOutput(double omega) {
+        return new InstantCommand(() -> swerve.setRotationOutput(omega), swerve).withName("swerve set rotation output");
+    }
+
+    // Sets translational and rotational speed
+    public Command setSpeed(double dx, double dy, double omega) {
+        return setPositionOutput(dx, dy).andThen(setRotationOutput(omega)).withName("swerve set speed");
+    }
+
+    // Stops all swerve output
     public Command stop() {
-        return Commands.runOnce(
-                        () -> {
-                            swerve.setPositionOutput(0, 0);
-                            swerve.setRotationOutput(0);
-                        },
-                        swerve)
-                .withName("swerve stop");
+        return setSpeed(0, 0, 0);
     }
 
     // Command to set position target
@@ -115,39 +111,29 @@ public class SwerveCommands {
         return new InstantCommand(() -> swerve.setPoseTarget(pose), swerve).withName("swerve set pose target");
     }
 
-    public Command alignToLeft() {
-        return new InstantCommand(() -> {
-            Pose2d pose = swerve.getPose();
-            Pose2d closest = null;
-            double closestDist = Double.MAX_VALUE;
-            for (int i = 0; i < Field.scoringPoses.length; i++) {
-                Pose2d otherPose = Field.scoringPoses[i][0].get();
-                double dist = otherPose.getTranslation().getDistance(pose.getTranslation());
-                if (dist < closestDist) {
-                    closestDist = dist;
-                    closest = otherPose;
-                }
-            }
-            swerve.setRotationTarget(closest.getRotation().getRadians());
-            swerve.setPositionTarget(closest.getX(), closest.getY());
-        });
-    }
-
-    public Command alignToRight() {
-        return new InstantCommand(() -> {
-            Pose2d pose = swerve.getPose();
-            Pose2d closest = null;
-            double closestDist = Double.MAX_VALUE;
-            for (int i = 0; i < Field.scoringPoses.length; i++) {
-                Pose2d otherPose = Field.scoringPoses[i][1].get();
-                double dist = otherPose.getTranslation().getDistance(pose.getTranslation());
-                if (dist < closestDist) {
-                    closestDist = dist;
-                    closest = otherPose;
-                }
-            }
-            swerve.setRotationTarget(closest.getRotation().getRadians());
-            swerve.setPositionTarget(closest.getX(), closest.getY());
-        });
+    // side = 0 aligns to left, side = 1 aligns to right
+    public Command alignToSide(int side) {
+        return new InstantCommand(
+                        () -> {
+                            Pose2d pose = swerve.getPose();
+                            FieldPose2d closest = null;
+                            double closestDist = Double.MAX_VALUE;
+                            for (int i = 0; i < Field.scoringPoses.length; i++) {
+                                // Get field pose scoring at the given branch
+                                FieldPose2d scoringPose = Field.scoringPoses[i][side];
+                                // Get the Pose2d that's flipped if on red alliance
+                                Pose2d otherPose = scoringPose.get();
+                                // Get the distance between bot position and the physical Pose2d
+                                double dist = otherPose.getTranslation().getDistance(pose.getTranslation());
+                                // If dist is the new closest set the closest pose to scoringPose
+                                if (dist < closestDist) {
+                                    closestDist = dist;
+                                    closest = scoringPose;
+                                }
+                            }
+                            swerve.setPoseTarget(closest);
+                        },
+                        swerve)
+                .withName(side == 0 ? "align to left" : "align to right");
     }
 }

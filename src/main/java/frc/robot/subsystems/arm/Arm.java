@@ -41,6 +41,8 @@ public class Arm extends SubsystemBase {
         public static final double gearRatio = 175 / 2.; // Ratio of motor rotations to arm rotations (unitless)
         public static final double encoderRatio = 1; // Ratio of encoder rotations to arm rotations (unitless)
 
+        public static final double armTolerance = Units.degreesToRadians(5);
+
         public static final LoggedNetworkNumber kP =
                 new LoggedNetworkNumber("Arm/kP", 50); // (volts per radian) more voltage when farther from target
         public static final LoggedNetworkNumber kD =
@@ -54,7 +56,7 @@ public class Arm extends SubsystemBase {
                 "Arm/kV", 0); // (volts per rad/s) voltage that scales with speed to overcome friction
         public static final LoggedNetworkNumber kA =
                 new LoggedNetworkNumber("Arm/kA", 0); // (volts per rad/s^2) extra voltage to help with acceleration
-        public static final LoggedNetworkNumber kI = new LoggedNetworkNumber("Arm/kI", 100);
+        public static final LoggedNetworkNumber kI = new LoggedNetworkNumber("Arm/kI", 30);
 
         public static final LoggedNetworkNumber maxVelocity =
                 new LoggedNetworkNumber("Arm/maxVelocity", 10); // (rad/s) Motion Magic max speed for moving to a target
@@ -183,6 +185,11 @@ public class Arm extends SubsystemBase {
     // Find out the current target angle (radians)
     public double getGoal() {
         return motor.getInputs().setpoint;
+    }
+
+    // Whether the error is within tolerance
+    public boolean atGoal() {
+        return Math.abs(getPosition() - getGoal()) < Constants.armTolerance;
     }
 
     @Override

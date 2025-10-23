@@ -30,9 +30,11 @@ public class Field {
 
     public static final double branchDist = 0.33; // Distance between two branches on the same side (meters)
 
-    public static final double reefRadius = 0.952; // Distance from center of the reef to center of an edge (meters)
+    public static final double reefRadius = 0.832; // Distance from center of the reef to center of an edge (meters)
 
     public static final double botRadius = 0.4318; // Distance from center of bot to edge of the bot (meters)
+
+    public static final double alignGap = 0.3; // Extra gap between the bot and reef
 
     public static FieldPose2d[][] scoringPoses =
             new FieldPose2d[6][2]; // Scoring poses as a 2D array, first reef side, then branch
@@ -42,7 +44,7 @@ public class Field {
         Pose2d[] visualization = new Pose2d[12];
 
         // Calculate the robot's approach distance
-        double approachDist = botRadius + reefRadius;
+        double approachDist = botRadius + reefRadius + alignGap;
 
         Pose2d blueReefPose = reefPose.getOnBlue();
         for (int side = 0; side < 6; side++) {

@@ -38,6 +38,7 @@ import org.littletonrobotics.junction.mechanism.LoggedMechanismRoot2d;
 import org.littletonrobotics.junction.networktables.LoggedNetworkBoolean;
 import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
 
+import frc.robot.Constants.Mode;
 import frc.robot.io.CameraIO;
 import frc.robot.io.CameraIO.CameraIOInputs;
 import frc.robot.io.GyroIO;
@@ -84,6 +85,10 @@ public class Swerve extends SubsystemBase {
         // Maximum angular speed of the robot
         public static final double maxAngularSpeedRadPerSec = maxLinearSpeedMetersPerSec / driveBaseRadius;
 
+        // Initial pose of the bot in simulation
+        public static final FieldPose2d simInitialPose =
+                new FieldPose2d(new Pose2d(2.5, Field.fieldWidth / 2, Rotation2d.k180deg));
+
         public static final LoggedNetworkBoolean swerveLocked =
                 new LoggedNetworkBoolean("Swerve/Locked", true); // Toggle to enable braking when stopped
 
@@ -93,11 +98,11 @@ public class Swerve extends SubsystemBase {
         public static final LoggedNetworkBoolean swerveFieldCentric =
                 new LoggedNetworkBoolean("Swerve/FieldCentric", true); // Toggle for field centric controls
 
-        public static final LoggedNetworkNumber translationkP = new LoggedNetworkNumber("Swerve/TransKP", 4);
+        public static final LoggedNetworkNumber translationkP = new LoggedNetworkNumber("Swerve/TransKP", 2);
         public static final LoggedNetworkNumber translationkD = new LoggedNetworkNumber("Swerve/TransKD", 0);
         public static final LoggedNetworkNumber translationkI = new LoggedNetworkNumber("Swerve/TransKI", 0);
 
-        public static final LoggedNetworkNumber rotationkP = new LoggedNetworkNumber("Swerve/RotKP", 1);
+        public static final LoggedNetworkNumber rotationkP = new LoggedNetworkNumber("Swerve/RotKP", 0.4);
         public static final LoggedNetworkNumber rotationkD = new LoggedNetworkNumber("Swerve/RotKD", 0);
         public static final LoggedNetworkNumber rotationkI = new LoggedNetworkNumber("Swerve/RotKI", 0);
     }
@@ -113,11 +118,14 @@ public class Swerve extends SubsystemBase {
         // Theta standard deviation multiplier based on distance
         public static final double visionThetaStdDevDistanceMultiplier = 0.2;
 
-        public static final Transform3d bratPose = new Transform3d(
-                new Translation3d(-0.19, -0.308, 0.318), new Rotation3d(0, 0, Units.degreesToRadians(200)));
+        // public static final Transform3d bratPose = new Transform3d(
+        //         new Translation3d(-0.193, -0.288, 0.31), new Rotation3d(0, 0, Units.degreesToRadians(210)));
+
+        // public static final Transform3d blatPose = new Transform3d(
+        //         new Translation3d(-0.208, 0.063, 0.33), new Rotation3d(0, 0, Units.degreesToRadians(210)));
 
         public static final Transform3d blatPose = new Transform3d(
-                new Translation3d(-0.178, 0.09, 0.33), new Rotation3d(0, 0, Units.degreesToRadians(183)));
+                new Translation3d(-0.208, 0.13, 0.33), new Rotation3d(0, 0, Units.degreesToRadians(210)));
 
         // How many robot pose measurements to store per camera
         public static final int maxMeasurements = 8;
@@ -179,11 +187,21 @@ public class Swerve extends SubsystemBase {
         this.gyro = gyro;
         this.modules = new SwerveModule[] {fl, fr, bl, br};
 
+        Pose2d initialPose;
+        if (frc.robot.Constants.currentMode != Mode.SIM) {
+            // If we're on a physical robot, initial pose estimate will be in the center of the field, since alliance
+            // probably hasn't loaded yet
+            initialPose = new Pose2d(Field.fieldLength / 2, Field.fieldWidth / 2, Rotation2d.kZero);
+        } else {
+            // If in sim, get Constants.simInitialPose and flip it on red alliance
+            initialPose = Constants.simInitialPose.get();
+        }
+
         estimator = new SwerveDrivePoseEstimator(
                 kinematics,
                 gyroAngle,
                 getModulePositions(),
-                new Pose2d(2.5, Field.fieldWidth / 2, Rotation2d.k180deg),
+                initialPose,
                 VecBuilder.fill(0.05, 0.05, Units.degreesToRadians(5)),
                 VecBuilder.fill(1, 1, 1));
 
@@ -197,7 +215,6 @@ public class Swerve extends SubsystemBase {
                 Constants.rotationkI.get(),
                 Constants.rotationkD.get(),
                 new Constraints(10, 10));
-        xController.setIZone(1);
 
         // Set wraparound on theta controller
         thetaController.enableContinuousInput(-Math.PI, Math.PI);
@@ -427,10 +444,10 @@ public class Swerve extends SubsystemBase {
 
             boolean positionFieldOriented = true;
             if (pidPosition) {
-                xSpeed = xController.calculate(
-                        getPose().getX(), targetPose.getOnBlue().getX());
-                ySpeed = yController.calculate(
-                        getPose().getY(), targetPose.getOnBlue().getY());
+                xSpeed =
+                        xController.calculate(getPose().getX(), targetPose.get().getX());
+                ySpeed =
+                        yController.calculate(getPose().getY(), targetPose.get().getY());
             } else {
                 xSpeed = dx;
                 ySpeed = dy;
@@ -445,7 +462,7 @@ public class Swerve extends SubsystemBase {
             if (pidRotation) {
                 thetaSpeed = thetaController.calculate(
                         getPose().getRotation().getRadians(),
-                        targetPose.getOnBlue().getRotation().getRadians());
+                        targetPose.get().getRotation().getRadians());
             } else {
                 thetaSpeed = dtheta;
             }
@@ -531,7 +548,7 @@ public class Swerve extends SubsystemBase {
         SwerveModuleState[] states = getModuleStates();
         for (int i = 0; i < 4; i++) {
             // Scale length down so it fits nicely on screen
-            speeds[i].setLength(states[i].speedMetersPerSecond / 3);
+            speeds[i].setLength(states[i].speedMetersPerSecond / 12);
             speeds[i].setAngle(states[i].angle);
         }
     }

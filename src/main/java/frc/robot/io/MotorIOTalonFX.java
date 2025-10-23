@@ -406,10 +406,17 @@ public class MotorIOTalonFX extends MotorIO {
         }
     }
 
+    // Modifies gains for unit scaling
     @Override
     public void setGains(Slot0Configs gains) {
-        config.Slot0 = gains;
-        configChanged = true;
+        setkP(gains.kP);
+        setkI(gains.kI);
+        setkD(gains.kD);
+        setkG(gains.kG);
+        setkS(gains.kS);
+        setkV(gains.kV);
+        setkA(gains.kA);
+        setFeedforwardType(gains.GravityType);
     }
 
     @Override

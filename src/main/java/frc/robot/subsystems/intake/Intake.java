@@ -14,7 +14,7 @@ public class Intake extends SubsystemBase {
         // CAN device ID for the intake motor controller
         public static final int motorId = 24;
         // Whether to flip motor direction (true means reverse forward/backward)
-        public static final boolean motorInverted = false;
+        public static final boolean motorInverted = true;
 
         public static final double statorCurrentLimit = 60; // (amps) limit on motor torque output for intake loads
         public static final double supplyCurrentLimit = 50; // (amps) normal current limit pulled from battery
@@ -47,31 +47,6 @@ public class Intake extends SubsystemBase {
     // Tell the intake motor how fast to spin (percent [-1 to 1], -1 = full outtake, 1 = full intake)
     public void setSpeed(double speed) {
         motor.setDutyCycle(speed);
-    }
-
-    // Tell the intake motor to stop
-    public void stop() {
-        motor.setDutyCycle(0);
-    }
-
-    // Find out how much current the motor is drawing (amps) - useful for detecting when we have a game piece
-    public double getSupplyCurrent() {
-        return motor.getInputs().supplyCurrent;
-    }
-
-    // Find out how much torque current the motor is producing (amps) - useful for detecting load
-    public double getTorqueCurrent() {
-        return motor.getInputs().torqueCurrent;
-    }
-
-    // Find out the motor voltage being applied (volts)
-    public double getAppliedVoltage() {
-        return motor.getInputs().appliedVoltage;
-    }
-
-    // Find out if we might have a game piece (high current draw indicates something is being processed)
-    public boolean hasGamePiece() {
-        return getSupplyCurrent() > 15; // (amps) threshold for detecting game piece load
     }
 
     @Override

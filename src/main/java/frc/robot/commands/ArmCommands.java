@@ -20,9 +20,24 @@ public class ArmCommands {
         return new InstantCommand(() -> arm.setSpeed(speed.getAsDouble()), arm).withName("arm set speed");
     }
 
+    // Command to manually control the arm at a fixed speed
+    public Command setSpeed(double speed) {
+        return setSpeed(() -> speed).withName("arm set speed " + speed);
+    }
+
+    // Command to stop all motor output to the arm
+    public Command stop() {
+        return setSpeed(0).withName("arm stop");
+    }
+
     // Command to set the goal of the arm (in radians)
     public Command setGoal(DoubleSupplier goal) {
         return new InstantCommand(() -> arm.setGoal(goal.getAsDouble()), arm).withName("arm set goal");
+    }
+
+    // Command to set the goal of the arm to a fixed value (in radians)
+    public Command setGoal(double goal) {
+        return setGoal(() -> goal).withName("arm set goal " + goal);
     }
 
     // Command to change the goal of the arm by the given amount of radians
@@ -31,23 +46,8 @@ public class ArmCommands {
                 .withName("arm change goal");
     }
 
-    // Command to stop all motor output to the arm
-    public Command stop() {
-        return setSpeed(() -> 0).withName("arm stop");
-    }
-
-    // Command to manually control the arm at a fixed speed
-    public Command manualControl(double speed) {
-        return setSpeed(() -> speed).withName("arm manual control");
-    }
-
-    // Command to set the goal of the arm to a fixed value (in radians)
-    public Command setGoal(double goal) {
-        return setGoal(() -> goal).withName("arm set goal " + goal);
-    }
-
     // Command to increment the goal by a fixed amount (in radians)
-    public Command incrementGoal(double increment) {
-        return changeGoal(() -> increment).withName("arm increment goal");
+    public Command changeGoal(double increment) {
+        return changeGoal(() -> increment).withName("arm change goal " + increment);
     }
 }

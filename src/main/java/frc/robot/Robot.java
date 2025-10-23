@@ -170,8 +170,12 @@ public class Robot extends LoggedRobot {
     @Override
     public void teleopInit() {
         if (Constants.currentMode == Mode.SIM) {
-            // In simulation start at Blue 2
-            DriverStationSim.setAllianceStationId(AllianceStationID.Blue2);
+            // Choose alliance station based on Constants.simIsRedAlliance
+            if (Constants.simIsRedAlliance) {
+                DriverStationSim.setAllianceStationId(AllianceStationID.Red2);
+            } else {
+                DriverStationSim.setAllianceStationId(AllianceStationID.Blue2);
+            }
         }
 
         if (autonomousCommand != null) {

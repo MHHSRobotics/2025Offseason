@@ -20,23 +20,23 @@ public class HangCommands {
         return new InstantCommand(() -> hang.setSpeed(speed.getAsDouble()), hang).withName("hang set speed");
     }
 
+    // Command to manually control the hang at a fixed speed
+    public Command setSpeed(double speed) {
+        return setSpeed(() -> speed).withName("hang set speed " + speed);
+    }
+
     // Tell the hang motor to stop all movement
     public Command stop() {
-        return new InstantCommand(() -> hang.stop(), hang).withName("hang stop");
+        return setSpeed(0.0).withName("hang stop");
     }
 
     // Tell the hang to extend up at full speed (for climbing up)
     public Command extendUp() {
-        return setSpeed(() -> 1.0).withName("hang extend up");
+        return setSpeed(1.0).withName("hang extend up");
     }
 
     // Tell the hang to retract down at full speed (for lowering down)
     public Command retractDown() {
-        return setSpeed(() -> -1.0).withName("hang retract down");
-    }
-
-    // Command to manually control the hang at a fixed speed
-    public Command manualControl(double speed) {
-        return setSpeed(() -> speed).withName("hang manual control");
+        return setSpeed(-1.0).withName("hang retract down");
     }
 }

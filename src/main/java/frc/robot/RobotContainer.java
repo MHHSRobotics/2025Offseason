@@ -39,7 +39,6 @@ import frc.robot.subsystems.swerve.TunerConstants;
 import frc.robot.subsystems.swerve.VisionSim;
 import frc.robot.subsystems.wrist.Wrist;
 import frc.robot.subsystems.wrist.WristSim;
-import frc.robot.util.Field;
 
 public class RobotContainer {
     private Arm arm;
@@ -328,20 +327,21 @@ public class RobotContainer {
         }
 
         if (Constants.visionEnabled) {
-            CameraIO brat;
+            // CameraIO brat;
             CameraIO blat;
             switch (Constants.currentMode) {
                 case REAL:
                 case SIM:
-                    brat = new CameraIOPhotonCamera("BackRight_AT", "Vision/BRAT", Swerve.VisionConstants.bratPose, 60);
-                    blat = new CameraIOPhotonCamera("BackLeft_AT", "Vision/BLAT", Swerve.VisionConstants.blatPose, 70);
+                    // brat = new CameraIOPhotonCamera("BackRight_AT", "Vision/BRAT", Swerve.VisionConstants.bratPose,
+                    // 60);
+                    blat = new CameraIOPhotonCamera("BackLeft_AT", "Vision/BLAT", Swerve.VisionConstants.blatPose, 60);
                     break;
                 default:
-                    brat = new CameraIO("BackRight_AT", "Vision/BRAT");
+                    // brat = new CameraIO("BackRight_AT", "Vision/BRAT");
                     blat = new CameraIO("BackLeft_AT", "Vision/BLAT");
                     break;
             }
-            swerve.addCameraSource(brat);
+            // swerve.addCameraSource(brat);
             swerve.addCameraSource(blat);
             if (Constants.currentMode == Mode.SIM) {
                 new VisionSim(swerve.getCameras(), swerve);
@@ -378,15 +378,19 @@ public class RobotContainer {
 
         controller.create().onTrue(swerveCommands.resetGyro());
 
-        controller.povLeft().onTrue(swerveCommands.alignToLeft());
+        controller.povLeft().onTrue(swerveCommands.alignToSide(0));
 
-        controller.povRight().onTrue(swerveCommands.alignToRight());
+        controller.povRight().onTrue(swerveCommands.alignToSide(1));
 
-        swerve.setDefaultCommand(swerveCommands.drive(
-                () -> -controller.getLeftY(),
-                () -> -controller.getLeftX(),
-                () -> -controller.getRightX(),
-                () -> Swerve.Constants.swerveFieldCentric.get()));
+        controller
+                .axisMagnitudeGreaterThan(0, Swerve.Constants.moveDeadband)
+                .or(controller.axisMagnitudeGreaterThan(1, Swerve.Constants.moveDeadband))
+                .or(controller.axisMagnitudeGreaterThan(2, Swerve.Constants.turnDeadband))
+                .onTrue(swerveCommands.drive(
+                        () -> -controller.getLeftY(),
+                        () -> -controller.getLeftX(),
+                        () -> -controller.getRightX(),
+                        () -> Swerve.Constants.swerveFieldCentric.get()));
 
         // Cancel all commands
         controller.PS().onTrue(Commands.runOnce(() -> CommandScheduler.getInstance()
@@ -406,44 +410,54 @@ public class RobotContainer {
         testControllerManual = new LoggedDashboardChooser<>("Test/Type");
         testControllerManual.addOption("Manual", "Manual");
         testControllerManual.addOption("PID", "PID");
-        testControllerManual.addOption("PIDChange", "PIDChange");
+
+        // Test controller swerve control for convenience
+        testController
+                .axisMagnitudeGreaterThan(0, Swerve.Constants.moveDeadband)
+                .or(testController.axisMagnitudeGreaterThan(1, Swerve.Constants.moveDeadband))
+                .or(testController.axisMagnitudeGreaterThan(2, Swerve.Constants.turnDeadband))
+                .onTrue(swerveCommands.drive(
+                        () -> -testController.getLeftY(),
+                        () -> -testController.getLeftX(),
+                        () -> -testController.getRightX(),
+                        () -> Swerve.Constants.swerveFieldCentric.get()));
 
         // Manual duty cycle forward test
         testController
                 .cross()
                 .and(() -> testControllerManual.get().equals("Manual"))
                 .and(() -> testControllerChooser.get().equals("Arm"))
-                .onTrue(armCommands.manualControl(0.2))
+                .onTrue(armCommands.setSpeed(0.2))
                 .onFalse(armCommands.stop());
         testController
                 .cross()
                 .and(() -> testControllerManual.get().equals("Manual"))
                 .and(() -> testControllerChooser.get().equals("Elevator"))
-                .onTrue(elevatorCommands.manualControl(0.2))
+                .onTrue(elevatorCommands.setSpeed(0.2))
                 .onFalse(elevatorCommands.stop());
         testController
                 .cross()
                 .and(() -> testControllerManual.get().equals("Manual"))
                 .and(() -> testControllerChooser.get().equals("Wrist"))
-                .onTrue(wristCommands.manualControl(0.2))
+                .onTrue(wristCommands.setSpeed(0.2))
                 .onFalse(wristCommands.stop());
         testController
                 .cross()
                 .and(() -> testControllerManual.get().equals("Manual"))
                 .and(() -> testControllerChooser.get().equals("Hang"))
-                .onTrue(hangCommands.manualControl(0.2))
+                .onTrue(hangCommands.setSpeed(0.2))
                 .onFalse(hangCommands.stop());
         testController
                 .cross()
                 .and(() -> testControllerManual.get().equals("Manual"))
                 .and(() -> testControllerChooser.get().equals("Intake"))
-                .onTrue(intakeCommands.manualControl(0.2))
+                .onTrue(intakeCommands.setSpeed(0.2))
                 .onFalse(intakeCommands.stop());
         testController
                 .cross()
                 .and(() -> testControllerManual.get().equals("Manual"))
                 .and(() -> testControllerChooser.get().equals("Swerve"))
-                .onTrue(swerveCommands.manualControl(0.2, 0, 0))
+                .onTrue(swerveCommands.setSpeed(0.2, 0, 0))
                 .onFalse(swerveCommands.stop());
 
         // Manual duty cycle backward test
@@ -451,37 +465,37 @@ public class RobotContainer {
                 .circle()
                 .and(() -> testControllerManual.get().equals("Manual"))
                 .and(() -> testControllerChooser.get().equals("Arm"))
-                .onTrue(armCommands.manualControl(-0.2))
+                .onTrue(armCommands.setSpeed(-0.2))
                 .onFalse(armCommands.stop());
         testController
                 .circle()
                 .and(() -> testControllerManual.get().equals("Manual"))
                 .and(() -> testControllerChooser.get().equals("Elevator"))
-                .onTrue(elevatorCommands.manualControl(-0.2))
+                .onTrue(elevatorCommands.setSpeed(-0.2))
                 .onFalse(elevatorCommands.stop());
         testController
                 .circle()
                 .and(() -> testControllerManual.get().equals("Manual"))
                 .and(() -> testControllerChooser.get().equals("Wrist"))
-                .onTrue(wristCommands.manualControl(-0.2))
+                .onTrue(wristCommands.setSpeed(-0.2))
                 .onFalse(wristCommands.stop());
         testController
                 .circle()
                 .and(() -> testControllerManual.get().equals("Manual"))
                 .and(() -> testControllerChooser.get().equals("Hang"))
-                .onTrue(hangCommands.manualControl(-0.2))
+                .onTrue(hangCommands.setSpeed(-0.2))
                 .onFalse(hangCommands.stop());
         testController
                 .circle()
                 .and(() -> testControllerManual.get().equals("Manual"))
                 .and(() -> testControllerChooser.get().equals("Intake"))
-                .onTrue(intakeCommands.manualControl(-0.2))
+                .onTrue(intakeCommands.setSpeed(-0.2))
                 .onFalse(intakeCommands.stop());
         testController
                 .circle()
                 .and(() -> testControllerManual.get().equals("Manual"))
                 .and(() -> testControllerChooser.get().equals("Swerve"))
-                .onTrue(swerveCommands.manualControl(-0.2, 0, 0))
+                .onTrue(swerveCommands.setSpeed(-0.2, 0, 0))
                 .onFalse(swerveCommands.stop());
 
         // PID down test
@@ -504,7 +518,7 @@ public class RobotContainer {
                 .cross()
                 .and(() -> testControllerManual.get().equals("PID"))
                 .and(() -> testControllerChooser.get().equals("Swerve"))
-                .onTrue(swerveCommands.setPoseTarget(Field.scoringPoses[4][0])); // ID 8
+                .onTrue(swerveCommands.alignToSide(0)); // Align to nearest left reef
 
         // PID up test
         testController
@@ -526,50 +540,22 @@ public class RobotContainer {
                 .circle()
                 .and(() -> testControllerManual.get().equals("PID"))
                 .and(() -> testControllerChooser.get().equals("Swerve"))
-                .onTrue(swerveCommands.setPositionTarget(1, 0));
-
-        // PID change up test
-        testController
-                .cross()
-                .and(() -> testControllerManual.get().equals("PIDChange"))
-                .and(() -> testControllerChooser.get().equals("Arm"))
-                .whileTrue(new RepeatCommand(armCommands.incrementGoal(0.02)));
-        testController
-                .cross()
-                .and(() -> testControllerManual.get().equals("PIDChange"))
-                .and(() -> testControllerChooser.get().equals("Elevator"))
-                .whileTrue(new RepeatCommand(elevatorCommands.incrementGoal(0.02)));
-        testController
-                .cross()
-                .and(() -> testControllerManual.get().equals("PIDChange"))
-                .and(() -> testControllerChooser.get().equals("Wrist"))
-                .whileTrue(new RepeatCommand(wristCommands.incrementGoal(0.02)));
-
-        // PID change down test
-        testController
-                .circle()
-                .and(() -> testControllerManual.get().equals("PIDChange"))
-                .and(() -> testControllerChooser.get().equals("Arm"))
-                .whileTrue(new RepeatCommand(armCommands.incrementGoal(-0.02)));
-        testController
-                .circle()
-                .and(() -> testControllerManual.get().equals("PIDChange"))
-                .and(() -> testControllerChooser.get().equals("Elevator"))
-                .whileTrue(new RepeatCommand(elevatorCommands.incrementGoal(-0.02)));
-        testController
-                .circle()
-                .and(() -> testControllerManual.get().equals("PIDChange"))
-                .and(() -> testControllerChooser.get().equals("Wrist"))
-                .whileTrue(new RepeatCommand(wristCommands.incrementGoal(-0.02)));
+                .onTrue(swerveCommands.alignToSide(1)); // Align to nearest right reef
     }
 
+    // Bindings for manual control of each of the subsystems
     public void configureManualBindings() {
-        manualController.square().whileTrue(new RepeatCommand(armCommands.incrementGoal(0.05)));
-        manualController.triangle().whileTrue(new RepeatCommand(armCommands.incrementGoal(-0.05)));
-        manualController.circle().whileTrue(new RepeatCommand(elevatorCommands.incrementGoal(0.05)));
-        manualController.cross().whileTrue(new RepeatCommand(elevatorCommands.incrementGoal(-0.05)));
-        manualController.povUp().whileTrue(new RepeatCommand(wristCommands.incrementGoal(0.05)));
-        manualController.povDown().whileTrue(new RepeatCommand(wristCommands.incrementGoal(-0.05)));
+        // Square + circle control arm
+        manualController.square().whileTrue(new RepeatCommand(armCommands.changeGoal(0.05)));
+        manualController.circle().whileTrue(new RepeatCommand(armCommands.changeGoal(-0.05)));
+
+        // Triangle + cross control elevator
+        manualController.triangle().whileTrue(new RepeatCommand(elevatorCommands.changeGoal(0.05)));
+        manualController.cross().whileTrue(new RepeatCommand(elevatorCommands.changeGoal(-0.05)));
+
+        // POV up + down control wrist
+        manualController.povUp().whileTrue(new RepeatCommand(wristCommands.changeGoal(0.05)));
+        manualController.povDown().whileTrue(new RepeatCommand(wristCommands.changeGoal(-0.05)));
     }
 
     public Command getAutonomousCommand() {
