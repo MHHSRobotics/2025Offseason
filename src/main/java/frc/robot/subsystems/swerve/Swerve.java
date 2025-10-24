@@ -118,8 +118,8 @@ public class Swerve extends SubsystemBase {
         // Theta standard deviation multiplier based on distance
         public static final double visionThetaStdDevDistanceMultiplier = 0.2;
 
-        // public static final Transform3d bratPose = new Transform3d(
-        //         new Translation3d(-0.193, -0.288, 0.31), new Rotation3d(0, 0, Units.degreesToRadians(210)));
+        public static final Transform3d bratPose = new Transform3d(
+                new Translation3d(-0.193, -0.288, 0.31), new Rotation3d(0, 0, Units.degreesToRadians(200)));
 
         // public static final Transform3d blatPose = new Transform3d(
         //         new Translation3d(-0.208, 0.063, 0.33), new Rotation3d(0, 0, Units.degreesToRadians(210)));
@@ -408,6 +408,17 @@ public class Swerve extends SubsystemBase {
         return cameras;
     }
 
+    // Gets translation error to the goal in meters
+    public double getTranslationError() {
+        return getPose().getTranslation().getDistance(targetPose.get().getTranslation());
+    }
+
+    // Gets rotation error to the goal in radians
+    public double getRotationError() {
+        return Math.abs(getPose().getRotation().getRadians()
+                - targetPose.get().getRotation().getRadians());
+    }
+
     @Override
     public void periodic() {
         // This runs every robot loop (~50 times per second)
@@ -474,7 +485,8 @@ public class Swerve extends SubsystemBase {
         Logger.recordOutput("Swerve/dy", ySpeed);
         Logger.recordOutput("Swerve/dtheta", dtheta);
         Logger.recordOutput("Swerve/TargetPose", targetPose.get());
-        Logger.recordOutput("Swerve/PIDPosition", pidPosition);
+        Logger.recordOutput("Swerve/PoseTranslationError", getTranslationError());
+        Logger.recordOutput("Swerve/PoseRotationError", getRotationError());
         Logger.recordOutput("Swerve/PIDRotation", pidRotation);
 
         // Get measurements from all connected cameras and add them to the pose estimator
