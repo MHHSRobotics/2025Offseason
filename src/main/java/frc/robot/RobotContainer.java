@@ -4,6 +4,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.RepeatCommand;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandPS5Controller;
 
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
@@ -327,21 +328,20 @@ public class RobotContainer {
         }
 
         if (Constants.visionEnabled) {
-            // CameraIO brat;
+            CameraIO brat;
             CameraIO blat;
             switch (Constants.currentMode) {
                 case REAL:
                 case SIM:
-                    // brat = new CameraIOPhotonCamera("BackRight_AT", "Vision/BRAT", Swerve.VisionConstants.bratPose,
-                    // 60);
+                    brat = new CameraIOPhotonCamera("BackRight_AT", "Vision/BRAT", Swerve.VisionConstants.bratPose, 60);
                     blat = new CameraIOPhotonCamera("BackLeft_AT", "Vision/BLAT", Swerve.VisionConstants.blatPose, 60);
                     break;
                 default:
-                    // brat = new CameraIO("BackRight_AT", "Vision/BRAT");
+                    brat = new CameraIO("BackRight_AT", "Vision/BRAT");
                     blat = new CameraIO("BackLeft_AT", "Vision/BLAT");
                     break;
             }
-            // swerve.addCameraSource(brat);
+            swerve.addCameraSource(brat);
             swerve.addCameraSource(blat);
             if (Constants.currentMode == Mode.SIM) {
                 new VisionSim(swerve.getCameras(), swerve);
@@ -556,10 +556,27 @@ public class RobotContainer {
         // POV up + down control wrist
         manualController.povUp().whileTrue(new RepeatCommand(wristCommands.changeGoal(0.05)));
         manualController.povDown().whileTrue(new RepeatCommand(wristCommands.changeGoal(-0.05)));
+
+        // Intake/outtake controls
+        manualController.L1().onTrue(intakeCommands.intake()).onFalse(intakeCommands.stop());
+        manualController.L2().onTrue(intakeCommands.outtake()).onFalse(intakeCommands.stop());
+
+        // Hang controls
+        manualController.povLeft().onTrue(hangCommands.extendUp()).onFalse(hangCommands.stop());
+        manualController.povRight().onTrue(hangCommands.retractDown()).onFalse(hangCommands.stop());
     }
 
     public Command getAutonomousCommand() {
-        return Commands.print("No autonomous command configured");
+        return ssCommands
+                .defaultPosition()
+                .andThen(new WaitCommand(0.5))
+                .andThen(swerveCommands.alignToSide(1))
+                .until(() -> swerve.getRotationError() < 0.1 && swerve.getTranslationError() < 0.1)
+                .andThen(ssCommands.L4Position())
+                .andThen(new WaitCommand(1))
+                .andThen(intakeCommands.outtake())
+                .andThen(new WaitCommand(0.2))
+                .andThen(intakeCommands.stop());
     }
 
     public void periodic() {

@@ -13,7 +13,7 @@
         },
         {
             "name":"BackLeft_AT",
-            "rotations":[{"axis":"z","degrees":23}],
+            "rotations":[{"axis":"z","degrees":30}],
             "position":[0.178,-0.09,0.29],
             "resolution":[800,600],
             "fov":60
