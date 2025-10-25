@@ -66,10 +66,10 @@ public class RobotContainer {
     private final CommandPS5Controller controller = new CommandPS5Controller(0);
 
     // Test controller for controlling one subsystem at a time
-    private final CommandPS5Controller testController = new CommandPS5Controller(1);
+    private final CommandPS5Controller testController = new CommandPS5Controller(2);
 
     // Manual controller for subsystems
-    private final CommandPS5Controller manualController = new CommandPS5Controller(2);
+    private final CommandPS5Controller manualController = new CommandPS5Controller(1);
     private LoggedDashboardChooser<String> testControllerChooser;
     private LoggedDashboardChooser<String> testControllerManual;
     private LoggedDashboardChooser<String> autoChooser;
@@ -597,7 +597,7 @@ public class RobotContainer {
                     .andThen(new WaitUntilCommand(
                             () -> swerve.getRotationError() < 0.1 && swerve.getTranslationError() < 0.1))
                     .andThen(ssCommands.L4Position())
-                    .andThen(new WaitCommand(2))
+                    .andThen(new WaitCommand(3))
                     .andThen(intakeCommands.outtake())
                     .andThen(new WaitCommand(0.2))
                     .andThen(intakeCommands.stop());
