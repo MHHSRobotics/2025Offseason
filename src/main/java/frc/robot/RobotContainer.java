@@ -572,6 +572,8 @@ public class RobotContainer {
         // Hang controls
         manualController.povLeft().onTrue(hangCommands.extendUp()).onFalse(hangCommands.stop());
         manualController.povRight().onTrue(hangCommands.retractDown()).onFalse(hangCommands.stop());
+
+        manualController.options().onTrue(ssCommands.defaultPosition());
     }
 
     public void configureAutoChooser() {
