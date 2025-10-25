@@ -597,7 +597,7 @@ public class RobotContainer {
                     .andThen(new WaitUntilCommand(
                             () -> swerve.getRotationError() < 0.1 && swerve.getTranslationError() < 0.1))
                     .andThen(ssCommands.L4Position())
-                    .andThen(new WaitCommand(1))
+                    .andThen(new WaitCommand(2))
                     .andThen(intakeCommands.outtake())
                     .andThen(new WaitCommand(0.2))
                     .andThen(intakeCommands.stop());
