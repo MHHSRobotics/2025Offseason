@@ -180,6 +180,19 @@
               "robot_color": 4294198070,
               "trajectory_color": 4294967295
             }
+          },
+          {
+            "title": "AutoSelection",
+            "x": 768.0,
+            "y": 512.0,
+            "width": 384.0,
+            "height": 128.0,
+            "type": "ComboBox Chooser",
+            "properties": {
+              "topic": "/SmartDashboard/AutoSelection",
+              "period": 0.06,
+              "sort_options": false
+            }
           }
         ]
       }
