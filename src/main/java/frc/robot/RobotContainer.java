@@ -562,8 +562,8 @@ public class RobotContainer {
         manualController.cross().whileTrue(new RepeatCommand(elevatorCommands.changeGoal(-0.05)));
 
         // POV up + down control wrist
-        manualController.povUp().whileTrue(new RepeatCommand(wristCommands.changeGoal(0.05)));
-        manualController.povDown().whileTrue(new RepeatCommand(wristCommands.changeGoal(-0.05)));
+        manualController.povDown().whileTrue(new RepeatCommand(wristCommands.changeGoal(0.05)));
+        manualController.povUp().whileTrue(new RepeatCommand(wristCommands.changeGoal(-0.05)));
 
         // Intake/outtake controls
         manualController.L1().onTrue(intakeCommands.intake()).onFalse(intakeCommands.stop());
