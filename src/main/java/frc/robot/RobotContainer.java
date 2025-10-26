@@ -587,7 +587,7 @@ public class RobotContainer {
         if (autoChooser.get().equals("Leave")) {
             return swerveCommands
                     .setPositionOutput(-2, 0)
-                    .andThen(new WaitCommand(2))
+                    .andThen(new WaitCommand(3))
                     .andThen(swerveCommands.setPositionOutput(0, 0));
         } else if (autoChooser.get().equals("Left") || autoChooser.get().equals("Right")) {
             return ssCommands
