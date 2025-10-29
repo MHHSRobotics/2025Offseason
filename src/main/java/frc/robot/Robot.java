@@ -64,8 +64,8 @@ public class Robot extends LoggedRobot {
         switch (Constants.currentMode) {
             case REAL:
                 // Check if log file exists
-                File file=new File("/U/logs");
-                if(!file.exists()){
+                File file = new File("/U/logs");
+                if (!file.exists()) {
                     Alerts.create("Log USB drive not found!", AlertType.kWarning);
                 }
             case SIM:

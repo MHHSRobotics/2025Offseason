@@ -1,7 +1,8 @@
 package frc.robot;
 
-import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -66,17 +67,21 @@ public class RobotContainer {
     // Main drive controller
     private final CommandPS5Controller controller = new CommandPS5Controller(0);
 
+    // Manual controller for subsystems
+    private final CommandPS5Controller manualController = new CommandPS5Controller(1);
+
     // Test controller for controlling one subsystem at a time
     private final CommandPS5Controller testController = new CommandPS5Controller(2);
 
-    // Manual controller for subsystems
-    private final CommandPS5Controller manualController = new CommandPS5Controller(1);
     private LoggedDashboardChooser<String> testControllerChooser;
     private LoggedDashboardChooser<String> testControllerManual;
     private LoggedDashboardChooser<String> autoChooser;
 
     // Publishes all robot data to AdvantageScope
     private RobotPublisher publisher;
+
+    private Alert controllerDisconnected = new Alert("Drive controller is disconnected", AlertType.kWarning);
+    private Alert manualDisconnected = new Alert("Manual controller is disconnected", AlertType.kWarning);
 
     public RobotContainer() {
         // Initialize all the IO objects, subsystems, and mechanism simulators
@@ -92,10 +97,10 @@ public class RobotContainer {
         configureManualBindings();
 
         // Configure bindings for test controller when not in match
-        if(!DriverStation.isFMSAttached()){
+        if (!DriverStation.isFMSAttached()) {
             configureTestBindings();
         }
-        
+
         // Set up the auto chooser
         configureAutoChooser();
 
@@ -579,6 +584,13 @@ public class RobotContainer {
         manualController.options().onTrue(ssCommands.defaultPosition());
     }
 
+    // Refresh drive and manual controller disconnect alerts
+    public void refreshControllerAlerts() {
+        controllerDisconnected.set(!controller.isConnected());
+        manualDisconnected.set(!manualController.isConnected());
+        System.out.println(manualController.isConnected());
+    }
+
     public void configureAutoChooser() {
         autoChooser = new LoggedDashboardChooser<>("AutoSelection");
         autoChooser.addOption("Left", "Left");
@@ -611,6 +623,10 @@ public class RobotContainer {
     }
 
     public void periodic() {
+        // Publish 3D robot data
         publisher.publish();
+
+        // Enable alerts for controller disconnects
+        refreshControllerAlerts();
     }
 }
