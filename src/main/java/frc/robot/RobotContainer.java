@@ -69,7 +69,7 @@ public class RobotContainer {
 
     // Manual controller for subsystems
     private final CommandPS5Controller manualController = new CommandPS5Controller(1);
-
+    
     // Test controller for controlling one subsystem at a time
     private final CommandPS5Controller testController = new CommandPS5Controller(2);
 
@@ -588,7 +588,6 @@ public class RobotContainer {
     public void refreshControllerAlerts() {
         controllerDisconnected.set(!controller.isConnected());
         manualDisconnected.set(!manualController.isConnected());
-        System.out.println(manualController.isConnected());
     }
 
     public void configureAutoChooser() {
