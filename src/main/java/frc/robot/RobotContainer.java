@@ -1,10 +1,13 @@
 package frc.robot;
 
+import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RepeatCommand;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
+import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandPS5Controller;
 
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
@@ -40,6 +43,7 @@ import frc.robot.subsystems.swerve.TunerConstants;
 import frc.robot.subsystems.swerve.VisionSim;
 import frc.robot.subsystems.wrist.Wrist;
 import frc.robot.subsystems.wrist.WristSim;
+import frc.robot.util.Alerts;
 
 public class RobotContainer {
     private Arm arm;
@@ -62,12 +66,13 @@ public class RobotContainer {
     private final CommandPS5Controller controller = new CommandPS5Controller(0);
 
     // Test controller for controlling one subsystem at a time
-    private final CommandPS5Controller testController = new CommandPS5Controller(1);
+    private final CommandPS5Controller testController = new CommandPS5Controller(2);
 
     // Manual controller for subsystems
-    private final CommandPS5Controller manualController = new CommandPS5Controller(2);
+    private final CommandPS5Controller manualController = new CommandPS5Controller(1);
     private LoggedDashboardChooser<String> testControllerChooser;
     private LoggedDashboardChooser<String> testControllerManual;
+    private LoggedDashboardChooser<String> autoChooser;
 
     // Publishes all robot data to AdvantageScope
     private RobotPublisher publisher;
@@ -87,6 +92,9 @@ public class RobotContainer {
 
         // Configure bindings for manual controller
         configureManualBindings();
+
+        // Set up the auto chooser
+        configureAutoChooser();
 
         // Initialize the publisher
         publisher = new RobotPublisher(arm, wrist, intake, elevator, hang, swerve);
@@ -554,8 +562,8 @@ public class RobotContainer {
         manualController.cross().whileTrue(new RepeatCommand(elevatorCommands.changeGoal(-0.05)));
 
         // POV up + down control wrist
-        manualController.povUp().whileTrue(new RepeatCommand(wristCommands.changeGoal(0.05)));
-        manualController.povDown().whileTrue(new RepeatCommand(wristCommands.changeGoal(-0.05)));
+        manualController.povDown().whileTrue(new RepeatCommand(wristCommands.changeGoal(0.05)));
+        manualController.povUp().whileTrue(new RepeatCommand(wristCommands.changeGoal(-0.05)));
 
         // Intake/outtake controls
         manualController.L1().onTrue(intakeCommands.intake()).onFalse(intakeCommands.stop());
@@ -564,19 +572,39 @@ public class RobotContainer {
         // Hang controls
         manualController.povLeft().onTrue(hangCommands.extendUp()).onFalse(hangCommands.stop());
         manualController.povRight().onTrue(hangCommands.retractDown()).onFalse(hangCommands.stop());
+
+        manualController.options().onTrue(ssCommands.defaultPosition());
+    }
+
+    public void configureAutoChooser() {
+        autoChooser = new LoggedDashboardChooser<>("AutoSelection");
+        autoChooser.addOption("Left", "Left");
+        autoChooser.addOption("Right", "Right");
+        autoChooser.addDefaultOption("Leave", "Leave");
     }
 
     public Command getAutonomousCommand() {
-        return ssCommands
-                .defaultPosition()
-                .andThen(new WaitCommand(0.5))
-                .andThen(swerveCommands.alignToSide(1))
-                .until(() -> swerve.getRotationError() < 0.1 && swerve.getTranslationError() < 0.1)
-                .andThen(ssCommands.L4Position())
-                .andThen(new WaitCommand(1))
-                .andThen(intakeCommands.outtake())
-                .andThen(new WaitCommand(0.2))
-                .andThen(intakeCommands.stop());
+        if (autoChooser.get().equals("Leave")) {
+            return swerveCommands
+                    .setPositionOutput(-2, 0)
+                    .andThen(new WaitCommand(3))
+                    .andThen(swerveCommands.setPositionOutput(0, 0));
+        } else if (autoChooser.get().equals("Left") || autoChooser.get().equals("Right")) {
+            return ssCommands
+                    .defaultPosition()
+                    .andThen(new WaitCommand(0.5))
+                    .andThen(swerveCommands.alignToSide(autoChooser.get().equals("Right") ? 1 : 0))
+                    .andThen(new WaitUntilCommand(
+                            () -> swerve.getRotationError() < 0.1 && swerve.getTranslationError() < 0.1))
+                    .andThen(ssCommands.L4Position())
+                    .andThen(new WaitCommand(3))
+                    .andThen(intakeCommands.outtake())
+                    .andThen(new WaitCommand(0.2))
+                    .andThen(intakeCommands.stop());
+        } else {
+            Alerts.create("Unknown auto specified", AlertType.kWarning);
+            return new InstantCommand();
+        }
     }
 
     public void periodic() {

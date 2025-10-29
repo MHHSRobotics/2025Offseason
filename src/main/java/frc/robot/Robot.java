@@ -154,6 +154,15 @@ public class Robot extends LoggedRobot {
 
     @Override
     public void autonomousInit() {
+        if (Constants.currentMode == Mode.SIM) {
+            // Choose alliance station based on Constants.simIsRedAlliance
+            if (Constants.simIsRedAlliance) {
+                DriverStationSim.setAllianceStationId(AllianceStationID.Red2);
+            } else {
+                DriverStationSim.setAllianceStationId(AllianceStationID.Blue2);
+            }
+        }
+
         autonomousCommand = robotContainer.getAutonomousCommand();
 
         if (autonomousCommand != null) {
