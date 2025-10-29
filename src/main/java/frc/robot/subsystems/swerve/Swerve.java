@@ -23,6 +23,8 @@ import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.Alert;
+import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -183,6 +185,9 @@ public class Swerve extends SubsystemBase {
     // For Elastic visualization
     private Field2d field = new Field2d();
 
+    // Alert for no vision measurements
+    private Alert noVision = new Alert("No vision measurements have been recorded yet", AlertType.kWarning);
+
     public Swerve(GyroIO gyro, SwerveModule fl, SwerveModule fr, SwerveModule bl, SwerveModule br) {
         this.gyro = gyro;
         this.modules = new SwerveModule[] {fl, fr, bl, br};
@@ -227,6 +232,9 @@ public class Swerve extends SubsystemBase {
 
         // Reset the gyro
         resetGyro();
+
+        // Enable vision alert
+        noVision.set(true);
     }
 
     // Find out where the modules are mounted on the robot relative to the center (meters)
@@ -372,6 +380,9 @@ public class Swerve extends SubsystemBase {
     public void addVisionMeasurement(
             Pose2d visionRobotPoseMeters, double timestampSeconds, Matrix<N3, N1> visionMeasurementStdDevs) {
         estimator.addVisionMeasurement(visionRobotPoseMeters, timestampSeconds, visionMeasurementStdDevs);
+
+        // Disable vision alert
+        noVision.set(false);
     }
 
     // Calculate vision standard deviations based on distance, ambiguity, and tag count
