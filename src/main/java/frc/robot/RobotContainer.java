@@ -1,5 +1,6 @@
 package frc.robot;
 
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
@@ -87,12 +88,14 @@ public class RobotContainer {
         // Add controller bindings
         configureBindings();
 
-        // Configure bindings for test controller
-        configureTestBindings();
-
         // Configure bindings for manual controller
         configureManualBindings();
 
+        // Configure bindings for test controller when not in match
+        if(!DriverStation.isFMSAttached()){
+            configureTestBindings();
+        }
+        
         // Set up the auto chooser
         configureAutoChooser();
 
