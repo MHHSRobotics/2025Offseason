@@ -1,5 +1,6 @@
 package frc.robot;
 
+import java.io.File;
 import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Map;
@@ -62,6 +63,11 @@ public class Robot extends LoggedRobot {
         // Set logging mode depending on the current running mode
         switch (Constants.currentMode) {
             case REAL:
+                // Check if log file exists
+                File file=new File("/U/logs");
+                if(!file.exists()){
+                    Alerts.create("Log USB drive not found!", AlertType.kWarning);
+                }
             case SIM:
                 Logger.addDataReceiver(new WPILOGWriter());
                 Logger.addDataReceiver(new NT4Publisher());
