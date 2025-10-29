@@ -176,6 +176,7 @@ simgui-ds.json
 
 # Simulation data log directory
 logs/
+real_logs/
 
 # Folder that has CTRE Phoenix Sim device config storage
 ctre_sim/
@@ -192,4 +193,8 @@ src/main/java/frc/robot/BuildConstants.java
 
 # Instructions for Claude Code
 CLAUDE.md
+.claude
 
+# Cursor
+.cursor
+.cursorrules

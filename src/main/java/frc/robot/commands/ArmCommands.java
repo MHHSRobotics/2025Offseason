@@ -4,10 +4,10 @@ import java.util.function.DoubleSupplier;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 
-import frc.robot.subsystems.Arm;
+import frc.robot.subsystems.arm.Arm;
 
+// Class to get commands for the arm. Separate from Arm for organizational purposes.
 public class ArmCommands {
     private Arm arm;
 
@@ -17,31 +17,37 @@ public class ArmCommands {
 
     // Command to set the speed of the arm
     public Command setSpeed(DoubleSupplier speed) {
-        return new InstantCommand(() -> arm.setSpeed(speed.getAsDouble()));
+        return new InstantCommand(() -> arm.setSpeed(speed.getAsDouble()), arm).withName("arm set speed");
     }
 
-    // Command to set the goal of the arm (in radians)
-    public Command setGoal(DoubleSupplier goal) {
-        return new InstantCommand(() -> arm.setGoal(goal.getAsDouble()), arm);
-    }
-
-    // Command to change the goal of the arm by the given amount of radians
-    public Command changeGoal(DoubleSupplier change) {
-        return new InstantCommand(() -> arm.setGoal(arm.getGoal() + change.getAsDouble()), arm);
+    // Command to manually control the arm at a fixed speed
+    public Command setSpeed(double speed) {
+        return setSpeed(() -> speed).withName("arm set speed " + speed);
     }
 
     // Command to stop all motor output to the arm
     public Command stop() {
-        return setSpeed(() -> 0);
+        return setSpeed(0).withName("arm stop");
     }
 
-    // Returns a command that runs quasistatic SysId for the arm in the given direction
-    public Command sysIdQuasistatic(SysIdRoutine.Direction dir) {
-        return arm.getSysId().quasistatic(dir).until(() -> !arm.withinSysIdLimits());
+    // Command to set the goal of the arm (in radians)
+    public Command setGoal(DoubleSupplier goal) {
+        return new InstantCommand(() -> arm.setGoal(goal.getAsDouble()), arm).withName("arm set goal");
     }
 
-    // Returns a command that runs dynamic SysId for the arm in the given direction
-    public Command sysIdDynamic(SysIdRoutine.Direction dir) {
-        return arm.getSysId().dynamic(dir).until(() -> !arm.withinSysIdLimits());
+    // Command to set the goal of the arm to a fixed value (in radians)
+    public Command setGoal(double goal) {
+        return setGoal(() -> goal).withName("arm set goal " + goal);
+    }
+
+    // Command to change the goal of the arm by the given amount of radians
+    public Command changeGoal(DoubleSupplier change) {
+        return new InstantCommand(() -> arm.setGoal(arm.getGoal() + change.getAsDouble()), arm)
+                .withName("arm change goal");
+    }
+
+    // Command to increment the goal by a fixed amount (in radians)
+    public Command changeGoal(double increment) {
+        return changeGoal(() -> increment).withName("arm change goal " + increment);
     }
 }
