@@ -100,10 +100,28 @@ public class Swerve extends SubsystemBase {
         public static final LoggedNetworkBoolean swerveFieldCentric =
                 new LoggedNetworkBoolean("Swerve/FieldCentric", true); // Toggle for field centric controls
 
+        // Drive motor PID
+        public static final LoggedNetworkNumber driveKP = new LoggedNetworkNumber("Swerve/DriveKP", 0.1);
+        public static final LoggedNetworkNumber driveKI = new LoggedNetworkNumber("Swerve/DriveKI", 0);
+        public static final LoggedNetworkNumber driveKD = new LoggedNetworkNumber("Swerve/DriveKD", 0);
+        public static final LoggedNetworkNumber driveKS = new LoggedNetworkNumber("Swerve/DriveKS", 0);
+        public static final LoggedNetworkNumber driveKV = new LoggedNetworkNumber("Swerve/DriveKV", 0.124);
+        public static final LoggedNetworkNumber driveKA = new LoggedNetworkNumber("Swerve/DriveKA", 0);
+
+        // Steer motor PID
+        public static final LoggedNetworkNumber steerKP = new LoggedNetworkNumber("Swerve/SteerKP", 20);
+        public static final LoggedNetworkNumber steerKI = new LoggedNetworkNumber("Swerve/SteerKI", 0);
+        public static final LoggedNetworkNumber steerKD = new LoggedNetworkNumber("Swerve/SteerKD", 0);
+        public static final LoggedNetworkNumber steerKS = new LoggedNetworkNumber("Swerve/SteerKS", 0);
+        public static final LoggedNetworkNumber steerKV = new LoggedNetworkNumber("Swerve/SteerKV", 0);
+        public static final LoggedNetworkNumber steerKA = new LoggedNetworkNumber("Swerve/SteerKA", 0);
+
+        // Auto align translation PID
         public static final LoggedNetworkNumber translationkP = new LoggedNetworkNumber("Swerve/TransKP", 2);
         public static final LoggedNetworkNumber translationkD = new LoggedNetworkNumber("Swerve/TransKD", 0);
         public static final LoggedNetworkNumber translationkI = new LoggedNetworkNumber("Swerve/TransKI", 0);
 
+        // Auto align rotation PID
         public static final LoggedNetworkNumber rotationkP = new LoggedNetworkNumber("Swerve/RotKP", 0.4);
         public static final LoggedNetworkNumber rotationkD = new LoggedNetworkNumber("Swerve/RotKD", 0);
         public static final LoggedNetworkNumber rotationkI = new LoggedNetworkNumber("Swerve/RotKI", 0);
@@ -122,9 +140,6 @@ public class Swerve extends SubsystemBase {
 
         public static final Transform3d bratPose = new Transform3d(
                 new Translation3d(-0.193, -0.288, 0.31), new Rotation3d(0, 0, Units.degreesToRadians(200)));
-
-        // public static final Transform3d blatPose = new Transform3d(
-        //         new Translation3d(-0.208, 0.063, 0.33), new Rotation3d(0, 0, Units.degreesToRadians(210)));
 
         public static final Transform3d blatPose = new Transform3d(
                 new Translation3d(-0.208, 0.13, 0.33), new Rotation3d(0, 0, Units.degreesToRadians(210)));
@@ -452,6 +467,24 @@ public class Swerve extends SubsystemBase {
         xController.setI(Constants.translationkI.get());
         yController.setI(Constants.translationkI.get());
         thetaController.setI(Constants.rotationkI.get());
+
+        for (SwerveModule module : modules) {
+            // Update drive motor PID
+            module.setDriveKP(Constants.driveKP.get());
+            module.setDriveKI(Constants.driveKI.get());
+            module.setDriveKD(Constants.driveKD.get());
+            module.setDriveKS(Constants.driveKS.get());
+            module.setDriveKV(Constants.driveKV.get());
+            module.setDriveKA(Constants.driveKA.get());
+
+            // Update steer motor PID
+            module.setAngleKP(Constants.steerKP.get());
+            module.setAngleKI(Constants.steerKI.get());
+            module.setAngleKD(Constants.steerKD.get());
+            module.setAngleKS(Constants.steerKS.get());
+            module.setAngleKV(Constants.steerKV.get());
+            module.setAngleKA(Constants.steerKA.get());
+        }
 
         double xSpeed = 0, ySpeed = 0;
 

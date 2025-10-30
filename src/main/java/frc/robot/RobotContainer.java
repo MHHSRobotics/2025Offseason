@@ -69,7 +69,7 @@ public class RobotContainer {
 
     // Manual controller for subsystems
     private final CommandPS5Controller manualController = new CommandPS5Controller(1);
-    
+
     // Test controller for controlling one subsystem at a time
     private final CommandPS5Controller testController = new CommandPS5Controller(2);
 
