@@ -180,19 +180,6 @@
               "robot_color": 4294198070,
               "trajectory_color": 4294967295
             }
-          },
-          {
-            "title": "AutoSelection",
-            "x": 768.0,
-            "y": 512.0,
-            "width": 384.0,
-            "height": 128.0,
-            "type": "ComboBox Chooser",
-            "properties": {
-              "topic": "/SmartDashboard/AutoSelection",
-              "period": 0.06,
-              "sort_options": false
-            }
           }
         ]
       }
@@ -696,6 +683,84 @@
             ]
           },
           {
+            "title": "Intake Settings",
+            "x": 1536.0,
+            "y": 0.0,
+            "width": 256.0,
+            "height": 256.0,
+            "type": "List Layout",
+            "properties": {
+              "label_position": "TOP"
+            },
+            "children": [
+              {
+                "title": "Disabled",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Toggle Switch",
+                "properties": {
+                  "topic": "Intake/Disabled",
+                  "period": 0.06,
+                  "data_type": "boolean"
+                }
+              },
+              {
+                "title": "Locked",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Toggle Switch",
+                "properties": {
+                  "topic": "Intake/Locked",
+                  "period": 0.06,
+                  "data_type": "boolean"
+                }
+              }
+            ]
+          },
+          {
+            "title": "Hang Settings",
+            "x": 1280.0,
+            "y": 0.0,
+            "width": 256.0,
+            "height": 256.0,
+            "type": "List Layout",
+            "properties": {
+              "label_position": "TOP"
+            },
+            "children": [
+              {
+                "title": "Disabled",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Toggle Switch",
+                "properties": {
+                  "topic": "Hang/Disabled",
+                  "period": 0.06,
+                  "data_type": "boolean"
+                }
+              },
+              {
+                "title": "Locked",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Toggle Switch",
+                "properties": {
+                  "topic": "Hang/Locked",
+                  "period": 0.06,
+                  "data_type": "boolean"
+                }
+              }
+            ]
+          },
+          {
             "title": "Swerve Settings",
             "x": 1024.0,
             "y": 0.0,
@@ -756,7 +821,7 @@
                   "topic": "Swerve/TransKP",
                   "period": 0.06,
                   "data_type": "double",
-                  "show_submit_button": true
+                  "show_submit_button": false
                 }
               },
               {
@@ -770,7 +835,7 @@
                   "topic": "Swerve/TransKI",
                   "period": 0.06,
                   "data_type": "double",
-                  "show_submit_button": true
+                  "show_submit_button": false
                 }
               },
               {
@@ -784,7 +849,7 @@
                   "topic": "Swerve/TransKD",
                   "period": 0.06,
                   "data_type": "double",
-                  "show_submit_button": true
+                  "show_submit_button": false
                 }
               },
               {
@@ -798,7 +863,7 @@
                   "topic": "Swerve/RotKP",
                   "period": 0.06,
                   "data_type": "double",
-                  "show_submit_button": true
+                  "show_submit_button": false
                 }
               },
               {
@@ -812,7 +877,7 @@
                   "topic": "Swerve/RotKI",
                   "period": 0.06,
                   "data_type": "double",
-                  "show_submit_button": true
+                  "show_submit_button": false
                 }
               },
               {
@@ -826,15 +891,15 @@
                   "topic": "Swerve/RotKD",
                   "period": 0.06,
                   "data_type": "double",
-                  "show_submit_button": true
+                  "show_submit_button": false
                 }
               }
             ]
           },
           {
-            "title": "Intake Settings",
-            "x": 1280.0,
-            "y": 0.0,
+            "title": "Drive Motor Settings",
+            "x": 1024.0,
+            "y": 384.0,
             "width": 256.0,
             "height": 256.0,
             "type": "List Layout",
@@ -843,37 +908,95 @@
             },
             "children": [
               {
-                "title": "Disabled",
+                "title": "DriveKP",
                 "x": 0.0,
                 "y": 0.0,
                 "width": 128.0,
                 "height": 128.0,
-                "type": "Toggle Switch",
+                "type": "Text Display",
                 "properties": {
-                  "topic": "Intake/Disabled",
+                  "topic": "Swerve/DriveKP",
                   "period": 0.06,
-                  "data_type": "boolean"
+                  "data_type": "double",
+                  "show_submit_button": false
                 }
               },
               {
-                "title": "Locked",
+                "title": "DriveKI",
                 "x": 0.0,
                 "y": 0.0,
                 "width": 128.0,
                 "height": 128.0,
-                "type": "Toggle Switch",
+                "type": "Text Display",
                 "properties": {
-                  "topic": "Intake/Locked",
+                  "topic": "Swerve/DriveKI",
                   "period": 0.06,
-                  "data_type": "boolean"
+                  "data_type": "double",
+                  "show_submit_button": false
+                }
+              },
+              {
+                "title": "DriveKD",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Text Display",
+                "properties": {
+                  "topic": "Swerve/DriveKD",
+                  "period": 0.06,
+                  "data_type": "double",
+                  "show_submit_button": false
+                }
+              },
+              {
+                "title": "DriveKS",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Text Display",
+                "properties": {
+                  "topic": "Swerve/DriveKS",
+                  "period": 0.06,
+                  "data_type": "double",
+                  "show_submit_button": false
+                }
+              },
+              {
+                "title": "DriveKV",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Text Display",
+                "properties": {
+                  "topic": "Swerve/DriveKV",
+                  "period": 0.06,
+                  "data_type": "double",
+                  "show_submit_button": false
+                }
+              },
+              {
+                "title": "DriveKA",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Text Display",
+                "properties": {
+                  "topic": "Swerve/DriveKA",
+                  "period": 0.06,
+                  "data_type": "double",
+                  "show_submit_button": false
                 }
               }
             ]
           },
           {
-            "title": "Hang Settings",
-            "x": 1536.0,
-            "y": 0.0,
+            "title": "Steer Motor Settings",
+            "x": 1024.0,
+            "y": 640.0,
             "width": 256.0,
             "height": 256.0,
             "type": "List Layout",
@@ -882,29 +1005,87 @@
             },
             "children": [
               {
-                "title": "Disabled",
+                "title": "SteerKP",
                 "x": 0.0,
                 "y": 0.0,
                 "width": 128.0,
                 "height": 128.0,
-                "type": "Toggle Switch",
+                "type": "Text Display",
                 "properties": {
-                  "topic": "Hang/Disabled",
+                  "topic": "Swerve/SteerKP",
                   "period": 0.06,
-                  "data_type": "boolean"
+                  "data_type": "double",
+                  "show_submit_button": false
                 }
               },
               {
-                "title": "Locked",
+                "title": "SteerKI",
                 "x": 0.0,
                 "y": 0.0,
                 "width": 128.0,
                 "height": 128.0,
-                "type": "Toggle Switch",
+                "type": "Text Display",
                 "properties": {
-                  "topic": "Hang/Locked",
+                  "topic": "Swerve/SteerKI",
                   "period": 0.06,
-                  "data_type": "boolean"
+                  "data_type": "double",
+                  "show_submit_button": false
+                }
+              },
+              {
+                "title": "SteerKD",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Text Display",
+                "properties": {
+                  "topic": "Swerve/SteerKD",
+                  "period": 0.06,
+                  "data_type": "double",
+                  "show_submit_button": false
+                }
+              },
+              {
+                "title": "SteerKS",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Text Display",
+                "properties": {
+                  "topic": "Swerve/SteerKS",
+                  "period": 0.06,
+                  "data_type": "double",
+                  "show_submit_button": false
+                }
+              },
+              {
+                "title": "SteerKV",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Text Display",
+                "properties": {
+                  "topic": "Swerve/SteerKV",
+                  "period": 0.06,
+                  "data_type": "double",
+                  "show_submit_button": false
+                }
+              },
+              {
+                "title": "SteerKA",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Text Display",
+                "properties": {
+                  "topic": "Swerve/SteerKA",
+                  "period": 0.06,
+                  "data_type": "double",
+                  "show_submit_button": false
                 }
               }
             ]
@@ -1124,8 +1305,8 @@
           },
           {
             "title": "Gyro Position (Radians)",
-            "x": 1024.0,
-            "y": 384.0,
+            "x": 1280.0,
+            "y": 640.0,
             "width": 256.0,
             "height": 128.0,
             "type": "Text Display",

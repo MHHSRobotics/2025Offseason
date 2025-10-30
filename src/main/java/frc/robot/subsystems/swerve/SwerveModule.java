@@ -87,6 +87,11 @@ public class SwerveModule {
         return angleMotor.getInputs().position;
     }
 
+    // Get target angle of this module
+    public double getTargetAngle() {
+        return angleMotor.getInputs().setpoint;
+    }
+
     // Find out how far the robot has driven (distance in meters)
     public double getPositionMeters() {
         return getWheelPosition() * constants.WheelRadius;
@@ -95,6 +100,11 @@ public class SwerveModule {
     // Find out how fast the robot is moving (speed in meters per second)
     public double getVelocityMetersPerSec() {
         return driveMotor.getInputs().velocity * constants.WheelRadius;
+    }
+
+    // Get target velocity of this module
+    public double getTargetVelocity() {
+        return driveMotor.getInputs().setpoint * constants.WheelRadius;
     }
 
     // Find out how much the wheel has rotated (angle in radians)
@@ -151,6 +161,11 @@ public class SwerveModule {
         return new SwerveModuleState(getVelocityMetersPerSec(), Rotation2d.fromRadians(getAngle()));
     }
 
+    // Get the module's target state
+    public SwerveModuleState getTargetState() {
+        return new SwerveModuleState(getTargetVelocity(), Rotation2d.fromRadians(getTargetAngle()));
+    }
+
     // This runs every robot loop (about 50 times per second) to update sensors and check for problems
     public void periodic() {
         // All updates handle logging and alerts automatically
@@ -163,5 +178,53 @@ public class SwerveModule {
 
         // Update current position
         currentPosition = new SwerveModulePosition(getPositionMeters(), Rotation2d.fromRadians(getAngle()));
+    }
+
+    public void setDriveKP(double kP) {
+        driveMotor.setkP(kP);
+    }
+
+    public void setDriveKI(double kI) {
+        driveMotor.setkI(kI);
+    }
+
+    public void setDriveKD(double kD) {
+        driveMotor.setkD(kD);
+    }
+
+    public void setDriveKS(double kS) {
+        driveMotor.setkS(kS);
+    }
+
+    public void setDriveKV(double kV) {
+        driveMotor.setkV(kV);
+    }
+
+    public void setDriveKA(double kA) {
+        driveMotor.setkA(kA);
+    }
+
+    public void setAngleKP(double kP) {
+        angleMotor.setkP(kP);
+    }
+
+    public void setAngleKI(double kI) {
+        angleMotor.setkI(kI);
+    }
+
+    public void setAngleKD(double kD) {
+        angleMotor.setkD(kD);
+    }
+
+    public void setAngleKS(double kS) {
+        angleMotor.setkS(kS);
+    }
+
+    public void setAngleKV(double kV) {
+        angleMotor.setkV(kV);
+    }
+
+    public void setAngleKA(double kA) {
+        angleMotor.setkA(kA);
     }
 }
