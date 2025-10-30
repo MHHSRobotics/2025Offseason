@@ -174,6 +174,9 @@ public class Swerve extends SubsystemBase {
     // Bars showing the speed (length) and direction (angle) of each module
     private final LoggedMechanismLigament2d[] speeds = new LoggedMechanismLigament2d[4];
 
+    // Bars showing the target speed and direction of each module
+    private final LoggedMechanismLigament2d[] targets = new LoggedMechanismLigament2d[4];
+
     // Holonomic controller for auto-align
     private final PIDController xController;
     private final PIDController yController;
@@ -285,6 +288,15 @@ public class Swerve extends SubsystemBase {
         SwerveModuleState[] states = new SwerveModuleState[4];
         for (int i = 0; i < 4; i++) {
             states[i] = modules[i].getState();
+        }
+        return states;
+    }
+
+    // Find out each module's current target state
+    public SwerveModuleState[] getModuleTargets() {
+        SwerveModuleState[] states = new SwerveModuleState[4];
+        for (int i = 0; i < 4; i++) {
+            states[i] = modules[i].getTargetState();
         }
         return states;
     }
@@ -531,6 +543,7 @@ public class Swerve extends SubsystemBase {
         Logger.recordOutput("Swerve/TargetPose", targetPose.get());
         Logger.recordOutput("Swerve/PoseTranslationError", getTranslationError());
         Logger.recordOutput("Swerve/PoseRotationError", getRotationError());
+        Logger.recordOutput("Swerve/PIDPosition", pidPosition);
         Logger.recordOutput("Swerve/PIDRotation", pidRotation);
 
         // Get measurements from all connected cameras and add them to the pose estimator
@@ -595,17 +608,22 @@ public class Swerve extends SubsystemBase {
         connect(1, 3);
         connect(2, 3);
         for (int i = 0; i < 4; i++) {
-            speeds[i] = roots[i].append(new LoggedMechanismLigament2d("Speed" + i, 0, 0, 5, new Color8Bit(Color.kRed)));
+            speeds[i] = roots[i].append(new LoggedMechanismLigament2d("Speed" + i, 0, 0, 8, new Color8Bit(Color.kRed)));
+            targets[i] =
+                    roots[i].append(new LoggedMechanismLigament2d("Target" + i, 0, 0, 3, new Color8Bit(Color.kYellow)));
         }
     }
 
     // Make the visualization match the real module speeds and directions
     private void refreshVisualization() {
         SwerveModuleState[] states = getModuleStates();
+        SwerveModuleState[] targetStates = getModuleTargets();
         for (int i = 0; i < 4; i++) {
             // Scale length down so it fits nicely on screen
             speeds[i].setLength(states[i].speedMetersPerSecond / 12);
             speeds[i].setAngle(states[i].angle);
+            targets[i].setLength(targetStates[i].speedMetersPerSecond / 12);
+            targets[i].setAngle(targetStates[i].angle);
         }
     }
 }

@@ -87,6 +87,11 @@ public class SwerveModule {
         return angleMotor.getInputs().position;
     }
 
+    // Get target angle of this module
+    public double getTargetAngle() {
+        return angleMotor.getInputs().setpoint;
+    }
+
     // Find out how far the robot has driven (distance in meters)
     public double getPositionMeters() {
         return getWheelPosition() * constants.WheelRadius;
@@ -95,6 +100,11 @@ public class SwerveModule {
     // Find out how fast the robot is moving (speed in meters per second)
     public double getVelocityMetersPerSec() {
         return driveMotor.getInputs().velocity * constants.WheelRadius;
+    }
+
+    // Get target velocity of this module
+    public double getTargetVelocity() {
+        return driveMotor.getInputs().setpoint * constants.WheelRadius;
     }
 
     // Find out how much the wheel has rotated (angle in radians)
@@ -149,6 +159,11 @@ public class SwerveModule {
     // Get the module's current state: how fast it's going and which way it's pointing
     public SwerveModuleState getState() {
         return new SwerveModuleState(getVelocityMetersPerSec(), Rotation2d.fromRadians(getAngle()));
+    }
+
+    // Get the module's target state
+    public SwerveModuleState getTargetState() {
+        return new SwerveModuleState(getTargetVelocity(), Rotation2d.fromRadians(getTargetAngle()));
     }
 
     // This runs every robot loop (about 50 times per second) to update sensors and check for problems
