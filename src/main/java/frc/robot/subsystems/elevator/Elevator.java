@@ -53,9 +53,9 @@ public class Elevator extends SubsystemBase {
                 new LoggedNetworkNumber("Elevator/kD", 70); // (volts per m/s) reacts to how fast error is changing
 
         public static final LoggedNetworkNumber kS = new LoggedNetworkNumber(
-                "Elevator/kS", 0); // (volts) voltage to get elevator moving (overcome static friction)
+                "Elevator/kS", 7); // (volts) voltage to get elevator moving (overcome static friction)
         public static final LoggedNetworkNumber kG = new LoggedNetworkNumber(
-                "Elevator/kG", 14.31); // (volts) voltage to hold the elevator up (compensate gravity)
+                "Elevator/kG", 11); // (volts) voltage to hold the elevator up (compensate gravity)
         public static final LoggedNetworkNumber kV = new LoggedNetworkNumber(
                 "Elevator/kV", 0); // (volts per m/s) voltage that scales with speed to overcome friction
         public static final LoggedNetworkNumber kA =
