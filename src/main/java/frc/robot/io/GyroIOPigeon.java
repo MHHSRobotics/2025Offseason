@@ -1,11 +1,20 @@
 package frc.robot.io;
 
-import edu.wpi.first.math.util.Units;
+import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.AngularVelocity;
+import edu.wpi.first.wpilibj.Alert.AlertType;
 
 import com.ctre.phoenix6.CANBus;
 import com.ctre.phoenix6.configs.Pigeon2Configuration;
 import com.ctre.phoenix6.hardware.Pigeon2;
 import com.ctre.phoenix6.sim.Pigeon2SimState;
+
+import frc.robot.Constants;
+import frc.robot.Constants.Mode;
+import frc.robot.util.Alerts;
+
+import static edu.wpi.first.units.Units.Degrees;
+import static edu.wpi.first.units.Units.DegreesPerSecond;
 
 public class GyroIOPigeon extends GyroIO {
     private Pigeon2 gyro;
@@ -33,9 +42,9 @@ public class GyroIOPigeon extends GyroIO {
     @Override
     public void update() {
         inputs.connected = disconnected ? false : gyro.isConnected();
-        inputs.yawPositionRad = Units.degreesToRadians(gyro.getYaw().getValueAsDouble());
+        inputs.yawPositionRad = Degrees.of(gyro.getYaw().getValueAsDouble());
         inputs.yawVelocityRadPerSec =
-                Units.degreesToRadians(gyro.getAngularVelocityZWorld().getValueAsDouble());
+                DegreesPerSecond.of(gyro.getAngularVelocityZWorld().getValueAsDouble());
         inputs.hardwareFault = gyro.getFault_Hardware().getValue();
 
         // Update alerts using the base class method (this checks all fault conditions and updates dashboard alerts)
@@ -43,22 +52,34 @@ public class GyroIOPigeon extends GyroIO {
     }
 
     @Override
-    public void setYaw(double yaw) {
+    public void setYaw(Angle yaw) {
         gyro.setYaw(yaw);
     }
 
     @Override
-    public void setMechYaw(double yaw) {
-        sim.setRawYaw(Units.radiansToDegrees(yaw));
+    public void setMechYaw(Angle yaw) {
+        if (Constants.currentMode == Mode.REAL) {
+            Alerts.create("Used sim-only method setMechYaw on " + getName(), AlertType.kWarning);
+            return;
+        }
+        sim.setRawYaw(yaw.in(Degrees));
     }
 
     @Override
-    public void setMechYawVelocity(double yawVelocity) {
-        sim.setAngularVelocityZ(Units.radiansToDegrees(yawVelocity));
+    public void setMechYawVelocity(AngularVelocity yawVelocity) {
+        if (Constants.currentMode == Mode.REAL) {
+            Alerts.create("Used sim-only method setMechYawVelocity on " + getName(), AlertType.kWarning);
+            return;
+        }
+        sim.setAngularVelocityZ(yawVelocity.in(DegreesPerSecond));
     }
 
     @Override
-    public void disconnect() {
-        disconnected = true;
+    public void setConnected(boolean connected) {
+        if (Constants.currentMode == Mode.REAL) {
+            Alerts.create("Used sim-only method setConnected on " + getName(), AlertType.kWarning);
+            return;
+        }
+        disconnected = !connected;
     }
 }

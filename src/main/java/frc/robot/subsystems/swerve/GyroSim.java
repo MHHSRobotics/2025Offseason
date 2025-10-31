@@ -14,6 +14,6 @@ public class GyroSim extends SubsystemBase {
 
     @Override
     public void periodic() {
-        gyro.disconnect();
+        gyro.setConnected(false);
     }
 }

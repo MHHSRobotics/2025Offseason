@@ -49,6 +49,7 @@ import frc.robot.util.FieldPose2d;
 import frc.robot.util.RobotUtils;
 
 import static edu.wpi.first.units.Units.MetersPerSecond;
+import static edu.wpi.first.units.Units.Radians;
 
 // Make the swerve drive move the robot in any direction and rotate at the same time.
 // Uses a pose estimator to keep track of where the robot is on the field.
@@ -292,7 +293,7 @@ public class Swerve extends SubsystemBase {
 
     // Set the gyro to rotation 0
     public void resetGyro() {
-        gyro.setYaw(0);
+        gyro.setYaw(Radians.of(0));
         gyroAngle = Rotation2d.kZero;
     }
 
@@ -516,7 +517,7 @@ public class Swerve extends SubsystemBase {
 
         if (gyro.getInputs().connected) {
             // If gyro is connected, read the angle
-            gyroAngle = Rotation2d.fromRadians(gyro.getInputs().yawPositionRad);
+            gyroAngle = new Rotation2d(gyro.getInputs().yawPositionRad);
         } else {
             // If gyro is disconnected, like in sim, get module deltas and use odometry to figure out the change in
             // angle
