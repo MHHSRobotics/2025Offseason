@@ -1,11 +1,18 @@
 package frc.robot.subsystems.elevator;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.units.AngleUnit;
+import edu.wpi.first.units.DistanceUnit;
+import edu.wpi.first.units.measure.Distance;
+import edu.wpi.first.units.measure.Per;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 import com.ctre.phoenix6.signals.GravityTypeValue;
+
+import static edu.wpi.first.units.Units.Meters;
+import static edu.wpi.first.units.Units.Radians;
 
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.mechanism.LoggedMechanism2d;
@@ -43,7 +50,7 @@ public class Elevator extends SubsystemBase {
         public static final double gearRatio = 8.0; // Ratio of motor rotations to drum rotations (unitless)
         public static final double encoderRatio = 0.5; // Ratio of encoder rotations to drum rotations (unitless)
 
-        public static final double drumRadius = 0.022; // Ratio of meters to drum radians (meters)
+        public static final Distance drumRadius = Meters.of(0.022); // Ratio of meters to drum radians (meters)
 
         public static final LoggedNetworkNumber kP =
                 new LoggedNetworkNumber("Elevator/kP", 80); // (volts per meter) more voltage when farther from target

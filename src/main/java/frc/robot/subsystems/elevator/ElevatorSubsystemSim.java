@@ -1,5 +1,8 @@
 package frc.robot.subsystems.elevator;
 
+import static edu.wpi.first.units.Units.Meters;
+import static edu.wpi.first.units.Units.Radians;
+
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.simulation.ElevatorSim;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -50,15 +53,15 @@ public class ElevatorSubsystemSim extends SubsystemBase {
 
         // 3) Tell the motor and encoder I/O the new elevator height and speed
         // All values here are mechanism meters (m) and meters per second (m/s)
-        leftMotor.setMechPosition(elevatorMech.getPositionMeters());
-        leftMotor.setMechVelocity(elevatorMech.getVelocityMetersPerSecond());
+        leftMotor.setMechPosition(Meters.of(elevatorMech.getPositionMeters()).div(Elevator.Constants.drumRadius).times(Radians.of(1)));
+        leftMotor.setMechVelocity(elevatorMech.getVelocityMetersPerSecond()/Elevator.Constants.drumRadius);
 
         // Right motor gets the same position and velocity since it follows the left motor
-        rightMotor.setMechPosition(elevatorMech.getPositionMeters());
-        rightMotor.setMechVelocity(elevatorMech.getVelocityMetersPerSecond());
+        rightMotor.setMechPosition(elevatorMech.getPositionMeters()/Elevator.Constants.drumRadius);
+        rightMotor.setMechVelocity(elevatorMech.getVelocityMetersPerSecond()/Elevator.Constants.drumRadius);
 
         // Encoder also gets the same values
-        encoder.setMechPosition(elevatorMech.getPositionMeters());
-        encoder.setMechVelocity(elevatorMech.getVelocityMetersPerSecond());
+        encoder.setMechPosition(elevatorMech.getPositionMeters()/Elevator.Constants.drumRadius);
+        encoder.setMechVelocity(elevatorMech.getVelocityMetersPerSecond()/Elevator.Constants.drumRadius);
     }
 }

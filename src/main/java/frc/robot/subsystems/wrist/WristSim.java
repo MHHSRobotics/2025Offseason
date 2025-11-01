@@ -1,5 +1,8 @@
 package frc.robot.subsystems.wrist;
 
+import static edu.wpi.first.units.Units.Radians;
+import static edu.wpi.first.units.Units.RadiansPerSecond;
+
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -49,7 +52,7 @@ public class WristSim extends SubsystemBase {
         // All values here are mechanism radians (rad) and radians per second (rad/s)
         motor.setMechPosition(wristMech.getAngleRads());
         motor.setMechVelocity(wristMech.getVelocityRadPerSec());
-        encoder.setMechPosition(wristMech.getAngleRads());
-        encoder.setMechVelocity(wristMech.getVelocityRadPerSec());
+        encoder.setMechPosition(Radians.of(wristMech.getAngleRads()));
+        encoder.setMechVelocity(RadiansPerSecond.of(wristMech.getVelocityRadPerSec()));
     }
 }

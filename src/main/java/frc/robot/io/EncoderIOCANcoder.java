@@ -1,7 +1,11 @@
 package frc.robot.io;
 
-import edu.wpi.first.math.util.Units;
+import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.wpilibj.Alert.AlertType;
+
+import static edu.wpi.first.units.Units.Rotations;
+import static edu.wpi.first.units.Units.RotationsPerSecond;
 
 import com.ctre.phoenix6.CANBus;
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
@@ -51,7 +55,9 @@ public class EncoderIOCANcoder extends EncoderIO {
      * Ideally this is a multiple of 2π to preserve periodicity for arm gravity compensation.
      * Non-multiple values trigger a warning as they may break gravity compensation assumptions.
      */
-    private double extraOffset;
+    private Angle extraOffset;
+
+    private boolean disconnected=false;
 
     private CANcoderSimState sim;
 
@@ -82,7 +88,7 @@ public class EncoderIOCANcoder extends EncoderIO {
         return encoderRatio;
     }
 
-    public double getExtraOffset() {
+    public Angle getExtraOffset() {
         return extraOffset;
     }
 
@@ -97,17 +103,16 @@ public class EncoderIOCANcoder extends EncoderIO {
             encoder.getConfigurator().apply(config);
         }
 
-        inputs.connected = encoder.isConnected();
+        inputs.connected = disconnected?false:encoder.isConnected();
 
         // Position calculation pipeline:
         // 1. CANcoder returns absolute position in encoder rotations (with MagnetOffset already applied)
         // 2. Convert to encoder radians: enc_rot * 2π
         // 3. Apply gear ratio to get mechanism units: (enc_rot * 2π) / encoderRatio
         // 4. Subtract software offset: final_pos = converted_pos - extraOffset
-        inputs.positionRad =
-                Units.rotationsToRadians(encoder.getAbsolutePosition().getValueAsDouble()) / encoderRatio - extraOffset;
+        inputs.positionRad = Rotations.of(encoder.getAbsolutePosition().getValueAsDouble()/encoderRatio).minus(extraOffset);
         inputs.velocityRadPerSec =
-                Units.rotationsToRadians(encoder.getVelocity().getValueAsDouble()) / encoderRatio;
+                RotationsPerSecond.of(encoder.getVelocity().getValueAsDouble()/encoderRatio);
 
         // Update fault inputs
         inputs.badMagnetFault = encoder.getFault_BadMagnet().getValue();
@@ -124,7 +129,6 @@ public class EncoderIOCANcoder extends EncoderIO {
     @Override
     public void setGearRatio(double ratio) {
         encoderRatio = ratio;
-        configChanged = true;
     }
 
     /**
@@ -141,23 +145,25 @@ public class EncoderIOCANcoder extends EncoderIO {
      * @param mechOffset Desired offset in mechanism radians
      */
     @Override
-    public void setOffset(double mechOffset) {
+    public void setOffset(Angle mechOffset) {
         // Convert mechanism offset to mech rotations
-        double rotOffset = Units.radiansToRotations(mechOffset);
+        double rotOffset = mechOffset.in(Rotations);
 
         // Wrap to [-0.5, 0.5] range to find the fractional rotation part
         double remOffset = rotOffset - Math.round(rotOffset);
 
+        // Actual offset required
         double magnetOffset = remOffset * encoderRatio;
 
         if (Math.abs(magnetOffset) <= 1) {
             // IDEAL CASE: We can use MagnetOffset for the fractional part
             // MagnetOffset handles the fractional rotation (in encoder rotations)
+            // MagnetOffset is negative due to CTRE behavior
             config.MagnetSensor.MagnetOffset = -magnetOffset;
 
             // extraOffset handles the integer rotations (converted back to mechanism radians)
             // This will be a multiple of 2π, preserving periodicity
-            extraOffset = Units.rotationsToRadians(rotOffset - remOffset);
+            extraOffset = Rotations.of(rotOffset - remOffset);
         } else {
             // FALLBACK CASE: If we can't fit in MagnetOffset, put entire offset in software
             config.MagnetSensor.MagnetOffset = 0;
@@ -190,7 +196,7 @@ public class EncoderIOCANcoder extends EncoderIO {
      * @param position Desired mechanism position in mech units
      */
     @Override
-    public void setMechPosition(double position) {
+    public void setMechPosition(Angle position) {
         if (Constants.currentMode == Mode.REAL) {
             Alerts.create("Used sim-only method setMechPosition on " + getName(), AlertType.kWarning);
             return;
@@ -200,8 +206,7 @@ public class EncoderIOCANcoder extends EncoderIO {
         // 2. Apply gear ratio: (position + extraOffset) * encoderRatio
         // 3. Convert to rotations: ((position + extraOffset) * encoderRatio) / 2π
         // 4. Add hardware offset: final + MagnetOffset
-        double encoderPos =
-                Units.radiansToRotations((position + extraOffset) * encoderRatio) - config.MagnetSensor.MagnetOffset;
+        double encoderPos = position.plus(extraOffset).times(encoderRatio).in(Rotations)-config.MagnetSensor.MagnetOffset;
 
         // Apply inversion if configured
         encoderPos = config.MagnetSensor.SensorDirection.equals(SensorDirectionValue.Clockwise_Positive)
@@ -215,18 +220,27 @@ public class EncoderIOCANcoder extends EncoderIO {
      * @param velocity Mechanism velocity in mech units per second
      */
     @Override
-    public void setMechVelocity(double velocity) {
+    public void setMechVelocity(AngularVelocity velocity) {
         if (Constants.currentMode == Mode.REAL) {
             Alerts.create("Used sim-only method setMechVelocity on " + getName(), AlertType.kWarning);
             return;
         }
         // Convert mechanism velocity to encoder velocity
-        double encoderVel = Units.radiansToRotations(velocity * encoderRatio);
+        double encoderVel = velocity.times(encoderRatio).in(RotationsPerSecond);
 
         // Apply inversion if configured
         encoderVel = config.MagnetSensor.SensorDirection.equals(SensorDirectionValue.Clockwise_Positive)
                 ? -encoderVel
                 : encoderVel;
         sim.setVelocity(encoderVel);
+    }
+
+    @Override
+    public void setConnected(boolean connected){
+        if (Constants.currentMode == Mode.REAL) {
+            Alerts.create("Used sim-only method setConnected on " + getName(), AlertType.kWarning);
+            return;
+        }
+        disconnected=!connected;
     }
 }

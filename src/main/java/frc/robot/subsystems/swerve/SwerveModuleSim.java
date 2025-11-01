@@ -5,6 +5,9 @@ import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.wpilibj.simulation.DCMotorSim;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
+import static edu.wpi.first.units.Units.Radians;
+import static edu.wpi.first.units.Units.RadiansPerSecond;
+
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.swerve.SwerveModuleConstants;
@@ -53,7 +56,7 @@ public class SwerveModuleSim extends SubsystemBase {
         steerMotor.setMechPosition(steerMech.getAngularPositionRad());
         steerMotor.setMechVelocity(steerMech.getAngularVelocityRadPerSec());
 
-        steerEncoder.setMechPosition(steerMech.getAngularPositionRad());
-        steerEncoder.setMechVelocity(steerMech.getAngularVelocityRadPerSec());
+        steerEncoder.setMechPosition(Radians.of(steerMech.getAngularPositionRad()));
+        steerEncoder.setMechVelocity(RadiansPerSecond.of(steerMech.getAngularVelocityRadPerSec()));
     }
 }

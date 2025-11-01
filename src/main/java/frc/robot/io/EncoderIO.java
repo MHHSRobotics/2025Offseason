@@ -1,5 +1,7 @@
 package frc.robot.io;
 
+import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 
@@ -15,8 +17,8 @@ public class EncoderIO {
     public static class EncoderIOInputs {
         public boolean connected;
 
-        public double positionRad; // mechanism radians
-        public double velocityRadPerSec; // mechanism radians per sec
+        public Angle positionRad;
+        public AngularVelocity velocityRadPerSec;
 
         public boolean badMagnetFault;
         public boolean hardwareFault;
@@ -72,7 +74,7 @@ public class EncoderIO {
         unsupportedFeature();
     }
 
-    public void setOffset(double offset) {
+    public void setOffset(Angle offset) {
         unsupportedFeature();
     }
 
@@ -80,11 +82,15 @@ public class EncoderIO {
         unsupportedFeature();
     }
 
-    public void setMechPosition(double position) {
+    public void setMechPosition(Angle position) {
         unsupportedFeature();
     }
 
-    public void setMechVelocity(double velocity) {
+    public void setMechVelocity(AngularVelocity velocity) {
+        unsupportedFeature();
+    }
+
+    public void setConnected(boolean connected){
         unsupportedFeature();
     }
 }

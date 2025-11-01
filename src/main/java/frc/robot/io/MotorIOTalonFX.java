@@ -1,5 +1,7 @@
 package frc.robot.io;
 
+import static edu.wpi.first.units.Units.Radians;
+
 import java.util.function.Supplier;
 
 import edu.wpi.first.math.MathUtil;
@@ -177,7 +179,7 @@ public class MotorIOTalonFX extends MotorIO {
                         / (config.Feedback.RotorToSensorRatio * config.Feedback.SensorToMechanismRatio));
 
         if (connectedEncoder != null) {
-            inputs.encoderDiff = inputs.position - connectedEncoder.getInputs().positionRad;
+            inputs.encoderDiff = inputs.position - connectedEncoder.getInputs().positionRad.in(Radians);
         }
 
         // Update alerts using the base class method (this checks all fault conditions and updates dashboard alerts)
@@ -502,8 +504,8 @@ public class MotorIOTalonFX extends MotorIO {
     public void setOffset(double offset) {
         if (config.Feedback.FeedbackSensorSource == FeedbackSensorSourceValue.FusedCANcoder
                 || config.Feedback.FeedbackSensorSource == FeedbackSensorSourceValue.RemoteCANcoder) {
-            connectedEncoder.setOffset(offset);
-            extraOffset = connectedEncoder.getExtraOffset();
+            connectedEncoder.setOffset(Radians.of(offset));
+            extraOffset = connectedEncoder.getExtraOffset().in(Radians);
         } else if (config.Feedback.FeedbackSensorSource == FeedbackSensorSourceValue.RotorSensor) {
             double ratio = config.Feedback.SensorToMechanismRatio;
 

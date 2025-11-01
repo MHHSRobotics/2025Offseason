@@ -3,6 +3,7 @@ package frc.robot.io;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 
 import frc.robot.Constants;
@@ -22,13 +23,20 @@ public class CameraIOPhotonCamera extends CameraIO {
 
     private Transform3d robotToCamera;
 
-    private double fov;
+    // For simulation only
+    private Angle fov;
+    private int pixelWidth;
+    private int pixelHeight;
+    private int fps;
 
-    public CameraIOPhotonCamera(String name, String logPath, Transform3d robotToCamera, double fov) {
+    public CameraIOPhotonCamera(String name, String logPath, Transform3d robotToCamera, Angle fov, int pixelWidth, int pixelHeight, int fps) {
         super(name, logPath);
         cam = new PhotonCamera(name);
         this.robotToCamera = robotToCamera;
         this.fov = fov;
+        this.pixelWidth=pixelWidth;
+        this.pixelHeight=pixelHeight;
+        this.fps=fps;
     }
 
     @Override
@@ -83,13 +91,16 @@ public class CameraIOPhotonCamera extends CameraIO {
             Alerts.create("Used sim-only method startSim on " + getName(), AlertType.kWarning);
             return;
         }
-        // Config for the camera sim
+        // Create config for the PhotonVision camera sim
         SimCameraProperties cameraProp = new SimCameraProperties();
-        // 640x480 input with 80 degree FOV
-        cameraProp.setCalibration(320, 240, Rotation2d.fromDegrees(fov));
-        // 50 FPS
-        cameraProp.setFPS(50);
-        // Latency of 35ms with standard deviation of 5ms
+
+        // Set resolution and FOV
+        cameraProp.setCalibration(pixelWidth, pixelHeight, new Rotation2d(fov));
+
+        // Set FPS
+        cameraProp.setFPS(fps);
+
+        // Standard latency of 35ms with standard deviation of 5ms
         cameraProp.setAvgLatencyMs(35);
         cameraProp.setLatencyStdDevMs(5);
 

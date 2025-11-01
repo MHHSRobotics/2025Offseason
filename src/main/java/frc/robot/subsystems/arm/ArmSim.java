@@ -1,5 +1,8 @@
 package frc.robot.subsystems.arm;
 
+import static edu.wpi.first.units.Units.Radians;
+import static edu.wpi.first.units.Units.RadiansPerSecond;
+
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -49,7 +52,7 @@ public class ArmSim extends SubsystemBase {
         // All values here are mechanism radians (rad) and radians per second (rad/s)
         motor.setMechPosition(armMech.getAngleRads());
         motor.setMechVelocity(armMech.getVelocityRadPerSec());
-        encoder.setMechPosition(armMech.getAngleRads());
-        encoder.setMechVelocity(armMech.getVelocityRadPerSec());
+        encoder.setMechPosition(Radians.of(armMech.getAngleRads()));
+        encoder.setMechVelocity(RadiansPerSecond.of(armMech.getVelocityRadPerSec()));
     }
 }
