@@ -1,8 +1,5 @@
 package frc.robot.subsystems.elevator;
 
-import static edu.wpi.first.units.Units.Meters;
-import static edu.wpi.first.units.Units.Radians;
-
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.simulation.ElevatorSim;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -46,15 +43,15 @@ public class ElevatorSubsystemSim extends SubsystemBase {
         // This runs every robot loop (about 50 times per second)
         // 1) Tell the simulator what voltage (volts) the left motor applied
         // (Right motor follows left motor, so we only need to simulate the left motor's voltage)
-        elevatorMech.setInputVoltage(leftMotor.getInputs().appliedVoltage);
+        elevatorMech.setInputVoltage(leftMotor.getInputs().appliedVoltageVolts);
 
         // 2) Step the simulator forward by 20 ms (0.02 seconds)
         elevatorMech.update(0.02);
 
         // 3) Tell the motor and encoder I/O the new elevator height and speed
         // All values here are mechanism meters (m) and meters per second (m/s)
-        leftMotor.setMechPosition(Meters.of(elevatorMech.getPositionMeters()).div(Elevator.Constants.drumRadius).times(Radians.of(1)));
-        leftMotor.setMechVelocity(elevatorMech.getVelocityMetersPerSecond()/Elevator.Constants.drumRadius);
+        leftMotor.setMechPosition(elevatorMech.getPositionMeters() / Elevator.Constants.drumRadius);
+        leftMotor.setMechVelocity(elevatorMech.getVelocityMetersPerSecond() / Elevator.Constants.drumRadius);
 
         // Right motor gets the same position and velocity since it follows the left motor
         rightMotor.setMechPosition(elevatorMech.getPositionMeters()/Elevator.Constants.drumRadius);

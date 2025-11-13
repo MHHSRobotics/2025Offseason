@@ -181,12 +181,12 @@ public class Wrist extends SubsystemBase {
 
     // Find out the current wrist angle (radians)
     public double getPosition() {
-        return motor.getInputs().position;
+        return motor.getInputs().positionRad;
     }
 
     // Find out how fast the wrist is rotating (radians per second)
     public double getVelocity() {
-        return motor.getInputs().velocity;
+        return motor.getInputs().velocityRadPerSec;
     }
 
     // Tell the wrist to go to a target angle (radians). Example: 0 rad ≈ wrist straight forward.
@@ -194,7 +194,7 @@ public class Wrist extends SubsystemBase {
     public void setGoal(double angle) {
         motor.setGoalWithCurrentMagic(
                 MathUtil.clamp(angle, Constants.minAngle, Constants.maxAngle),
-                () -> Constants.kG.get() * Math.cos(getPosition() + armMotor.getInputs().position));
+                () -> Constants.kG.get() * Math.cos(getPosition() + armMotor.getInputs().positionRad));
     }
 
     // Find out the current target angle (radians)
@@ -223,7 +223,7 @@ public class Wrist extends SubsystemBase {
         encoder.update();
 
         // 2) Update the on-screen wrist drawing to match the current wrist angle (radians)
-        wrist.setAngle(Rotation2d.fromRadians(motor.getInputs().position));
+        wrist.setAngle(Rotation2d.fromRadians(motor.getInputs().positionRad));
 
         if (motor.getInputs().controlMode.startsWith("MM_")) {
             // If the motor is using Motion Magic (PID to a target), show the target and P/I/D/FF bars

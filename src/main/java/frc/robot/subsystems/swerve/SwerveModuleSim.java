@@ -5,9 +5,6 @@ import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.wpilibj.simulation.DCMotorSim;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-import static edu.wpi.first.units.Units.Radians;
-import static edu.wpi.first.units.Units.RadiansPerSecond;
-
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.swerve.SwerveModuleConstants;
@@ -44,8 +41,8 @@ public class SwerveModuleSim extends SubsystemBase {
 
     @Override
     public void periodic() {
-        driveMech.setInputVoltage(driveMotor.getInputs().appliedVoltage);
-        steerMech.setInputVoltage(steerMotor.getInputs().appliedVoltage);
+        driveMech.setInputVoltage(driveMotor.getInputs().appliedVoltageVolts);
+        steerMech.setInputVoltage(steerMotor.getInputs().appliedVoltageVolts);
 
         driveMech.update(0.02);
         steerMech.update(0.02);
@@ -53,10 +50,13 @@ public class SwerveModuleSim extends SubsystemBase {
         driveMotor.setMechPosition(driveMech.getAngularPositionRad());
         driveMotor.setMechVelocity(driveMech.getAngularVelocityRadPerSec());
 
-        steerMotor.setMechPosition(steerMech.getAngularPositionRad());
-        steerMotor.setMechVelocity(steerMech.getAngularVelocityRadPerSec());
+        double steerAngle = steerMech.getAngularPositionRad();
+        double steerVelocity = steerMech.getAngularVelocityRadPerSec();
 
-        steerEncoder.setMechPosition(Radians.of(steerMech.getAngularPositionRad()));
-        steerEncoder.setMechVelocity(RadiansPerSecond.of(steerMech.getAngularVelocityRadPerSec()));
+        steerMotor.setMechPosition(steerAngle);
+        steerMotor.setMechVelocity(steerVelocity);
+
+        steerEncoder.setMechPosition(steerAngle);
+        steerEncoder.setMechVelocity(steerVelocity);
     }
 }

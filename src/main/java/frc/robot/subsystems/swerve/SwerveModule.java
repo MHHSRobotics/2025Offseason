@@ -84,7 +84,7 @@ public class SwerveModule {
 
     // Find out which direction the wheel is currently pointing (angle in radians)
     public double getAngle() {
-        return angleMotor.getInputs().position;
+        return angleMotor.getInputs().positionRad;
     }
 
     // Find out how far the robot has driven (distance in meters)
@@ -94,12 +94,12 @@ public class SwerveModule {
 
     // Find out how fast the robot is moving (speed in meters per second)
     public double getVelocityMetersPerSec() {
-        return driveMotor.getInputs().velocity * constants.WheelRadius;
+        return driveMotor.getInputs().velocityRadPerSec * constants.WheelRadius;
     }
 
     // Find out how much the wheel has rotated (angle in radians)
     public double getWheelPosition() {
-        return driveMotor.getInputs().position;
+        return driveMotor.getInputs().positionRad;
     }
 
     // Make the swerve module go a certain speed and direction (state has speed in m/s and angle in radians)

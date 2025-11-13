@@ -293,7 +293,7 @@ public class Swerve extends SubsystemBase {
 
     // Set the gyro to rotation 0
     public void resetGyro() {
-        gyro.setYaw(Radians.of(0));
+        gyro.setYaw(0);
         gyroAngle = Rotation2d.kZero;
     }
 

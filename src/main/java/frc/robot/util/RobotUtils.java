@@ -1,11 +1,15 @@
 package frc.robot.util;
 
+import static edu.wpi.first.units.Units.Radians;
+
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
+import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj.DriverStation;
 
 // Utility functions used it multiple places
@@ -147,5 +151,11 @@ public class RobotUtils {
         } else {
             return rot;
         }
+    }
+
+    // Clamp helper function for angles
+    public static Angle clamp(Angle a,Angle min,Angle max){
+        double aR=a.in(Radians),minR=min.in(Radians),maxR=max.in(Radians);
+        return Radians.of(MathUtil.clamp(aR,minR,maxR));
     }
 }

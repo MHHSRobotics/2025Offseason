@@ -1,8 +1,10 @@
 package frc.robot.subsystems.arm;
 
-import edu.wpi.first.math.MathUtil;
+import static edu.wpi.first.units.Units.Degrees;
+import static edu.wpi.first.units.Units.Radians;
+
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.util.Units;
+import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -18,6 +20,7 @@ import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
 
 import frc.robot.io.EncoderIO;
 import frc.robot.io.MotorIO;
+import frc.robot.util.RobotUtils;
 
 // Make the arm subsystem move a single-jointed arm to targets and show helpful
 // visuals for students tuning it. All angles are arm mechanism angles (radians).
@@ -28,8 +31,8 @@ public class Arm extends SubsystemBase {
 
         // CAN device ID for the arm motor controller
         public static final int motorId = 22;
-        // Angle offset (radians) to line up the absolute encoder zero with the real arm zero
-        public static final double offset = 2.45; // -2.85;
+        // Angle offset to line up the absolute encoder zero with the real arm zero
+        public static final Angle offset = Radians.of(2.45); // Radians.of(-2.85);
         // Whether to flip motor direction (true means reverse forward/backward)
         public static final boolean motorInverted = false;
 
@@ -41,7 +44,7 @@ public class Arm extends SubsystemBase {
         public static final double gearRatio = 175 / 2.; // Ratio of motor rotations to arm rotations (unitless)
         public static final double encoderRatio = 1; // Ratio of encoder rotations to arm rotations (unitless)
 
-        public static final double armTolerance = Units.degreesToRadians(5);
+        public static final Angle armTolerance = Degrees.of(5);
 
         public static final LoggedNetworkNumber kP =
                 new LoggedNetworkNumber("Arm/kP", 50); // (volts per radian) more voltage when farther from target
@@ -70,12 +73,11 @@ public class Arm extends SubsystemBase {
 
         public static final double mass = 10; // (kg) estimated arm mass for simulation
         public static final double armLength = 0.6; // Arm length (meters)
-        public static final double moi =
-                (1. / 3.) * mass * armLength * armLength; // (kg·m^2) how hard it is to rotate the arm
+        public static final double moi = (1.0 / 3.0) * mass * armLength * armLength; // (kg·m^2) moment of inertia
 
-        public static final double minAngle = Units.degreesToRadians(-45); // (radians) soft lower limit (~-45°)
-        public static final double maxAngle = Units.degreesToRadians(140); // (radians) soft upper limit (~140°)
-        public static final double startAngle = Units.degreesToRadians(90); // (radians) start angle in sim (~90°)
+        public static final Angle minAngle = Degrees.of(-45); // Soft lower limit
+        public static final Angle maxAngle = Degrees.of(140); // Soft upper limit
+        public static final Angle startAngle = Degrees.of(90); // Start angle in sim
 
         public static final double rotorToSensorRatio =
                 gearRatio / encoderRatio; // Ratio of motor rotations to encoder rotations (unitless)
@@ -85,9 +87,6 @@ public class Arm extends SubsystemBase {
 
         public static final LoggedNetworkBoolean armDisabled =
                 new LoggedNetworkBoolean("Arm/Disabled", false); // Toggle to completely disable the arm subsystem
-
-        // Angle constants
-        public static final double defaultAngle = Units.degreesToRadians(90);
     }
 
     // Arm motor interface; handles real robot and simulation for us
@@ -155,9 +154,9 @@ public class Arm extends SubsystemBase {
         motor.setFeedforwardType(GravityTypeValue.Arm_Cosine);
 
         // Set motor offset
-        motor.setOffset(Constants.offset);
+        motor.setOffset(Constants.offset.in(Radians));
 
-        motor.setLimits(Constants.minAngle, Constants.maxAngle);
+        motor.setLimits(Constants.minAngle.in(Radians), Constants.maxAngle.in(Radians));
 
         // Add middle dot to visualization
         root.append(new LoggedMechanismLigament2d("Middle", 0.0, 0, 10, new Color8Bit(Color.kBlue)));
@@ -169,17 +168,17 @@ public class Arm extends SubsystemBase {
     }
 
     public double getPosition() {
-        return motor.getInputs().position;
+        return motor.getInputs().positionRad;
     }
 
     public double getVelocity() {
-        return motor.getInputs().velocity;
+        return motor.getInputs().velocityRadPerSec;
     }
 
     // Tell the arm to go to a target angle (radians). Example: 0 rad ≈ arm straight forward.
     // We clamp to safe limits so the arm won't try to drive past its allowed range.
     public void setGoal(double pos) {
-        motor.setGoalWithCurrentMagic(MathUtil.clamp(pos, Constants.minAngle, Constants.maxAngle));
+        motor.setGoalWithCurrentMagic(pos);
     }
 
     // Find out the current target angle (radians)
@@ -189,7 +188,7 @@ public class Arm extends SubsystemBase {
 
     // Whether the error is within tolerance
     public boolean atGoal() {
-        return Math.abs(getPosition() - getGoal()) < Constants.armTolerance;
+        return Math.abs(motor.getInputs().error) < Constants.armTolerance.in(Radians);
     }
 
     @Override
@@ -208,7 +207,7 @@ public class Arm extends SubsystemBase {
         encoder.update();
 
         // 2) Update the on-screen arm drawing to match the current arm angle (radians)
-        arm.setAngle(Rotation2d.fromRadians(motor.getInputs().position));
+        arm.setAngle(new Rotation2d(motor.getInputs().positionRad));
 
         if (motor.getInputs().controlMode.startsWith("MM_")) {
             // If the motor is using Motion Magic (PID to a target), show the target and P/D/FF bars

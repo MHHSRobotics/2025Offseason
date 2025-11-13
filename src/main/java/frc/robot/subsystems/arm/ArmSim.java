@@ -1,7 +1,6 @@
 package frc.robot.subsystems.arm;
 
 import static edu.wpi.first.units.Units.Radians;
-import static edu.wpi.first.units.Units.RadiansPerSecond;
 
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
@@ -33,26 +32,28 @@ public class ArmSim extends SubsystemBase {
                 Arm.Constants.gearRatio,
                 Arm.Constants.moi,
                 Arm.Constants.armLength,
-                Arm.Constants.minAngle,
-                Arm.Constants.maxAngle,
+                Arm.Constants.minAngle.in(Radians),
+                Arm.Constants.maxAngle.in(Radians),
                 true,
-                Arm.Constants.startAngle);
+                Arm.Constants.startAngle.in(Radians));
     }
 
     @Override
     public void periodic() {
         // This runs every robot loop (about 50 times per second)
         // 1) Tell the simulator what voltage (volts) the motor applied
-        armMech.setInputVoltage(motor.getInputs().appliedVoltage);
+        armMech.setInputVoltage(motor.getInputs().appliedVoltageVolts);
 
         // 2) Step the simulator forward by 20 ms (0.02 seconds)
         armMech.update(0.02);
 
         // 3) Tell the motor and encoder I/O the new arm angle and speed
-        // All values here are mechanism radians (rad) and radians per second (rad/s)
-        motor.setMechPosition(armMech.getAngleRads());
-        motor.setMechVelocity(armMech.getVelocityRadPerSec());
-        encoder.setMechPosition(Radians.of(armMech.getAngleRads()));
-        encoder.setMechVelocity(RadiansPerSecond.of(armMech.getVelocityRadPerSec()));
+        double angle = armMech.getAngleRads();
+        double velocity = armMech.getVelocityRadPerSec();
+
+        motor.setMechPosition(angle);
+        encoder.setMechPosition(angle);
+        motor.setMechVelocity(velocity);
+        encoder.setMechVelocity(velocity);
     }
 }

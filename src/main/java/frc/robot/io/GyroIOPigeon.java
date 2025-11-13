@@ -1,7 +1,6 @@
 package frc.robot.io;
 
-import edu.wpi.first.units.measure.Angle;
-import edu.wpi.first.units.measure.AngularVelocity;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 
 import com.ctre.phoenix6.CANBus;
@@ -13,22 +12,22 @@ import frc.robot.Constants;
 import frc.robot.Constants.Mode;
 import frc.robot.util.Alerts;
 
-import static edu.wpi.first.units.Units.Degrees;
-import static edu.wpi.first.units.Units.DegreesPerSecond;
-
 public class GyroIOPigeon extends GyroIO {
     private Pigeon2 gyro;
     private Pigeon2SimState sim;
 
-    private boolean disconnected = false;
+    private boolean disconnected;
 
+    private int id;
+    private CANBus canBus;
     public GyroIOPigeon(int id, CANBus canBus, String name, String logPath) {
         super(name, logPath);
         gyro = new Pigeon2(id, canBus);
         gyro.getConfigurator().apply(new Pigeon2Configuration());
         gyro.getConfigurator().setYaw(0);
-
         sim = gyro.getSimState();
+        this.id=id;
+        this.canBus=canBus;
     }
 
     public GyroIOPigeon(int id, String canBus, String name, String logPath) {
@@ -39,12 +38,19 @@ public class GyroIOPigeon extends GyroIO {
         this(id, new CANBus(), name, logPath);
     }
 
+    public int getId(){
+        return id;
+    }
+
+    public CANBus getCANBus(){
+        return canBus;
+    }
+
     @Override
     public void update() {
         inputs.connected = disconnected ? false : gyro.isConnected();
-        inputs.yawPositionRad = Degrees.of(gyro.getYaw().getValueAsDouble());
-        inputs.yawVelocityRadPerSec =
-                DegreesPerSecond.of(gyro.getAngularVelocityZWorld().getValueAsDouble());
+        inputs.yawPositionRad = Units.degreesToRadians(gyro.getYaw().getValueAsDouble());
+        inputs.yawVelocityRadPerSec = Units.degreesToRadians(gyro.getAngularVelocityZWorld().getValueAsDouble());
         inputs.hardwareFault = gyro.getFault_Hardware().getValue();
 
         // Update alerts using the base class method (this checks all fault conditions and updates dashboard alerts)
@@ -52,26 +58,26 @@ public class GyroIOPigeon extends GyroIO {
     }
 
     @Override
-    public void setYaw(Angle yaw) {
-        gyro.setYaw(yaw);
+    public void setYaw(double yaw) {
+        gyro.setYaw(Units.radiansToDegrees(yaw));
     }
 
     @Override
-    public void setMechYaw(Angle yaw) {
+    public void setMechYaw(double yaw) {
         if (Constants.currentMode == Mode.REAL) {
             Alerts.create("Used sim-only method setMechYaw on " + getName(), AlertType.kWarning);
             return;
         }
-        sim.setRawYaw(yaw.in(Degrees));
+        sim.setRawYaw(Units.radiansToDegrees(yaw));
     }
 
     @Override
-    public void setMechYawVelocity(AngularVelocity yawVelocity) {
+    public void setMechYawVelocity(double yawVelocity) {
         if (Constants.currentMode == Mode.REAL) {
             Alerts.create("Used sim-only method setMechYawVelocity on " + getName(), AlertType.kWarning);
             return;
         }
-        sim.setAngularVelocityZ(yawVelocity.in(DegreesPerSecond));
+        sim.setAngularVelocityZ(Units.radiansToDegrees(yawVelocity));
     }
 
     @Override

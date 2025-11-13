@@ -1,18 +1,11 @@
 package frc.robot.subsystems.elevator;
 
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.units.AngleUnit;
-import edu.wpi.first.units.DistanceUnit;
-import edu.wpi.first.units.measure.Distance;
-import edu.wpi.first.units.measure.Per;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 import com.ctre.phoenix6.signals.GravityTypeValue;
-
-import static edu.wpi.first.units.Units.Meters;
-import static edu.wpi.first.units.Units.Radians;
 
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.mechanism.LoggedMechanism2d;
@@ -50,7 +43,7 @@ public class Elevator extends SubsystemBase {
         public static final double gearRatio = 8.0; // Ratio of motor rotations to drum rotations (unitless)
         public static final double encoderRatio = 0.5; // Ratio of encoder rotations to drum rotations (unitless)
 
-        public static final Distance drumRadius = Meters.of(0.022); // Ratio of meters to drum radians (meters)
+        public static final double drumRadius = 0.022; // Ratio of meters to drum radians (meters)
 
         public static final LoggedNetworkNumber kP =
                 new LoggedNetworkNumber("Elevator/kP", 80); // (volts per meter) more voltage when farther from target
@@ -178,7 +171,7 @@ public class Elevator extends SubsystemBase {
 
         // Make the right motor follow the left motor (they should move together)
         rightMotor.follow(
-                Constants.leftMotorId,
+                leftMotor,
                 Constants.leftMotorInverted
                         ^ Constants
                                 .rightMotorInverted); // take the XOR of the two inverts to calculate relative inversion
@@ -195,12 +188,12 @@ public class Elevator extends SubsystemBase {
 
     // Find out how high the elevator is right now (height in meters)
     public double getPosition() {
-        return leftMotor.getInputs().position;
+        return leftMotor.getInputs().positionRad;
     }
 
     // Find out how fast the elevator is moving (speed in meters per second)
     public double getVelocity() {
-        return leftMotor.getInputs().velocity;
+        return leftMotor.getInputs().velocityRadPerSec;
     }
 
     // Tell the elevator to go to a target height (meters). Example: 0.5 = half meter up.
@@ -238,7 +231,7 @@ public class Elevator extends SubsystemBase {
         encoder.update();
 
         // 2) Update the on-screen elevator drawing to match the current elevator height (meters)
-        elevator.setLength(leftMotor.getInputs().position + 0.1); // Add 0.1 for visual base
+        elevator.setLength(leftMotor.getInputs().positionRad + 0.1); // Add 0.1 for visual base
 
         if (leftMotor.getInputs().controlMode.startsWith("MM_")) {
             // If the motor is using Motion Magic (PID to a target), show the target and P/I/D/FF bars

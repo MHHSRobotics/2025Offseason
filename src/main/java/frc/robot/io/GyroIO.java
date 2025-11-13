@@ -1,7 +1,5 @@
 package frc.robot.io;
 
-import edu.wpi.first.units.measure.Angle;
-import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 
@@ -16,8 +14,8 @@ public class GyroIO {
     @AutoLog
     public static class GyroIOInputs {
         public boolean connected;
-        public Angle yawPositionRad;
-        public AngularVelocity yawVelocityRadPerSec;
+        public double yawPositionRad; // Gyro yaw position (rad)
+        public double yawVelocityRadPerSec; // Gyro yaw velocity (rad/s)
         public boolean hardwareFault;
     }
 
@@ -65,15 +63,15 @@ public class GyroIO {
         }
     }
 
-    public void setYaw(Angle yaw) {
+    public void setYaw(double yaw) {
         unsupportedFeature();
     }
 
-    public void setMechYaw(Angle yaw) {
+    public void setMechYaw(double yaw) {
         unsupportedFeature();
     }
 
-    public void setMechYawVelocity(AngularVelocity yawVelocity) {
+    public void setMechYawVelocity(double yawVelocity) {
         unsupportedFeature();
     }
 

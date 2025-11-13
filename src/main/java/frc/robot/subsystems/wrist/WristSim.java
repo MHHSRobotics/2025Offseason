@@ -1,8 +1,5 @@
 package frc.robot.subsystems.wrist;
 
-import static edu.wpi.first.units.Units.Radians;
-import static edu.wpi.first.units.Units.RadiansPerSecond;
-
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -43,16 +40,19 @@ public class WristSim extends SubsystemBase {
     public void periodic() {
         // This runs every robot loop (about 50 times per second)
         // 1) Tell the simulator what voltage (volts) the motor applied
-        wristMech.setInputVoltage(motor.getInputs().appliedVoltage);
+        wristMech.setInputVoltage(motor.getInputs().appliedVoltageVolts);
 
         // 2) Step the simulator forward by 20 ms (0.02 seconds)
         wristMech.update(0.02);
 
         // 3) Tell the motor and encoder I/O the new wrist angle and speed
         // All values here are mechanism radians (rad) and radians per second (rad/s)
-        motor.setMechPosition(wristMech.getAngleRads());
-        motor.setMechVelocity(wristMech.getVelocityRadPerSec());
-        encoder.setMechPosition(Radians.of(wristMech.getAngleRads()));
-        encoder.setMechVelocity(RadiansPerSecond.of(wristMech.getVelocityRadPerSec()));
+        double angle = wristMech.getAngleRads();
+        double velocity = wristMech.getVelocityRadPerSec();
+
+        motor.setMechPosition(angle);
+        motor.setMechVelocity(velocity);
+        encoder.setMechPosition(angle);
+        encoder.setMechVelocity(velocity);
     }
 }

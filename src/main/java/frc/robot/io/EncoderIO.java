@@ -1,7 +1,5 @@
 package frc.robot.io;
 
-import edu.wpi.first.units.measure.Angle;
-import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 
@@ -12,13 +10,16 @@ import frc.robot.Constants;
 import frc.robot.Constants.Mode;
 import frc.robot.util.Alerts;
 
+// Make a simple encoder interface used by subsystems.
+// All position/velocity values are doubles in mechanism units (radians for rotary, meters for linear).
+// For linear mechanisms, configure the gear ratio to include conversion from linear to angular units.
 public class EncoderIO {
     @AutoLog
     public static class EncoderIOInputs {
         public boolean connected;
 
-        public Angle positionRad;
-        public AngularVelocity velocityRadPerSec;
+        public double positionRad; // Encoder position (rad or m)
+        public double velocityRadPerSec; // Encoder velocity (rad/s or m/s)
 
         public boolean badMagnetFault;
         public boolean hardwareFault;
@@ -74,7 +75,7 @@ public class EncoderIO {
         unsupportedFeature();
     }
 
-    public void setOffset(Angle offset) {
+    public void setOffset(double offset) {
         unsupportedFeature();
     }
 
@@ -82,15 +83,15 @@ public class EncoderIO {
         unsupportedFeature();
     }
 
-    public void setMechPosition(Angle position) {
+    public void setMechPosition(double position) {
         unsupportedFeature();
     }
 
-    public void setMechVelocity(AngularVelocity velocity) {
+    public void setMechVelocity(double velocity) {
         unsupportedFeature();
     }
 
-    public void setConnected(boolean connected){
+    public void setConnected(boolean connected) {
         unsupportedFeature();
     }
 }
