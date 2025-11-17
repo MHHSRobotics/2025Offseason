@@ -125,6 +125,18 @@ public class Swerve extends SubsystemBase {
         public static final LoggedNetworkNumber rotationkP = new LoggedNetworkNumber("Swerve/RotKP", 0.4);
         public static final LoggedNetworkNumber rotationkD = new LoggedNetworkNumber("Swerve/RotKD", 0);
         public static final LoggedNetworkNumber rotationkI = new LoggedNetworkNumber("Swerve/RotKI", 0);
+
+        public static final LoggedNetworkNumber drivekP = new LoggedNetworkNumber("Swerve/DriveKP", 0.1);
+        public static final LoggedNetworkNumber drivekD = new LoggedNetworkNumber("Swerve/DriveKD", 0);
+        public static final LoggedNetworkNumber drivekS = new LoggedNetworkNumber("Swerve/DriveKS", 0.18);
+        public static final LoggedNetworkNumber drivekV = new LoggedNetworkNumber("Swerve/DriveKV", 0.124);
+        public static final LoggedNetworkNumber drivekA = new LoggedNetworkNumber("Swerve/DriveKA", 0);
+
+        public static final LoggedNetworkNumber steerkP = new LoggedNetworkNumber("Swerve/SteerKP", 0);
+        public static final LoggedNetworkNumber steerkD = new LoggedNetworkNumber("Swerve/SteerKD", 0);
+        public static final LoggedNetworkNumber steerkS = new LoggedNetworkNumber("Swerve/SteerKS", 0);
+        public static final LoggedNetworkNumber steerkV = new LoggedNetworkNumber("Swerve/SteerKV", 0);
+        public static final LoggedNetworkNumber steerkA = new LoggedNetworkNumber("Swerve/SteerKA", 0);
     }
 
     public static class VisionConstants {
