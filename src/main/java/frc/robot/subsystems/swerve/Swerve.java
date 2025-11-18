@@ -100,6 +100,9 @@ public class Swerve extends SubsystemBase {
         public static final LoggedNetworkBoolean swerveFieldCentric =
                 new LoggedNetworkBoolean("Swerve/FieldCentric", true); // Toggle for field centric controls
 
+        public static final LoggedNetworkBoolean swerveVoltage =
+                new LoggedNetworkBoolean("Swerve/VoltageControl", false); // Toggle for field centric controls
+        
         // Drive motor PID
         public static final LoggedNetworkNumber driveKP = new LoggedNetworkNumber("Swerve/DriveKP", 0.1);
         public static final LoggedNetworkNumber driveKI = new LoggedNetworkNumber("Swerve/DriveKI", 0);
@@ -358,6 +361,13 @@ public class Swerve extends SubsystemBase {
         }
     }
 
+    // Sets the voltage of every drive motor on the bot
+    public void setVoltage(double volts){
+        for(SwerveModule mod:modules){
+            mod.setDriveVoltage(volts);
+        }
+    }
+
     // Make the modules point in an X pattern so it's harder to push the robot.
     public void lock() {
         locked = true;
@@ -520,32 +530,36 @@ public class Swerve extends SubsystemBase {
             }
             kinematics.resetHeadings(headings);
         } else {
-
-            boolean positionFieldOriented = true;
-            if (pidPosition) {
-                xSpeed =
-                        xController.calculate(getPose().getX(), targetPose.get().getX());
-                ySpeed =
-                        yController.calculate(getPose().getY(), targetPose.get().getY());
-            } else {
-                xSpeed = dx;
-                ySpeed = dy;
-                if (!fieldOriented) {
-                    positionFieldOriented = false;
-                } else if (RobotUtils.onRedAlliance()) {
-                    xSpeed *= -1;
-                    ySpeed *= -1;
+            if(Constants.swerveVoltage.get()){
+                setVoltage(dx*12);
+            }else{
+                    boolean positionFieldOriented = true;
+                if (pidPosition) {
+                    xSpeed =
+                            xController.calculate(getPose().getX(), targetPose.get().getX());
+                    ySpeed =
+                            yController.calculate(getPose().getY(), targetPose.get().getY());
+                } else {
+                    xSpeed = dx;
+                    ySpeed = dy;
+                    if (!fieldOriented) {
+                        positionFieldOriented = false;
+                    } else if (RobotUtils.onRedAlliance()) {
+                        xSpeed *= -1;
+                        ySpeed *= -1;
+                    }
                 }
+                double thetaSpeed;
+                if (pidRotation) {
+                    thetaSpeed = thetaController.calculate(
+                            getPose().getRotation().getRadians(),
+                            targetPose.get().getRotation().getRadians());
+                } else {
+                    thetaSpeed = dtheta;
+                }
+                setSpeeds(xSpeed, ySpeed, thetaSpeed, positionFieldOriented);
             }
-            double thetaSpeed;
-            if (pidRotation) {
-                thetaSpeed = thetaController.calculate(
-                        getPose().getRotation().getRadians(),
-                        targetPose.get().getRotation().getRadians());
-            } else {
-                thetaSpeed = dtheta;
-            }
-            setSpeeds(xSpeed, ySpeed, thetaSpeed, positionFieldOriented);
+            
         }
 
         Logger.recordOutput("Swerve/Locked", locked);
@@ -604,6 +618,8 @@ public class Swerve extends SubsystemBase {
                 2,
                 new Color8Bit(Color.kWhite)));
     }
+
+    
 
     private void initializeMechs() {
         Translation2d[] moduleTranslations = getModuleTranslations();
