@@ -173,19 +173,6 @@ public class SwerveModule {
         angleMotor.update();
         angleEncoder.update();
 
-        // Update gains
-        driveMotor.setkP(Swerve.Constants.drivekP.get());
-        driveMotor.setkD(Swerve.Constants.drivekD.get());
-        driveMotor.setkS(Swerve.Constants.drivekS.get());
-        driveMotor.setkV(Swerve.Constants.drivekV.get());
-        driveMotor.setkA(Swerve.Constants.drivekA.get());
-
-        angleMotor.setkP(Swerve.Constants.steerkP.get());
-        angleMotor.setkD(Swerve.Constants.steerkD.get());
-        angleMotor.setkS(Swerve.Constants.steerkS.get());
-        angleMotor.setkV(Swerve.Constants.steerkV.get());
-        angleMotor.setkA(Swerve.Constants.steerkA.get());
-
         // Update last position
         lastPosition = currentPosition;
 
