@@ -115,7 +115,7 @@ public class Swerve extends SubsystemBase {
         public static final LoggedNetworkNumber steerkP = new LoggedNetworkNumber("Swerve/SteerKP", 20);
         public static final LoggedNetworkNumber steerkI = new LoggedNetworkNumber("Swerve/SteerKI", 0);
         public static final LoggedNetworkNumber steerkD = new LoggedNetworkNumber("Swerve/SteerKD", 0);
-        public static final LoggedNetworkNumber steerkS = new LoggedNetworkNumber("Swerve/SteerKS", 0);
+        public static final LoggedNetworkNumber steerkS = new LoggedNetworkNumber("Swerve/SteerKS", 0.22);
         public static final LoggedNetworkNumber steerkV = new LoggedNetworkNumber("Swerve/SteerKV", 0);
         public static final LoggedNetworkNumber steerkA = new LoggedNetworkNumber("Swerve/SteerKA", 0);
 
