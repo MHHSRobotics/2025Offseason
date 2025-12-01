@@ -7,6 +7,7 @@ import edu.wpi.first.wpilibj.Alert.AlertType;
 
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.signals.GravityTypeValue;
+import com.ctre.phoenix6.signals.StaticFeedforwardSignValue;
 
 import org.littletonrobotics.junction.AutoLog;
 import org.littletonrobotics.junction.Logger;
@@ -248,6 +249,10 @@ public class MotorIO {
 
     // Tell the controller which gravity model to use (like Arm_Cosine or Elevator_Static)
     public void setFeedforwardType(GravityTypeValue type) {
+        unsupportedFeature();
+    }
+
+    public void setStaticType(StaticFeedforwardSignValue type) {
         unsupportedFeature();
     }
 

@@ -28,6 +28,7 @@ import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
 import com.ctre.phoenix6.signals.GravityTypeValue;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
+import com.ctre.phoenix6.signals.StaticFeedforwardSignValue;
 import com.ctre.phoenix6.sim.TalonFXSimState;
 
 import frc.robot.Constants;
@@ -460,6 +461,15 @@ public class MotorIOTalonFX extends MotorIO {
     public void setFeedforwardType(GravityTypeValue type) {
         if (type != config.Slot0.GravityType) {
             config.Slot0.GravityType = type;
+            configChanged = true;
+        }
+    }
+
+    // Tell the controller which kS model to use
+    @Override
+    public void setStaticType(StaticFeedforwardSignValue type) {
+        if (type != config.Slot0.StaticFeedforwardSign) {
+            config.Slot0.StaticFeedforwardSign = type;
             configChanged = true;
         }
     }

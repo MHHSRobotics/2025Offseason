@@ -100,21 +100,24 @@ public class Swerve extends SubsystemBase {
         public static final LoggedNetworkBoolean swerveFieldCentric =
                 new LoggedNetworkBoolean("Swerve/FieldCentric", true); // Toggle for field centric controls
 
+        public static final LoggedNetworkBoolean swerveVoltage =
+                new LoggedNetworkBoolean("Swerve/VoltageControl", false); // Toggle for field centric controls
+
         // Drive motor PID
-        public static final LoggedNetworkNumber driveKP = new LoggedNetworkNumber("Swerve/DriveKP", 0.1);
-        public static final LoggedNetworkNumber driveKI = new LoggedNetworkNumber("Swerve/DriveKI", 0);
-        public static final LoggedNetworkNumber driveKD = new LoggedNetworkNumber("Swerve/DriveKD", 0);
-        public static final LoggedNetworkNumber driveKS = new LoggedNetworkNumber("Swerve/DriveKS", 0);
-        public static final LoggedNetworkNumber driveKV = new LoggedNetworkNumber("Swerve/DriveKV", 0.124);
-        public static final LoggedNetworkNumber driveKA = new LoggedNetworkNumber("Swerve/DriveKA", 0);
+        public static final LoggedNetworkNumber drivekP = new LoggedNetworkNumber("Swerve/DriveKP", 0.1);
+        public static final LoggedNetworkNumber drivekI = new LoggedNetworkNumber("Swerve/DriveKI", 0);
+        public static final LoggedNetworkNumber drivekD = new LoggedNetworkNumber("Swerve/DriveKD", 0);
+        public static final LoggedNetworkNumber drivekS = new LoggedNetworkNumber("Swerve/DriveKS", 0.185);
+        public static final LoggedNetworkNumber drivekV = new LoggedNetworkNumber("Swerve/DriveKV", 0.122);
+        public static final LoggedNetworkNumber drivekA = new LoggedNetworkNumber("Swerve/DriveKA", 0.05);
 
         // Steer motor PID
-        public static final LoggedNetworkNumber steerKP = new LoggedNetworkNumber("Swerve/SteerKP", 20);
-        public static final LoggedNetworkNumber steerKI = new LoggedNetworkNumber("Swerve/SteerKI", 0);
-        public static final LoggedNetworkNumber steerKD = new LoggedNetworkNumber("Swerve/SteerKD", 0);
-        public static final LoggedNetworkNumber steerKS = new LoggedNetworkNumber("Swerve/SteerKS", 0);
-        public static final LoggedNetworkNumber steerKV = new LoggedNetworkNumber("Swerve/SteerKV", 0);
-        public static final LoggedNetworkNumber steerKA = new LoggedNetworkNumber("Swerve/SteerKA", 0);
+        public static final LoggedNetworkNumber steerkP = new LoggedNetworkNumber("Swerve/SteerKP", 20);
+        public static final LoggedNetworkNumber steerkI = new LoggedNetworkNumber("Swerve/SteerKI", 0);
+        public static final LoggedNetworkNumber steerkD = new LoggedNetworkNumber("Swerve/SteerKD", 0);
+        public static final LoggedNetworkNumber steerkS = new LoggedNetworkNumber("Swerve/SteerKS", 0.22);
+        public static final LoggedNetworkNumber steerkV = new LoggedNetworkNumber("Swerve/SteerKV", 0);
+        public static final LoggedNetworkNumber steerkA = new LoggedNetworkNumber("Swerve/SteerKA", 0);
 
         // Auto align translation PID
         public static final LoggedNetworkNumber translationkP = new LoggedNetworkNumber("Swerve/TransKP", 2);
@@ -125,18 +128,6 @@ public class Swerve extends SubsystemBase {
         public static final LoggedNetworkNumber rotationkP = new LoggedNetworkNumber("Swerve/RotKP", 0.4);
         public static final LoggedNetworkNumber rotationkD = new LoggedNetworkNumber("Swerve/RotKD", 0);
         public static final LoggedNetworkNumber rotationkI = new LoggedNetworkNumber("Swerve/RotKI", 0);
-
-        public static final LoggedNetworkNumber drivekP = new LoggedNetworkNumber("Swerve/DriveKP", 0.1);
-        public static final LoggedNetworkNumber drivekD = new LoggedNetworkNumber("Swerve/DriveKD", 0);
-        public static final LoggedNetworkNumber drivekS = new LoggedNetworkNumber("Swerve/DriveKS", 0.18);
-        public static final LoggedNetworkNumber drivekV = new LoggedNetworkNumber("Swerve/DriveKV", 0.124);
-        public static final LoggedNetworkNumber drivekA = new LoggedNetworkNumber("Swerve/DriveKA", 0);
-
-        public static final LoggedNetworkNumber steerkP = new LoggedNetworkNumber("Swerve/SteerKP", 0);
-        public static final LoggedNetworkNumber steerkD = new LoggedNetworkNumber("Swerve/SteerKD", 0);
-        public static final LoggedNetworkNumber steerkS = new LoggedNetworkNumber("Swerve/SteerKS", 0);
-        public static final LoggedNetworkNumber steerkV = new LoggedNetworkNumber("Swerve/SteerKV", 0);
-        public static final LoggedNetworkNumber steerkA = new LoggedNetworkNumber("Swerve/SteerKA", 0);
     }
 
     public static class VisionConstants {
@@ -358,6 +349,13 @@ public class Swerve extends SubsystemBase {
         }
     }
 
+    // Sets the voltage of every drive motor on the bot
+    public void setVoltage(double volts) {
+        for (SwerveModule mod : modules) {
+            mod.setDriveVoltage(volts);
+        }
+    }
+
     // Make the modules point in an X pattern so it's harder to push the robot.
     public void lock() {
         locked = true;
@@ -494,20 +492,20 @@ public class Swerve extends SubsystemBase {
 
         for (SwerveModule module : modules) {
             // Update drive motor PID
-            module.setDriveKP(Constants.driveKP.get());
-            module.setDriveKI(Constants.driveKI.get());
-            module.setDriveKD(Constants.driveKD.get());
-            module.setDriveKS(Constants.driveKS.get());
-            module.setDriveKV(Constants.driveKV.get());
-            module.setDriveKA(Constants.driveKA.get());
+            module.setDriveKP(Constants.drivekP.get());
+            module.setDriveKI(Constants.drivekI.get());
+            module.setDriveKD(Constants.drivekD.get());
+            module.setDriveKS(Constants.drivekS.get());
+            module.setDriveKV(Constants.drivekV.get());
+            module.setDriveKA(Constants.drivekA.get());
 
             // Update steer motor PID
-            module.setAngleKP(Constants.steerKP.get());
-            module.setAngleKI(Constants.steerKI.get());
-            module.setAngleKD(Constants.steerKD.get());
-            module.setAngleKS(Constants.steerKS.get());
-            module.setAngleKV(Constants.steerKV.get());
-            module.setAngleKA(Constants.steerKA.get());
+            module.setAngleKP(Constants.steerkP.get());
+            module.setAngleKI(Constants.steerkI.get());
+            module.setAngleKD(Constants.steerkD.get());
+            module.setAngleKS(Constants.steerkS.get());
+            module.setAngleKV(Constants.steerkV.get());
+            module.setAngleKA(Constants.steerkA.get());
         }
 
         double xSpeed = 0, ySpeed = 0;
@@ -520,32 +518,35 @@ public class Swerve extends SubsystemBase {
             }
             kinematics.resetHeadings(headings);
         } else {
-
-            boolean positionFieldOriented = true;
-            if (pidPosition) {
-                xSpeed =
-                        xController.calculate(getPose().getX(), targetPose.get().getX());
-                ySpeed =
-                        yController.calculate(getPose().getY(), targetPose.get().getY());
+            if (Constants.swerveVoltage.get()) {
+                setVoltage(dx * 12);
             } else {
-                xSpeed = dx;
-                ySpeed = dy;
-                if (!fieldOriented) {
-                    positionFieldOriented = false;
-                } else if (RobotUtils.onRedAlliance()) {
-                    xSpeed *= -1;
-                    ySpeed *= -1;
+                boolean positionFieldOriented = true;
+                if (pidPosition) {
+                    xSpeed = xController.calculate(
+                            getPose().getX(), targetPose.get().getX());
+                    ySpeed = yController.calculate(
+                            getPose().getY(), targetPose.get().getY());
+                } else {
+                    xSpeed = dx;
+                    ySpeed = dy;
+                    if (!fieldOriented) {
+                        positionFieldOriented = false;
+                    } else if (RobotUtils.onRedAlliance()) {
+                        xSpeed *= -1;
+                        ySpeed *= -1;
+                    }
                 }
+                double thetaSpeed;
+                if (pidRotation) {
+                    thetaSpeed = thetaController.calculate(
+                            getPose().getRotation().getRadians(),
+                            targetPose.get().getRotation().getRadians());
+                } else {
+                    thetaSpeed = dtheta;
+                }
+                setSpeeds(xSpeed, ySpeed, thetaSpeed, positionFieldOriented);
             }
-            double thetaSpeed;
-            if (pidRotation) {
-                thetaSpeed = thetaController.calculate(
-                        getPose().getRotation().getRadians(),
-                        targetPose.get().getRotation().getRadians());
-            } else {
-                thetaSpeed = dtheta;
-            }
-            setSpeeds(xSpeed, ySpeed, thetaSpeed, positionFieldOriented);
         }
 
         Logger.recordOutput("Swerve/Locked", locked);
