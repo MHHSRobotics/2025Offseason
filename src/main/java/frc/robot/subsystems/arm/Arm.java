@@ -1,6 +1,5 @@
 package frc.robot.subsystems.arm;
 
-import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.util.Color;
@@ -8,6 +7,7 @@ import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 import com.ctre.phoenix6.signals.GravityTypeValue;
+import com.ctre.phoenix6.signals.StaticFeedforwardSignValue;
 
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.mechanism.LoggedMechanism2d;
@@ -44,14 +44,14 @@ public class Arm extends SubsystemBase {
         public static final double armTolerance = Units.degreesToRadians(5);
 
         public static final LoggedNetworkNumber kP =
-                new LoggedNetworkNumber("Arm/kP", 50); // (volts per radian) more voltage when farther from target
+                new LoggedNetworkNumber("Arm/kP", 96); // (volts per radian) more voltage when farther from target
         public static final LoggedNetworkNumber kD =
-                new LoggedNetworkNumber("Arm/kD", 20); // (volts per rad/s) reacts to how fast error is changing
+                new LoggedNetworkNumber("Arm/kD", 15); // (volts per rad/s) reacts to how fast error is changing
 
         public static final LoggedNetworkNumber kS =
-                new LoggedNetworkNumber("Arm/kS", 0); // (volts) voltage to get arm moving (overcome static friction)
+                new LoggedNetworkNumber("Arm/kS", 5); // (volts) voltage to get arm moving (overcome static friction)
         public static final LoggedNetworkNumber kG = new LoggedNetworkNumber(
-                "Arm/kG", 12); // (volts) voltage to hold the arm level (compensate gravity at 0 rad)
+                "Arm/kG", 7); // (volts) voltage to hold the arm level (compensate gravity at 0 rad)
         public static final LoggedNetworkNumber kV = new LoggedNetworkNumber(
                 "Arm/kV", 0); // (volts per rad/s) voltage that scales with speed to overcome friction
         public static final LoggedNetworkNumber kA =
@@ -61,7 +61,7 @@ public class Arm extends SubsystemBase {
         public static final LoggedNetworkNumber maxVelocity =
                 new LoggedNetworkNumber("Arm/maxVelocity", 10); // (rad/s) Motion Magic max speed for moving to a target
         public static final LoggedNetworkNumber maxAccel = new LoggedNetworkNumber(
-                "Arm/maxAccel", 4); // (rad/s^2) Motion Magic max acceleration for moving to a target
+                "Arm/maxAccel", 7); // (rad/s^2) Motion Magic max acceleration for moving to a target
 
         public static final double statorCurrentLimit = 70; // (amps) limit on motor torque output
         public static final double supplyCurrentLimit = 60; // (amps) normal current limit pulled from battery
@@ -159,6 +159,8 @@ public class Arm extends SubsystemBase {
 
         motor.setLimits(Constants.minAngle, Constants.maxAngle);
 
+        motor.setStaticType(StaticFeedforwardSignValue.UseClosedLoopSign);
+
         // Add middle dot to visualization
         root.append(new LoggedMechanismLigament2d("Middle", 0.0, 0, 10, new Color8Bit(Color.kBlue)));
     }
@@ -176,10 +178,10 @@ public class Arm extends SubsystemBase {
         return motor.getInputs().velocity;
     }
 
-    // Tell the arm to go to a target angle (radians). Example: 0 rad ≈ arm straight forward.
-    // We clamp to safe limits so the arm won't try to drive past its allowed range.
-    public void setGoal(double pos) {
-        motor.setGoalWithCurrentMagic(MathUtil.clamp(pos, Constants.minAngle, Constants.maxAngle));
+    // Tell the wrist to go to a target angle (radians). Example: 0 rad ≈ wrist straight forward.
+    // We clamp to safe limits so the wrist won't try to drive past its allowed range.
+    public void setGoal(double angle) {
+        motor.setGoalWithCurrentMagic(angle, () -> Constants.kG.get() * Math.cos(getPosition() + 0.19));
     }
 
     // Find out the current target angle (radians)
