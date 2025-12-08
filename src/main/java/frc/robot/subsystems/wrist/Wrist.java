@@ -64,6 +64,9 @@ public class Wrist extends SubsystemBase {
         public static final LoggedNetworkNumber maxAccel = new LoggedNetworkNumber(
                 "Wrist/maxAccel", 6.3); // (rad/s^2) Motion Magic max acceleration for moving to a target
 
+        // Point at which the wrist is vertical (rad)
+        public static final double verticalPos=1.07;
+
         public static final double statorCurrentLimit = 70; // (amps) limit on motor torque output
         public static final double supplyCurrentLimit = 60; // (amps) normal current limit pulled from battery
         public static final double supplyCurrentLowerLimit = 40; // (amps) reduce to this if over limit for some time
@@ -195,7 +198,7 @@ public class Wrist extends SubsystemBase {
     // We clamp to safe limits so the wrist won't try to drive past its allowed range.
     public void setGoal(double angle) {
         motor.setGoalWithCurrentMagic(
-                angle, () -> Constants.kG.get() * Math.cos(getPosition() + armMotor.getInputs().position + 0.5));
+                angle, () -> Constants.kG.get() * Math.cos(getPosition() + armMotor.getInputs().position - Constants.verticalPos));
     }
 
     // Find out the current target angle (radians)
