@@ -1,6 +1,5 @@
 package frc.robot.subsystems.wrist;
 
-import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.util.Color;
@@ -8,6 +7,7 @@ import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 import com.ctre.phoenix6.signals.GravityTypeValue;
+import com.ctre.phoenix6.signals.StaticFeedforwardSignValue;
 
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.mechanism.LoggedMechanism2d;
@@ -51,9 +51,9 @@ public class Wrist extends SubsystemBase {
                 new LoggedNetworkNumber("Wrist/kI", 0); // (volts per rad) removes steady state error
 
         public static final LoggedNetworkNumber kS = new LoggedNetworkNumber(
-                "Wrist/kS", 0.0); // (volts) voltage to get wrist moving (overcome static friction)
+                "Wrist/kS", 6.0); // (volts) voltage to get wrist moving (overcome static friction)
         public static final LoggedNetworkNumber kG = new LoggedNetworkNumber(
-                "Wrist/kG", 25.0); // (volts) voltage to hold the wrist level (compensate gravity at 0 rad)
+                "Wrist/kG", 14.1); // (volts) voltage to hold the wrist level (compensate gravity at 0 rad)
         public static final LoggedNetworkNumber kV = new LoggedNetworkNumber(
                 "Wrist/kV", 0); // (volts per rad/s) voltage that scales with speed to overcome friction
         public static final LoggedNetworkNumber kA =
@@ -63,6 +63,9 @@ public class Wrist extends SubsystemBase {
                 "Wrist/maxVelocity", 6.3); // (rad/s) Motion Magic max speed for moving to a target
         public static final LoggedNetworkNumber maxAccel = new LoggedNetworkNumber(
                 "Wrist/maxAccel", 6.3); // (rad/s^2) Motion Magic max acceleration for moving to a target
+
+        // Point at which the wrist is vertical (rad)
+        public static final double verticalPos=1.07;
 
         public static final double statorCurrentLimit = 70; // (amps) limit on motor torque output
         public static final double supplyCurrentLimit = 60; // (amps) normal current limit pulled from battery
@@ -170,6 +173,8 @@ public class Wrist extends SubsystemBase {
         // Set limits on the motor
         motor.setLimits(Constants.minAngle, Constants.maxAngle);
 
+        motor.setStaticType(StaticFeedforwardSignValue.UseClosedLoopSign);
+
         // Add the middle dot to the visualization
         root.append(new LoggedMechanismLigament2d("Middle", 0.0, 0, 10, new Color8Bit(Color.kPurple)));
     }
@@ -193,8 +198,7 @@ public class Wrist extends SubsystemBase {
     // We clamp to safe limits so the wrist won't try to drive past its allowed range.
     public void setGoal(double angle) {
         motor.setGoalWithCurrentMagic(
-                MathUtil.clamp(angle, Constants.minAngle, Constants.maxAngle),
-                () -> Constants.kG.get() * Math.cos(getPosition() + armMotor.getInputs().position));
+                angle, () -> Constants.kG.get() * Math.cos(getPosition() + armMotor.getInputs().position - Constants.verticalPos));
     }
 
     // Find out the current target angle (radians)

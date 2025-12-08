@@ -47,7 +47,7 @@ public class Elevator extends SubsystemBase {
         public static final double drumRadius = 0.022; // Ratio of meters to drum radians (meters)
 
         public static final LoggedNetworkNumber kP =
-                new LoggedNetworkNumber("Elevator/kP", 225); // (volts per meter) more voltage when farther from target
+                new LoggedNetworkNumber("Elevator/kP", 275); // (volts per meter) more voltage when farther from target
         public static final LoggedNetworkNumber kI = new LoggedNetworkNumber(
                 "Elevator/kI", 0); // (volts per meter-second) helps eliminate steady-state error
         public static final LoggedNetworkNumber kD =
@@ -65,7 +65,7 @@ public class Elevator extends SubsystemBase {
         public static final LoggedNetworkNumber maxVelocity = new LoggedNetworkNumber(
                 "Elevator/maxVelocity", 5); // (m/s) Motion Magic max speed for moving to a target
         public static final LoggedNetworkNumber maxAccel = new LoggedNetworkNumber(
-                "Elevator/maxAccel", 8); // (m/s^2) Motion Magic max acceleration for moving to a target
+                "Elevator/maxAccel", 12); // (m/s^2) Motion Magic max acceleration for moving to a target
 
         public static final double statorCurrentLimit = 70; // (amps) limit on motor torque output
         public static final double supplyCurrentLimit = 60; // (amps) normal current limit pulled from battery
