@@ -139,10 +139,10 @@ public class Swerve extends SubsystemBase {
         public static final double visionThetaStdDevDistanceMultiplier = 0.2;
 
         public static final Transform3d bratPose = new Transform3d(
-                new Translation3d(-0.193, -0.288, 0.31), new Rotation3d(0, 0, Units.degreesToRadians(200)));
+                new Translation3d(-0.17, -0.3, 0.32), new Rotation3d(0, 0, Units.degreesToRadians(200)));
 
         public static final Transform3d blatPose = new Transform3d(
-                new Translation3d(-0.208, 0.13, 0.33), new Rotation3d(0, 0, Units.degreesToRadians(210)));
+                new Translation3d(-0.18, 0.076, 0.33), new Rotation3d(0, 0, Units.degreesToRadians(210)));
 
         // How many robot pose measurements to store per camera
         public static final int maxMeasurements = 8;
